@@ -1,4 +1,4 @@
-name: Sync Meta Ads Data
+name: Sync Ads Data (Meta + TikTok)
 
 on:
   workflow_dispatch:
@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 jobs:
-  sync-meta-ads:
+  sync-ads-data:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,16 +22,17 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Pull Meta Ads Insights for the past 30 days
+      - name: Pull Meta and TikTok Ads Insights for the past 30 days
         env:
           META_ACCESS_TOKEN: ${{ secrets.META_ACCESS_TOKEN }}
           META_AD_ACCOUNT_ID: ${{ secrets.META_AD_ACCOUNT_ID }}
           META_GRAPH_VERSION: ${{ vars.META_GRAPH_VERSION }}
-          META_DATE_PRESET: last_30d
-        run: node scripts/sync-meta-ads.mjs
+          TIKTOK_ACCESS_TOKEN: ${{ secrets.TIKTOK_ACCESS_TOKEN }}
+          TIKTOK_ADVERTISER_ID: ${{ secrets.TIKTOK_ADVERTISER_ID }}
+        run: node scripts/sync-ads-data.mjs
 
       - name: Commit updated dashboard data
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Update Meta Ads dashboard data"
+          commit_message: "Update Meta and TikTok Ads dashboard data"
           file_pattern: dashboard-data.json
