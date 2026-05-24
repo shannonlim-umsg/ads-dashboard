@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Meta Ads Dashboard</title>
+<title>Meta + TikTok Ads Dashboard</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
 :root{
@@ -30,8 +30,8 @@ tr.campaign-row-main,tr.adset-row-main{cursor:pointer}tr.campaign-row-main td:fi
 <div class="wrap">
   <header>
     <div>
-      <h1 id="dashTitle" contenteditable="true" spellcheck="false">Meta Ads Campaign Dashboard</h1>
-      <div class="sub" id="dashSubtitle" contenteditable="true" spellcheck="false">GitHub Pages dashboard with Meta campaign, ad set, and ad-level reporting for the past 30 days.</div>
+      <h1 id="dashTitle" contenteditable="true" spellcheck="false">Meta + TikTok Ads Campaign Dashboard</h1>
+      <div class="sub" id="dashSubtitle" contenteditable="true" spellcheck="false">GitHub Pages dashboard with Meta and TikTok campaign, ad set/ad group, and ad-level reporting for the past 30 days.</div>
       <div class="status"><span class="dot"></span><span id="saveState">Ready</span></div>
     </div>
     <div class="actions">
@@ -50,7 +50,7 @@ tr.campaign-row-main,tr.adset-row-main{cursor:pointer}tr.campaign-row-main td:fi
 
   <div id="emptyState" class="empty" style="display:none">
     <h2>No data yet</h2>
-    <p>Run the GitHub Action to sync Meta Ads data, or click Add / Update Week to enter results manually.</p>
+    <p>Run the GitHub Action to sync Meta and TikTok Ads data, or click Add / Update Week to enter results manually.</p>
   </div>
 
   <div id="dashboardBody">
@@ -69,7 +69,7 @@ tr.campaign-row-main,tr.adset-row-main{cursor:pointer}tr.campaign-row-main td:fi
 <div class="modal-backdrop" id="weekModal"><div class="modal">
   <div class="modal-header"><span class="modal-title" id="weekModalTitle">Add / Update Week</span><button class="x" onclick="closeModal('weekModal')">x</button></div>
   <div class="date-grid">
-    <div><label>Week label</label><input id="weekLabel" placeholder="Meta 30D Import" /></div>
+    <div><label>Week label</label><input id="weekLabel" placeholder="Ads 30D Import" /></div>
     <div><label>Start date</label><input type="date" id="weekStart" onchange="updatePeriodLabel()" /></div>
     <div><label>End date / Period label</label><div style="display:grid;grid-template-columns:1fr 1.2fr;gap:8px"><input type="date" id="weekEnd" onchange="updatePeriodLabel()" /><input id="weekPeriod" placeholder="Last 30 Days" /></div></div>
   </div>
@@ -189,7 +189,7 @@ const DEFAULT_SECTIONS=[
  {id:'table',kind:'builtin',type:'table',title:'Campaign Results Table',visible:true,wide:true}
 ];
 function defaultCards(){return DEFAULT_METRICS.filter(m=>m.enabled).map(m=>({id:m.key,label:m.label,note:m.editable?'Campaign metric':'Calculated metric',visible:true,metric:m.key})).concat([{id:'rows',label:'Rows',note:'Rows matching filters',visible:true,metric:'rows'}]);}
-function defaultState(){return{settings:{title:'Meta Ads Campaign Dashboard',subtitle:'GitHub Pages dashboard with Meta campaign, ad set, and ad-level reporting for the past 30 days.',footer:'Data is synced by GitHub Actions into dashboard-data.json, then retained in browser localStorage after loading.'},weeks:[],metrics:structuredClone(DEFAULT_METRICS),cards:defaultCards(),columns:structuredClone(DEFAULT_COLUMNS),sections:structuredClone(DEFAULT_SECTIONS)};}
+function defaultState(){return{settings:{title:'Meta + TikTok Ads Campaign Dashboard',subtitle:'GitHub Pages dashboard with Meta and TikTok campaign, ad set/ad group, and ad-level reporting for the past 30 days.',footer:'Data is synced by GitHub Actions into dashboard-data.json, then retained in browser localStorage after loading.'},weeks:[],metrics:structuredClone(DEFAULT_METRICS),cards:defaultCards(),columns:structuredClone(DEFAULT_COLUMNS),sections:structuredClone(DEFAULT_SECTIONS)};}
 let state=loadState(); let charts={}; let editingWeekId=null; let selectedSectionKind='stat';
 function loadState(){try{const saved=JSON.parse(localStorage.getItem(STORAGE_KEY));return mergeState(saved||defaultState());}catch{return defaultState();}}
 function mergeState(s){const d=defaultState();s={...d,...s};s.settings={...d.settings,...(s.settings||{})};s.metrics=mergeByKey(d.metrics,s.metrics||[],'key');s.cards=mergeByKey(defaultCards(),s.cards||[],'id');s.columns=mergeByKey(d.columns,s.columns||[],'key');s.sections=mergeByKey(d.sections,s.sections||[],'id');s.weeks=(s.weeks||[]).map(normalizeWeek);return s;}
@@ -202,7 +202,32 @@ function metricValue(key,obj){if(key==='ctr')return Number(obj.impressions||0)?N
 function formatMetric(key,val){const t=metricDef(key).type;if(t==='currency')return money(val,(key==='spend'||key==='revenue')?0:2);if(t==='percent')return pct(val);if(t==='ratio')return Number(val||0).toFixed(2)+'x';return num(val);}
 function totalize(rows){const t={};editableMetrics().forEach(m=>t[m.key]=sum(rows.map(r=>r.object),m.key));return t;}
 function getWeeks(){return state.weeks||[];}
-function allCampaignRows(){const out=[];getWeeks().forEach((w,wi)=>{const adsets=w.adsets||[], ads=w.ads||[];(w.campaigns||[]).forEach(c=>{const nestedAdsets=adsets.filter(a=>(a.metaCampaignId&&c.metaCampaignId&&a.metaCampaignId===c.metaCampaignId)||(!a.metaCampaignId&&a.campaign===c.name)).map(a=>({...a,_ads:ads.filter(ad=>(ad.metaAdsetId&&a.metaAdsetId&&ad.metaAdsetId===a.metaAdsetId)||(!ad.metaAdsetId&&ad.adset===a.name&&ad.campaign===c.name))}));const nestedIds=new Set();nestedAdsets.forEach(a=>(a._ads||[]).forEach(ad=>nestedIds.add(ad.id)));const directAds=ads.filter(ad=>((ad.metaCampaignId&&c.metaCampaignId&&ad.metaCampaignId===c.metaCampaignId)||(!ad.metaCampaignId&&ad.campaign===c.name))&&!nestedIds.has(ad.id));out.push({level:'Campaign',week:w,weekIndex:wi,object:c,_adsets:nestedAdsets,_directAds:directAds});});});return out;}
+function allCampaignRows(){
+  const out=[];
+  getWeeks().forEach((w,wi)=>{
+    const adsets=w.adsets||[], ads=w.ads||[];
+    (w.campaigns||[]).forEach(c=>{
+      const campaignMatches=(child)=>(
+        (child.metaCampaignId&&c.metaCampaignId&&child.metaCampaignId===c.metaCampaignId)||
+        (child.tiktokCampaignId&&c.tiktokCampaignId&&child.tiktokCampaignId===c.tiktokCampaignId)||
+        (!child.metaCampaignId&&!child.tiktokCampaignId&&child.campaign===c.name)
+      );
+      const nestedAdsets=adsets.filter(campaignMatches).map(a=>{
+        const adsetMatches=(ad)=>(
+          (ad.metaAdsetId&&a.metaAdsetId&&ad.metaAdsetId===a.metaAdsetId)||
+          (ad.tiktokAdgroupId&&a.tiktokAdgroupId&&ad.tiktokAdgroupId===a.tiktokAdgroupId)||
+          (!ad.metaAdsetId&&!ad.tiktokAdgroupId&&ad.adset===a.name&&ad.campaign===c.name)
+        );
+        return {...a,_ads:ads.filter(adsetMatches)};
+      });
+      const nestedIds=new Set();
+      nestedAdsets.forEach(a=>(a._ads||[]).forEach(ad=>nestedIds.add(ad.id)));
+      const directAds=ads.filter(ad=>campaignMatches(ad)&&!nestedIds.has(ad.id));
+      out.push({level:'Campaign',week:w,weekIndex:wi,object:c,_adsets:nestedAdsets,_directAds:directAds});
+    });
+  });
+  return out;
+}
 function filterRows(rows){const week=getVal('weekFilter'),artist=getVal('artistFilter'),platform=getVal('platformFilter'),type=getVal('typeFilter'),campaign=getVal('campaignFilter');return rows.filter(r=>(week==='All'||r.week.id===week)&&(artist==='All'||r.object.artist===artist)&&(platform==='All'||r.object.platform===platform)&&(type==='All'||r.object.type===type)&&(campaign==='All'||r.object.name===campaign));}
 function selectedRows(){return filterRows(allCampaignRows());}
 function getVal(id){const el=document.getElementById(id);return el?el.value:'All';}
@@ -215,7 +240,7 @@ function idx(order,id){const i=order.indexOf(id);return i<0?9999:i;}
 function hideCard(id){state.cards=state.cards.map(c=>c.id===id?{...c,visible:false}:c);save();render();}
 function renderSections(rows){const grid=document.getElementById('sectionsGrid');grid.innerHTML='';state.sections.filter(s=>s.visible!==false).forEach(sec=>{const el=document.createElement('section');el.className='section '+(sec.wide?'wide':'');el.draggable=true;el.dataset.section=sec.id;el.innerHTML=sectionHTML(sec);grid.appendChild(el);renderSectionContent(sec,rows);});enableDrag(grid,'.section','section',order=>{state.sections.sort((a,b)=>idx(order,a.id)-idx(order,b.id));save();});}
 function sectionHTML(sec){const remove=sec.kind==='custom'?`<button class="icon-btn" onclick="removeSection('${sec.id}')">Remove</button>`:'';return `<div class="section-title"><h2 contenteditable="true" onblur="saveSectionTitle('${sec.id}',this.textContent)">${esc(sec.title)}</h2><div class="section-actions"><span class="hint">${sectionHint(sec)}</span>${remove}<span class="handle">::</span></div></div><div id="sectionBody_${sec.id}"></div>`;}
-function sectionHint(sec){if(sec.type==='table')return 'Nested campaign > ad set > ad';if(sec.type==='trend')return 'by week';if(sec.type==='platform')return 'spend share';if(sec.type==='ranking')return 'ranked campaigns';return sec.kind||'';}
+function sectionHint(sec){if(sec.type==='table')return 'Nested campaign > ad set/ad group > ad';if(sec.type==='trend')return 'by week';if(sec.type==='platform')return 'spend share';if(sec.type==='ranking')return 'ranked campaigns';return sec.kind||'';}
 function saveSectionTitle(id,text){const s=state.sections.find(x=>x.id===id);if(s){s.title=text.trim()||s.title;save();}}
 function renderSectionContent(sec,rows){const body=document.getElementById('sectionBody_'+sec.id);if(!body)return;if(sec.type==='trend'){body.innerHTML='<div class="chartbox"><canvas id="chart_trend"></canvas></div>';drawTrend(rows);}else if(sec.type==='platform'){body.innerHTML='<div class="chartbox"><canvas id="chart_platform"></canvas></div>';drawPlatform(rows);}else if(sec.type==='ranking'){body.innerHTML='<div class="chartbox"><canvas id="chart_ranking"></canvas></div>';drawRanking(rows);}else if(sec.type==='table'){body.innerHTML='<div class="tablewrap"><table id="resultsTable"></table></div>';renderTable(rows);}else if(sec.type==='text'){body.innerHTML=`<div contenteditable="true" style="min-height:80px;line-height:1.7;color:var(--muted)" onblur="saveTextSection('${sec.id}',this.innerText)">${esc(sec.content||'Click to edit text...')}</div>`;}else if(sec.type==='stat'){body.innerHTML=`<div class="custom-stats">${(sec.cards||[]).map((c,i)=>`<div class="custom-stat"><div class="kpi-label" contenteditable="true" onblur="saveStatCard('${sec.id}',${i},'label',this.textContent)">${esc(c.label)}</div><div class="kpi-value" contenteditable="true" onblur="saveStatCard('${sec.id}',${i},'value',this.textContent)">${esc(c.value)}</div><div class="kpi-note" contenteditable="true" onblur="saveStatCard('${sec.id}',${i},'note',this.textContent)">${esc(c.note||'')}</div></div>`).join('')}</div>`;}else if(sec.type==='chart'){body.innerHTML=`<div class="chartbox"><canvas id="chart_${sec.id}"></canvas></div>`;drawCustomChart(sec,rows);}}
 function chartDestroy(id){if(charts[id]){charts[id].destroy();charts[id]=null;}}

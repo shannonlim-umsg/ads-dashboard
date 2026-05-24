@@ -1,57 +1,64 @@
-# Meta Ads Dashboard for GitHub Pages
+# Meta + TikTok Ads Dashboard for GitHub Pages
 
-This package is a complete GitHub Pages dashboard with a GitHub Actions data sync.
+This package publishes the dashboard on GitHub Pages and syncs paid ads data from Meta and TikTok using GitHub Actions.
 
-## What this includes
+## Included files
 
-- `index.html` - the editable dashboard
-- `dashboard-data.json` - the data file served by GitHub Pages
-- `scripts/sync-meta-ads.mjs` - pulls Meta Ads insights from campaign, ad set, and ad level
-- `.github/workflows/sync-meta.yml` - GitHub Actions workflow that runs the sync
-- `sync-meta.yml` - visible backup copy of the workflow file, included in case hidden folders are hard to upload
-- `.nojekyll` - ensures GitHub Pages serves files normally
+```text
+index.html
+dashboard-data.json
+scripts/sync-ads-data.mjs
+.github/workflows/sync-ads-data.yml
+README.md
+```
 
-## What the dashboard does
+## What it syncs
 
-- Pulls Meta Ads data for the past 30 days
-- Pulls all 3 reporting levels:
-  - Campaign level
-  - Ad Set level
-  - Ad level
-- Shows Campaign > Ad Set > Ad rows in an accordion table
-- Retains synced data in both `dashboard-data.json` and browser localStorage
-- Lets you edit all dashboard text, sections, KPI cards, metrics, and columns
-- Lets you add new KPI cards and new dashboard sections
-- Lets you show/hide table columns and create new custom editable columns
-- Uses calendar date inputs for manual week entries
-- Provides separate manual entry sections for Campaigns, Ad Sets, and Ads
+The workflow pulls the past 30 days of data and stores it in `dashboard-data.json`.
+
+### Meta
+
+- Campaign level
+- Ad Set level
+- Ad level
+
+### TikTok
+
+- Campaign level
+- Ad Group level, mapped into the dashboard as `Ad Set / Ad Group`
+- Ad level
+
+The dashboard table nests data like this:
+
+```text
+Campaign
+  > Ad Set / Ad Group
+      > Ad
+```
 
 ## GitHub setup
 
-### 1. Upload all files
+Upload all files to the root of your GitHub repository.
 
-Upload this package into the root of your GitHub repository.
-
-The workflow file must exist at this exact path:
+Make sure the workflow file is located exactly here:
 
 ```text
-.github/workflows/sync-meta.yml
+.github/workflows/sync-ads-data.yml
 ```
 
-If GitHub does not show hidden folders, create the workflow manually:
-
-1. Go to your repository
-2. Click **Add file > Create new file**
-3. In the filename box, type:
+If GitHub does not show hidden folders on upload, create the file manually in GitHub by clicking:
 
 ```text
-.github/workflows/sync-meta.yml
+Add file > Create new file
 ```
 
-4. Paste the contents of the included root-level `sync-meta.yml`
-5. Commit the file
+Then type the filename as:
 
-### 2. Add repo secrets
+```text
+.github/workflows/sync-ads-data.yml
+```
+
+## Repository secrets
 
 Go to:
 
@@ -59,7 +66,9 @@ Go to:
 Settings > Secrets and variables > Actions > New repository secret
 ```
 
-Add:
+Add whichever platforms you want to sync.
+
+### Meta secrets
 
 ```text
 META_ACCESS_TOKEN
@@ -68,15 +77,16 @@ META_AD_ACCOUNT_ID
 
 `META_AD_ACCOUNT_ID` should be numeric only, without `act_`.
 
-Optional repository variable:
+### TikTok secrets
 
 ```text
-META_GRAPH_VERSION
+TIKTOK_ACCESS_TOKEN
+TIKTOK_ADVERTISER_ID
 ```
 
-If omitted, the script uses `v24.0`.
+`TIKTOK_ADVERTISER_ID` should be the numeric TikTok advertiser ID.
 
-### 3. Enable GitHub Pages
+## Enable GitHub Pages
 
 Go to:
 
@@ -84,39 +94,34 @@ Go to:
 Settings > Pages
 ```
 
-Set:
+Choose:
 
 ```text
-Source: Deploy from branch
+Source: Deploy from a branch
 Branch: main
 Folder: /root
 ```
 
-### 4. Run the sync
+## Run the sync
 
 Go to:
 
 ```text
-Actions > Sync Meta Ads Data > Run workflow
+Actions > Sync Ads Data (Meta + TikTok) > Run workflow
 ```
 
-The workflow also runs daily at 01:00 UTC.
-
-### 5. Open dashboard
-
-Open the GitHub Pages URL shown in Settings > Pages.
-
-Click:
+When the workflow finishes, open the GitHub Pages dashboard and click:
 
 ```text
 Sync GitHub Data
 ```
 
-The dashboard also attempts to load `dashboard-data.json` automatically on page load.
+The dashboard will load `dashboard-data.json` and retain the data in browser localStorage.
 
 ## Notes
 
-- The dashboard is static and safe for GitHub Pages because the Meta access token is only used by GitHub Actions.
-- `dashboard-data.json` is public once published via GitHub Pages. Do not include secrets in it.
-- Synced data is retained. Each daily sync creates or updates a snapshot named like `Meta Last 30 Days YYYY-MM-DD`.
-- Custom table cell values are retained when a sync updates the same Meta campaign/ad set/ad IDs.
+- If only Meta secrets are present, the workflow syncs Meta and skips TikTok.
+- If only TikTok secrets are present, the workflow syncs TikTok and skips Meta.
+- If neither platform has secrets, the workflow fails to prevent committing empty data.
+- TikTok calls the middle level `Ad Group`; the dashboard displays it as `Ad Set / Ad Group` for consistency with Meta.
+- Revenue may be `0` unless purchase value is available from the platform reporting data.
