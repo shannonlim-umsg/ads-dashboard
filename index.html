@@ -151,15 +151,22 @@ const DEFAULT_METRICS=[
  {key:'spend',label:'Spend',type:'currency',enabled:true,editable:true,base:true},
  {key:'impressions',label:'Impressions',type:'number',enabled:true,editable:true,base:true},
  {key:'reach',label:'Reach',type:'number',enabled:true,editable:true,base:true},
- {key:'clicks',label:'Clicks',type:'number',enabled:true,editable:true,base:true},
+ {key:'clicks',label:'Clicks (all)',type:'number',enabled:true,editable:true,base:true},
+ {key:'link_clicks',label:'Link Clicks',type:'number',enabled:true,editable:true,base:true},
  {key:'views',label:'Views',type:'number',enabled:true,editable:true,base:true},
- {key:'conversions',label:'Conversions',type:'number',enabled:true,editable:true,base:true},
+ {key:'purchases',label:'Purchases',type:'number',enabled:true,editable:true,base:true},
+ {key:'conversions',label:'Conversions',type:'number',enabled:false,editable:true,base:true},
  {key:'revenue',label:'Revenue',type:'currency',enabled:true,editable:true,base:true},
- {key:'ctr',label:'CTR',type:'percent',enabled:true,editable:false,formula:'clicks / impressions'},
- {key:'cpc',label:'CPC',type:'currency',enabled:true,editable:false,formula:'spend / clicks'},
- {key:'cpa',label:'CPA',type:'currency',enabled:true,editable:false,formula:'spend / conversions'},
- {key:'cpm',label:'CPM',type:'currency',enabled:true,editable:false,formula:'spend / impressions x 1000'},
- {key:'roas',label:'ROAS',type:'ratio',enabled:true,editable:false,formula:'revenue / spend'}
+ {key:'ctr_all',label:'CTR (all)',type:'percent',enabled:true,editable:false,formula:'Clicks (all) / impressions'},
+ {key:'ctr_link',label:'CTR (link)',type:'percent',enabled:true,editable:false,formula:'Link clicks / impressions'},
+ {key:'cpc_all',label:'CPC (all)',type:'currency',enabled:true,editable:false,formula:'Spend / Clicks (all)'},
+ {key:'cpc_link',label:'CPC (cost per link click)',type:'currency',enabled:true,editable:false,formula:'Spend / Link Clicks'},
+ {key:'cpm',label:'CPM',type:'currency',enabled:true,editable:false,formula:'Spend / Impressions x 1000'},
+ {key:'purchase_roas',label:'Purchase ROAS',type:'ratio',enabled:true,editable:false,formula:'Purchase value / spend or Meta purchase_roas'},
+ {key:'ctr',label:'CTR',type:'percent',enabled:false,editable:false,formula:'clicks / impressions'},
+ {key:'cpc',label:'CPC',type:'currency',enabled:false,editable:false,formula:'spend / clicks'},
+ {key:'cpa',label:'CPA',type:'currency',enabled:false,editable:false,formula:'spend / conversions'},
+ {key:'roas',label:'ROAS',type:'ratio',enabled:false,editable:false,formula:'revenue / spend'}
 ];
 const DEFAULT_COLUMNS=[
  {key:'level',label:'Level',type:'text',visible:true,base:true},
@@ -167,19 +174,26 @@ const DEFAULT_COLUMNS=[
  {key:'period',label:'Period',type:'text',visible:false,base:true},
  {key:'artist',label:'Artist',type:'text',visible:true,base:true},
  {key:'campaign',label:'Campaign',type:'text',visible:true,base:true},
- {key:'adset',label:'Ad Set',type:'text',visible:true,base:true},
+ {key:'adset',label:'Ad Set / Ad Group',type:'text',visible:true,base:true},
  {key:'ad',label:'Ad',type:'text',visible:true,base:true},
  {key:'platform',label:'Platform',type:'text',visible:true,base:true},
  {key:'type',label:'Campaign Type',type:'text',visible:true,base:true},
  {key:'spend',label:'Spend',type:'metric',metric:'spend',visible:true,base:true},
- {key:'revenue',label:'Revenue',type:'metric',metric:'revenue',visible:true,base:true},
- {key:'roas',label:'ROAS',type:'metric',metric:'roas',visible:true,base:true},
- {key:'cpa',label:'CPA',type:'metric',metric:'cpa',visible:true,base:true},
  {key:'impressions',label:'Impressions',type:'metric',metric:'impressions',visible:true,base:true},
  {key:'reach',label:'Reach',type:'metric',metric:'reach',visible:false,base:true},
- {key:'clicks',label:'Clicks',type:'metric',metric:'clicks',visible:true,base:true},
+ {key:'cpm',label:'CPM',type:'metric',metric:'cpm',visible:true,base:true},
+ {key:'clicks',label:'Clicks (all)',type:'metric',metric:'clicks',visible:true,base:true},
+ {key:'ctr_all',label:'CTR (all)',type:'metric',metric:'ctr_all',visible:true,base:true},
+ {key:'cpc_all',label:'CPC (all)',type:'metric',metric:'cpc_all',visible:true,base:true},
+ {key:'link_clicks',label:'Link Clicks',type:'metric',metric:'link_clicks',visible:true,base:true},
+ {key:'ctr_link',label:'CTR (link)',type:'metric',metric:'ctr_link',visible:true,base:true},
+ {key:'cpc_link',label:'CPC (cost per link click)',type:'metric',metric:'cpc_link',visible:true,base:true},
+ {key:'purchases',label:'Purchases',type:'metric',metric:'purchases',visible:true,base:true},
+ {key:'purchase_roas',label:'Purchase ROAS',type:'metric',metric:'purchase_roas',visible:true,base:true},
+ {key:'revenue',label:'Revenue',type:'metric',metric:'revenue',visible:false,base:true},
+ {key:'roas',label:'ROAS',type:'metric',metric:'roas',visible:false,base:true},
  {key:'views',label:'Views',type:'metric',metric:'views',visible:false,base:true},
- {key:'conversions',label:'Conversions',type:'metric',metric:'conversions',visible:true,base:true},
+ {key:'conversions',label:'Conversions',type:'metric',metric:'conversions',visible:false,base:true},
  {key:'status',label:'Status',type:'text',visible:true,base:true}
 ];
 const DEFAULT_SECTIONS=[
@@ -198,7 +212,7 @@ function normalizeWeek(w){w={id:w.id||slug((w.label||'week')+'_'+(w.dateTo||w.pe
 function editableMetrics(){return state.metrics.filter(m=>m.enabled&&m.editable);}
 function enabledMetrics(){return state.metrics.filter(m=>m.enabled);}
 function metricDef(k){return state.metrics.find(m=>m.key===k)||{key:k,label:k,type:'number'};}
-function metricValue(key,obj){if(key==='ctr')return Number(obj.impressions||0)?Number(obj.clicks||0)/Number(obj.impressions||0):0;if(key==='cpc')return Number(obj.clicks||0)?Number(obj.spend||0)/Number(obj.clicks||0):0;if(key==='cpa')return Number(obj.conversions||0)?Number(obj.spend||0)/Number(obj.conversions||0):0;if(key==='cpm')return Number(obj.impressions||0)?Number(obj.spend||0)/Number(obj.impressions||0)*1000:0;if(key==='roas')return Number(obj.spend||0)?Number(obj.revenue||0)/Number(obj.spend||0):0;return Number(obj[key]||0);}
+function metricValue(key,obj){if(key==='ctr'||key==='ctr_all')return Number(obj.ctr_all||0)|| (Number(obj.impressions||0)?Number(obj.clicks||obj.clicks_all||0)/Number(obj.impressions||0):0);if(key==='ctr_link')return Number(obj.ctr_link||0)|| (Number(obj.impressions||0)?Number(obj.link_clicks||0)/Number(obj.impressions||0):0);if(key==='cpc'||key==='cpc_all')return Number(obj.cpc_all||0)|| (Number(obj.clicks||obj.clicks_all||0)?Number(obj.spend||0)/Number(obj.clicks||obj.clicks_all||0):0);if(key==='cpc_link')return Number(obj.cpc_link||0)|| (Number(obj.link_clicks||0)?Number(obj.spend||0)/Number(obj.link_clicks||0):0);if(key==='cpa')return Number(obj.conversions||0)?Number(obj.spend||0)/Number(obj.conversions||0):0;if(key==='cpm')return Number(obj.cpm||0)|| (Number(obj.impressions||0)?Number(obj.spend||0)/Number(obj.impressions||0)*1000:0);if(key==='purchase_roas')return Number(obj.purchase_roas||0)|| (Number(obj.spend||0)?Number(obj.revenue||0)/Number(obj.spend||0):0);if(key==='roas')return Number(obj.roas||0)|| (Number(obj.spend||0)?Number(obj.revenue||0)/Number(obj.spend||0):0);return Number(obj[key]||0);}
 function formatMetric(key,val){const t=metricDef(key).type;if(t==='currency')return money(val,(key==='spend'||key==='revenue')?0:2);if(t==='percent')return pct(val);if(t==='ratio')return Number(val||0).toFixed(2)+'x';return num(val);}
 function totalize(rows){const t={};editableMetrics().forEach(m=>t[m.key]=sum(rows.map(r=>r.object),m.key));return t;}
 function getWeeks(){return state.weeks||[];}
@@ -233,7 +247,7 @@ function selectedRows(){return filterRows(allCampaignRows());}
 function getVal(id){const el=document.getElementById(id);return el?el.value:'All';}
 function buildFilters(){const rows=allCampaignRows();const weeks=getWeeks();const f=document.getElementById('filters');function opts(values,all){return `<option value="All">${all}</option>`+values.map(v=>`<option value="${esc(v.value??v)}">${esc(v.label??v)}</option>`).join('');}const currentById={weekFilter:getVal('weekFilter'),artistFilter:getVal('artistFilter'),platformFilter:getVal('platformFilter'),typeFilter:getVal('typeFilter'),campaignFilter:getVal('campaignFilter'),rankMetric:getVal('rankMetric')};f.innerHTML=`<div class="filter"><label>Week</label><select id="weekFilter">${opts(weeks.map(w=>({value:w.id,label:w.label+' - '+w.period})),'All weeks')}</select></div><div class="filter"><label>Artist</label><select id="artistFilter">${opts(uniq(rows.map(r=>r.object.artist)),'All artists')}</select></div><div class="filter"><label>Platform</label><select id="platformFilter">${opts(uniq(rows.map(r=>r.object.platform)),'All platforms')}</select></div><div class="filter"><label>Campaign Type</label><select id="typeFilter">${opts(uniq(rows.map(r=>r.object.type)),'All types')}</select></div><div class="filter"><label>Campaign</label><select id="campaignFilter">${opts(uniq(rows.map(r=>r.object.name)),'All campaigns')}</select></div><div class="filter"><label>Rank chart by</label><select id="rankMetric">${enabledMetrics().map(m=>`<option value="${m.key}">${esc(m.label)}</option>`).join('')}</select></div>`;['weekFilter','artistFilter','platformFilter','typeFilter','campaignFilter','rankMetric'].forEach(id=>{const el=document.getElementById(id);const cur=currentById[id];if(cur&&[...el.options].some(o=>o.value===cur))el.value=cur;el.addEventListener('change',render);});}
 function render(){document.getElementById('dashTitle').textContent=state.settings.title;document.getElementById('dashSubtitle').textContent=state.settings.subtitle;document.getElementById('dashFooter').textContent=state.settings.footer;buildFilters();const rows=selectedRows();document.getElementById('emptyState').style.display=getWeeks().length?'none':'block';document.getElementById('dashboardBody').style.display=getWeeks().length?'block':'none';if(!getWeeks().length)return;renderCards(rows);renderSections(rows);}
-function renderCards(rows){const totals=totalize(rows);const prev=previousTotals(rows);const values={};enabledMetrics().forEach(m=>{const v=metricValue(m.key,totals);values[m.key]={value:formatMetric(m.key,v),delta:['spend','revenue','clicks','conversions'].includes(m.key)?deltaHtml(v,metricValue(m.key,prev)):''};});values.rows={value:num(rows.length),delta:''};const wrap=document.getElementById('kpis');wrap.innerHTML=state.cards.filter(c=>c.visible).map(c=>{const v=c.staticValue?{value:c.staticValue,delta:''}:(values[c.metric||c.id]||{value:'-',delta:''});return `<div class="card draggable" draggable="true" data-card="${esc(c.id)}"><div class="card-tools"><div class="kpi-label">${esc(c.label)}</div><div class="card-actions"><button class="icon-btn" onclick="hideCard('${esc(c.id)}')">x</button><span class="handle">::</span></div></div><div class="kpi-value">${v.value}</div>${v.delta}<div class="kpi-note">${esc(c.note||'')}</div></div>`;}).join('');enableDrag(wrap,'.draggable','card',order=>{state.cards.sort((a,b)=>idx(order,a.id)-idx(order,b.id));save();});}
+function renderCards(rows){const totals=totalize(rows);const prev=previousTotals(rows);const values={};enabledMetrics().forEach(m=>{const v=metricValue(m.key,totals);values[m.key]={value:formatMetric(m.key,v),delta:['spend','revenue','clicks','link_clicks','purchases'].includes(m.key)?deltaHtml(v,metricValue(m.key,prev)):''};});values.rows={value:num(rows.length),delta:''};const wrap=document.getElementById('kpis');wrap.innerHTML=state.cards.filter(c=>c.visible).map(c=>{const v=c.staticValue?{value:c.staticValue,delta:''}:(values[c.metric||c.id]||{value:'-',delta:''});return `<div class="card draggable" draggable="true" data-card="${esc(c.id)}"><div class="card-tools"><div class="kpi-label">${esc(c.label)}</div><div class="card-actions"><button class="icon-btn" onclick="hideCard('${esc(c.id)}')">x</button><span class="handle">::</span></div></div><div class="kpi-value">${v.value}</div>${v.delta}<div class="kpi-note">${esc(c.note||'')}</div></div>`;}).join('');enableDrag(wrap,'.draggable','card',order=>{state.cards.sort((a,b)=>idx(order,a.id)-idx(order,b.id));save();});}
 function previousTotals(rows){const weekIds=uniq(rows.map(r=>r.week.id));if(weekIds.length!==1)return{};const i=getWeeks().findIndex(w=>w.id===weekIds[0]);if(i<=0)return{};const prevWeekId=getWeeks()[i-1].id;const currentWeek=getVal('weekFilter');document.getElementById('weekFilter').value=prevWeekId;const prevRows=selectedRows();document.getElementById('weekFilter').value=currentWeek;return totalize(prevRows);}
 function deltaHtml(cur,prev){if(prev===undefined||prev===null)return'';const d=cur-prev;if(!d)return'<div class="delta flat">flat vs previous</div>';const p=prev?Math.abs(d/prev*100).toFixed(0)+'%':'';return `<div class="delta ${d>0?'up':'down'}">${d>0?'up':'down'} ${p} vs previous</div>`;}
 function idx(order,id){const i=order.indexOf(id);return i<0?9999:i;}
