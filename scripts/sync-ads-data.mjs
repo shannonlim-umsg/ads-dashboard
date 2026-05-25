@@ -73,9 +73,16 @@ const metaMetricFields = [
   "impressions",
   "reach",
   "clicks",
+  "ctr",
+  "inline_link_clicks",
+  "inline_link_click_ctr",
+  "cpc",
+  "cpm",
+  "cost_per_inline_link_click",
   "spend",
   "actions",
   "action_values",
+  "purchase_roas",
   "video_play_actions",
   "date_start",
   "date_stop"
@@ -119,6 +126,14 @@ async function fetchMetaInsights(level) {
   return fetchAllMetaPages(url);
 }
 
+function metaPurchases(row) {
+  return actionValue(row.actions, [
+    "purchase",
+    "omni_purchase",
+    "offsite_conversion.fb_pixel_purchase"
+  ]);
+}
+
 function metaConversions(row) {
   return actionValue(row.actions, [
     "purchase",
@@ -145,15 +160,77 @@ function metaViews(row) {
   return actionValue(row.actions, ["video_view"]);
 }
 
+function metaPercentToRatio(value) {
+  if (value === undefined || value === null || value === "") return 0;
+  const n = Number(value || 0);
+  // Meta returns CTR percentage strings such as "1.23"; the dashboard stores ratios such as 0.0123.
+  return Number.isFinite(n) ? n / 100 : 0;
+}
+
+function safeRatio(numerator, denominator) {
+  const n = Number(numerator || 0);
+  const d = Number(denominator || 0);
+  return d ? n / d : 0;
+}
+
+function metaLinkClicks(row) {
+  return Number(row.inline_link_clicks || 0);
+}
+
+function metaCtrAll(row) {
+  return metaPercentToRatio(row.ctr) || safeRatio(row.clicks, row.impressions);
+}
+
+function metaCtrLink(row) {
+  return metaPercentToRatio(row.inline_link_click_ctr) || safeRatio(metaLinkClicks(row), row.impressions);
+}
+
+function metaCpcAll(row) {
+  const apiValue = Number(row.cpc || 0);
+  return apiValue || safeRatio(row.spend, row.clicks);
+}
+
+function metaCpcLink(row) {
+  const apiValue = Number(row.cost_per_inline_link_click || 0);
+  return apiValue || safeRatio(row.spend, metaLinkClicks(row));
+}
+
+function metaCpm(row) {
+  const apiValue = Number(row.cpm || 0);
+  return apiValue || (safeRatio(row.spend, row.impressions) * 1000);
+}
+
+function actionStatsFirstValue(stats) {
+  if (!Array.isArray(stats) || !stats.length) return 0;
+  return Number(stats[0]?.value || 0);
+}
+
+function metaPurchaseRoas(row) {
+  return actionValue(row.purchase_roas, [
+    "purchase",
+    "omni_purchase",
+    "offsite_conversion.fb_pixel_purchase"
+  ]) || actionStatsFirstValue(row.purchase_roas) || safeRatio(metaRevenue(row), row.spend);
+}
+
 function metaBaseMetrics(row) {
   return {
     impressions: Number(row.impressions || 0),
     reach: Number(row.reach || 0),
     clicks: Number(row.clicks || 0),
+    clicks_all: Number(row.clicks || 0),
+    link_clicks: metaLinkClicks(row),
+    ctr_all: metaCtrAll(row),
+    ctr_link: metaCtrLink(row),
+    cpc_all: metaCpcAll(row),
+    cpc_link: metaCpcLink(row),
+    cpm: metaCpm(row),
     views: metaViews(row),
+    purchases: metaPurchases(row),
     conversions: metaConversions(row),
     spend: Number(row.spend || 0),
     revenue: metaRevenue(row),
+    purchase_roas: metaPurchaseRoas(row),
     status: "active"
   };
 }
@@ -329,14 +406,28 @@ async function fetchTikTokReportWithFallback(levelKey) {
 }
 
 function tiktokBaseMetrics(row) {
+  const impressions = tiktokNumber(row, ["impressions", "show_cnt"]);
+  const clicks = tiktokNumber(row, ["clicks", "click_cnt"]);
+  const linkClicks = tiktokNumber(row, ["link_clicks", "clicks", "click_cnt"]);
+  const spend = tiktokNumber(row, ["spend", "cost"]);
+  const purchases = tiktokNumber(row, ["purchase", "purchases", "conversion", "real_time_conversion", "result"]);
   return {
-    impressions: tiktokNumber(row, ["impressions", "show_cnt"]),
+    impressions,
     reach: tiktokNumber(row, ["reach"]),
-    clicks: tiktokNumber(row, ["clicks", "click_cnt"]),
+    clicks,
+    clicks_all: clicks,
+    link_clicks: linkClicks,
+    ctr_all: impressions ? clicks / impressions : 0,
+    ctr_link: impressions ? linkClicks / impressions : 0,
+    cpc_all: clicks ? spend / clicks : 0,
+    cpc_link: linkClicks ? spend / linkClicks : 0,
+    cpm: impressions ? spend / impressions * 1000 : 0,
     views: tiktokNumber(row, ["video_watched_2s", "video_views", "video_play_actions"]),
-    conversions: tiktokNumber(row, ["conversion", "real_time_conversion", "result"]),
-    spend: tiktokNumber(row, ["spend", "cost"]),
+    purchases,
+    conversions: purchases,
+    spend,
     revenue: 0,
+    purchase_roas: 0,
     status: "active"
   };
 }
