@@ -3,7 +3,6 @@ name: Sync Ads Data (Meta + TikTok)
 on:
   workflow_dispatch:
   schedule:
-    # Runs daily at 01:00 UTC
     - cron: "0 1 * * *"
 
 permissions:
@@ -22,17 +21,16 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Pull Meta and TikTok Ads Insights for the past 30 days
+      - name: Pull Meta and TikTok Ads data
         env:
           META_ACCESS_TOKEN: ${{ secrets.META_ACCESS_TOKEN }}
           META_AD_ACCOUNT_ID: ${{ secrets.META_AD_ACCOUNT_ID }}
-          META_GRAPH_VERSION: ${{ vars.META_GRAPH_VERSION }}
           TIKTOK_ACCESS_TOKEN: ${{ secrets.TIKTOK_ACCESS_TOKEN }}
           TIKTOK_ADVERTISER_ID: ${{ secrets.TIKTOK_ADVERTISER_ID }}
         run: node scripts/sync-ads-data.mjs
 
-      - name: Commit updated dashboard data
+      - name: Commit updated dashboard data and debug log
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Update Meta and TikTok Ads dashboard data"
-          file_pattern: dashboard-data.json
+          commit_message: "Update ads dashboard data"
+          file_pattern: dashboard-data.json sync-debug.json
