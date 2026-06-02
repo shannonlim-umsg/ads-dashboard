@@ -74,15 +74,31 @@ const metaMetricFields = [
   "reach",
   "clicks",
   "ctr",
-  "inline_link_clicks",
-  "inline_link_click_ctr",
   "cpc",
   "cpm",
-  "cost_per_inline_link_click",
   "spend",
+
+  // Link-click fields from Meta Ads Insights.
+  // Some accounts/campaign types return inline link clicks, while others only expose link clicks
+  // through actions/cost_per_action_type or outbound click stats.
+  "inline_link_clicks",
+  "inline_link_click_ctr",
+  "cost_per_inline_link_click",
+  "unique_inline_link_clicks",
+  "unique_link_clicks_ctr",
+  "outbound_clicks",
+  "outbound_clicks_ctr",
+  "cost_per_outbound_click",
+  "website_ctr",
+  "cost_per_action_type",
+
+  // Purchase / revenue / ROAS fields.
   "actions",
   "action_values",
   "purchase_roas",
+  "website_purchase_roas",
+  "mobile_app_purchase_roas",
+
   "video_play_actions",
   "date_start",
   "date_stop"
@@ -126,31 +142,53 @@ async function fetchMetaInsights(level) {
   return fetchAllMetaPages(url);
 }
 
+function actionStatsValue(stats, types = []) {
+  if (!Array.isArray(stats) || !stats.length) return 0;
+  if (types.length) {
+    for (const type of types) {
+      const found = stats.find(a => a.action_type === type);
+      if (found) return Number(found.value || 0);
+    }
+  }
+  return Number(stats[0]?.value || 0);
+}
+
+function firstPositive(...values) {
+  for (const value of values) {
+    const n = Number(value || 0);
+    if (Number.isFinite(n) && n > 0) return n;
+  }
+  return 0;
+}
+
+const PURCHASE_ACTION_TYPES = [
+  "purchase",
+  "omni_purchase",
+  "offsite_conversion.fb_pixel_purchase",
+  "onsite_conversion.purchase",
+  "onsite_conversion.website_purchase",
+  "web_in_store_purchase",
+  "mobile_app_purchase",
+  "app_custom_event.fb_mobile_purchase"
+];
+
+const CONVERSION_ACTION_TYPES = [
+  ...PURCHASE_ACTION_TYPES,
+  "lead",
+  "onsite_conversion.lead_grouped",
+  "complete_registration"
+];
+
 function metaPurchases(row) {
-  return actionValue(row.actions, [
-    "purchase",
-    "omni_purchase",
-    "offsite_conversion.fb_pixel_purchase"
-  ]);
+  return actionValue(row.actions, PURCHASE_ACTION_TYPES);
 }
 
 function metaConversions(row) {
-  return actionValue(row.actions, [
-    "purchase",
-    "omni_purchase",
-    "offsite_conversion.fb_pixel_purchase",
-    "lead",
-    "onsite_conversion.lead_grouped",
-    "complete_registration"
-  ]);
+  return actionValue(row.actions, CONVERSION_ACTION_TYPES);
 }
 
 function metaRevenue(row) {
-  return actionValue(row.action_values, [
-    "purchase",
-    "omni_purchase",
-    "offsite_conversion.fb_pixel_purchase"
-  ]);
+  return actionValue(row.action_values, PURCHASE_ACTION_TYPES);
 }
 
 function metaViews(row) {
@@ -163,7 +201,7 @@ function metaViews(row) {
 function metaPercentToRatio(value) {
   if (value === undefined || value === null || value === "") return 0;
   const n = Number(value || 0);
-  // Meta returns CTR percentage strings such as "1.23"; the dashboard stores ratios such as 0.0123.
+  // Meta returns percentage strings such as "1.23"; the dashboard stores ratios such as 0.0123.
   return Number.isFinite(n) ? n / 100 : 0;
 }
 
@@ -174,64 +212,88 @@ function safeRatio(numerator, denominator) {
 }
 
 function metaLinkClicks(row) {
-  return Number(row.inline_link_clicks || 0);
+  return firstPositive(
+    row.inline_link_clicks,
+    actionValue(row.actions, ["link_click"]),
+    actionStatsValue(row.outbound_clicks, ["outbound_click"]),
+    row.unique_inline_link_clicks
+  );
 }
 
 function metaCtrAll(row) {
-  return metaPercentToRatio(row.ctr) || safeRatio(row.clicks, row.impressions);
+  return firstPositive(
+    metaPercentToRatio(row.ctr),
+    safeRatio(row.clicks, row.impressions)
+  );
 }
 
 function metaCtrLink(row) {
-  return metaPercentToRatio(row.inline_link_click_ctr) || safeRatio(metaLinkClicks(row), row.impressions);
+  return firstPositive(
+    metaPercentToRatio(row.inline_link_click_ctr),
+    safeRatio(metaLinkClicks(row), row.impressions),
+    metaPercentToRatio(actionStatsValue(row.outbound_clicks_ctr, ["outbound_click"])),
+    metaPercentToRatio(actionStatsValue(row.website_ctr, ["link_click", "outbound_click"]))
+  );
 }
 
 function metaCpcAll(row) {
-  const apiValue = Number(row.cpc || 0);
-  return apiValue || safeRatio(row.spend, row.clicks);
+  return firstPositive(
+    row.cpc,
+    safeRatio(row.spend, row.clicks)
+  );
 }
 
 function metaCpcLink(row) {
-  const apiValue = Number(row.cost_per_inline_link_click || 0);
-  return apiValue || safeRatio(row.spend, metaLinkClicks(row));
+  return firstPositive(
+    row.cost_per_inline_link_click,
+    actionStatsValue(row.cost_per_action_type, ["link_click"]),
+    actionStatsValue(row.cost_per_outbound_click, ["outbound_click"]),
+    safeRatio(row.spend, metaLinkClicks(row))
+  );
 }
 
 function metaCpm(row) {
-  const apiValue = Number(row.cpm || 0);
-  return apiValue || (safeRatio(row.spend, row.impressions) * 1000);
-}
-
-function actionStatsFirstValue(stats) {
-  if (!Array.isArray(stats) || !stats.length) return 0;
-  return Number(stats[0]?.value || 0);
+  return firstPositive(
+    row.cpm,
+    safeRatio(row.spend, row.impressions) * 1000
+  );
 }
 
 function metaPurchaseRoas(row) {
-  return actionValue(row.purchase_roas, [
-    "purchase",
-    "omni_purchase",
-    "offsite_conversion.fb_pixel_purchase"
-  ]) || actionStatsFirstValue(row.purchase_roas) || safeRatio(metaRevenue(row), row.spend);
+  return firstPositive(
+    actionStatsValue(row.purchase_roas, PURCHASE_ACTION_TYPES),
+    actionStatsValue(row.website_purchase_roas, PURCHASE_ACTION_TYPES),
+    actionStatsValue(row.mobile_app_purchase_roas, PURCHASE_ACTION_TYPES),
+    safeRatio(metaRevenue(row), row.spend)
+  );
 }
 
 function metaBaseMetrics(row) {
+  const linkClicks = metaLinkClicks(row);
+  const purchases = metaPurchases(row);
+  const revenue = metaRevenue(row);
   return {
     impressions: Number(row.impressions || 0),
     reach: Number(row.reach || 0),
     clicks: Number(row.clicks || 0),
     clicks_all: Number(row.clicks || 0),
-    link_clicks: metaLinkClicks(row),
+    link_clicks: linkClicks,
     ctr_all: metaCtrAll(row),
     ctr_link: metaCtrLink(row),
     cpc_all: metaCpcAll(row),
     cpc_link: metaCpcLink(row),
     cpm: metaCpm(row),
     views: metaViews(row),
-    purchases: metaPurchases(row),
+    purchases,
     conversions: metaConversions(row),
     spend: Number(row.spend || 0),
-    revenue: metaRevenue(row),
+    revenue,
     purchase_roas: metaPurchaseRoas(row),
-    status: "active"
+    status: "active",
+
+    // Useful for debugging if Meta returns 0 for inline-link metrics.
+    outbound_clicks: actionStatsValue(row.outbound_clicks, ["outbound_click"]),
+    unique_inline_link_clicks: Number(row.unique_inline_link_clicks || 0)
   };
 }
 
