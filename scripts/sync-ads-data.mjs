@@ -321,44 +321,122 @@ async function syncMeta() {
 }
 
 /* TikTok */
-const TIKTOK_URL = "https://business-api.tiktok.com/open_api/v1.3/report/integrated/get/";
+const TIKTOK_BASE = "https://business-api.tiktok.com/open_api/v1.3";
+const TIKTOK_REPORT_URL = `${TIKTOK_BASE}/report/integrated/get/`;
+
 const tiktokLevels = {
   campaign: { dataLevel: "AUCTION_CAMPAIGN", dimensions: ["campaign_id"] },
   adgroup: { dataLevel: "AUCTION_ADGROUP", dimensions: ["adgroup_id"] },
   ad: { dataLevel: "AUCTION_AD", dimensions: ["ad_id"] }
 };
+
+// Important: keep Reporting API metrics numeric only. Names/hierarchy are enriched from
+// campaign/get, adgroup/get, and ad/get, because TikTok may reject name fields as metrics.
 const tiktokMetricSets = [
-  ["campaign_name", "campaign_id", "adgroup_name", "adgroup_id", "ad_name", "ad_id", "spend", "impressions", "reach", "clicks", "conversion", "real_time_conversion", "result", "video_watched_2s"],
+  ["spend", "impressions", "clicks", "reach", "conversion", "real_time_conversion", "result", "video_watched_2s", "ctr", "cpc", "cpm"],
   ["spend", "impressions", "clicks", "conversion", "real_time_conversion", "result"],
   ["spend", "impressions", "clicks"]
 ];
-async function fetchTikTokOnce(levelKey, metrics, page) {
-  const cfg = tiktokLevels[levelKey];
-  const params = new URLSearchParams();
-  params.set("advertiser_id", TIKTOK_ADVERTISER_ID);
-  params.set("service_type", "AUCTION");
-  params.set("report_type", "BASIC");
-  params.set("data_level", cfg.dataLevel);
-  params.set("dimensions", JSON.stringify(cfg.dimensions));
-  params.set("metrics", JSON.stringify(metrics));
-  params.set("start_date", startDate);
-  params.set("end_date", endDate);
-  params.set("page", String(page));
-  params.set("page_size", "1000");
-  const json = await fetchJson(`${TIKTOK_URL}?${params.toString()}`, { headers: { "Access-Token": TIKTOK_ACCESS_TOKEN } });
-  if (json.code !== undefined && Number(json.code) !== 0) throw new Error(JSON.stringify(json, null, 2));
+
+async function fetchTikTokJson(url) {
+  const json = await fetchJson(url, {
+    headers: {
+      "Access-Token": TIKTOK_ACCESS_TOKEN,
+      "Accept": "application/json"
+    }
+  });
+  if (json.code !== undefined && Number(json.code) !== 0) {
+    const err = new Error(JSON.stringify(json, null, 2));
+    err.body = json;
+    throw err;
+  }
   return json;
 }
+
+function tiktokParams(params) {
+  const search = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (value === undefined || value === null || value === "") continue;
+    search.set(key, Array.isArray(value) || typeof value === "object" ? JSON.stringify(value) : String(value));
+  }
+  return search.toString();
+}
+
+async function fetchTikTokEntityPages(entity, fields) {
+  if (!TIKTOK_ACCESS_TOKEN || !TIKTOK_ADVERTISER_ID) return [];
+
+  const endpoint = `${TIKTOK_BASE}/${entity}/get/`;
+  const rows = [];
+  let page = 1;
+  let totalPage = 1;
+
+  try {
+    while (page <= totalPage) {
+      const url = `${endpoint}?${tiktokParams({
+        advertiser_id: TIKTOK_ADVERTISER_ID,
+        fields,
+        page,
+        page_size: 1000
+      })}`;
+      const json = await fetchTikTokJson(url);
+      const data = json.data || {};
+      rows.push(...(data.list || []));
+      totalPage = Number(data.page_info?.total_page || data.page_info?.total_pages || 1);
+      page += 1;
+    }
+    debug.tiktok[`${entity}Get`] = { status: "ok", rows: rows.length };
+    return rows;
+  } catch (err) {
+    debug.tiktok[`${entity}Get`] = { status: "error", message: String(err.message || err).slice(0, 4000) };
+    return [];
+  }
+}
+
+async function buildTikTokEntityMaps() {
+  const [campaigns, adgroups, ads] = await Promise.all([
+    fetchTikTokEntityPages("campaign", ["campaign_id", "campaign_name", "objective_type", "operation_status", "secondary_status"]),
+    fetchTikTokEntityPages("adgroup", ["adgroup_id", "adgroup_name", "campaign_id", "operation_status", "secondary_status"]),
+    fetchTikTokEntityPages("ad", ["ad_id", "ad_name", "adgroup_id", "campaign_id", "operation_status", "secondary_status"])
+  ]);
+
+  const campaignMap = new Map(campaigns.map(c => [String(c.campaign_id || ""), c]));
+  const adgroupMap = new Map(adgroups.map(g => [String(g.adgroup_id || ""), g]));
+  const adMap = new Map(ads.map(a => [String(a.ad_id || ""), a]));
+
+  return { campaignMap, adgroupMap, adMap };
+}
+
+async function fetchTikTokOnce(levelKey, metrics, page) {
+  const cfg = tiktokLevels[levelKey];
+  const url = `${TIKTOK_REPORT_URL}?${tiktokParams({
+    advertiser_id: TIKTOK_ADVERTISER_ID,
+    service_type: "AUCTION",
+    report_type: "BASIC",
+    data_level: cfg.dataLevel,
+    dimensions: cfg.dimensions,
+    metrics,
+    start_date: startDate,
+    end_date: endDate,
+    query_mode: "REGULAR",
+    page,
+    page_size: 1000
+  })}`;
+
+  return fetchTikTokJson(url);
+}
+
 async function fetchTikTokReport(levelKey) {
   if (!TIKTOK_ACCESS_TOKEN || !TIKTOK_ADVERTISER_ID) {
     debug.tiktok.levels[levelKey] = { status: "skipped", reason: "Missing TIKTOK_ACCESS_TOKEN or TIKTOK_ADVERTISER_ID" };
     return [];
   }
+
   for (let i = 0; i < tiktokMetricSets.length; i++) {
     const metrics = tiktokMetricSets[i];
     const rows = [];
     let page = 1;
     let totalPage = 1;
+
     try {
       while (page <= totalPage) {
         const json = await fetchTikTokOnce(levelKey, metrics, page);
@@ -367,18 +445,32 @@ async function fetchTikTokReport(levelKey) {
         totalPage = Number(data.page_info?.total_page || data.page_info?.total_pages || 1);
         page += 1;
       }
-      debug.tiktok.levels[levelKey] = { status: "ok", metricSet: i + 1, rows: rows.length };
+
+      debug.tiktok.levels[levelKey] = {
+        status: "ok",
+        metricSet: i + 1,
+        rows: rows.length,
+        metrics
+      };
       return rows;
     } catch (err) {
-      debug.tiktok.levels[levelKey] = { status: "error", metricSet: i + 1, message: String(err.message || err).slice(0, 4000) };
+      debug.tiktok.levels[levelKey] = {
+        status: "error",
+        metricSet: i + 1,
+        metrics,
+        message: String(err.message || err).slice(0, 4000)
+      };
       console.warn(`TikTok ${levelKey} metric set ${i + 1} failed; trying fallback.`);
     }
   }
+
   return [];
 }
+
 function ttVal(row, key) {
   return row?.metrics?.[key] ?? row?.dimensions?.[key] ?? row?.[key] ?? "";
 }
+
 function ttNum(row, keys) {
   for (const key of keys) {
     const value = ttVal(row, key);
@@ -386,22 +478,32 @@ function ttNum(row, keys) {
   }
   return 0;
 }
+
+function ttRatioPercent(row, keys, fallback) {
+  for (const key of keys) {
+    const value = ttVal(row, key);
+    if (value !== undefined && value !== null && value !== "") return Number(value || 0) / 100;
+  }
+  return fallback;
+}
+
 function tiktokBase(row) {
   const impressions = ttNum(row, ["impressions", "show_cnt"]);
   const clicks = ttNum(row, ["clicks", "click_cnt"]);
   const spend = ttNum(row, ["spend", "cost"]);
   const purchases = ttNum(row, ["purchase", "purchases", "conversion", "real_time_conversion", "result"]);
+
   return {
     impressions,
     reach: ttNum(row, ["reach"]),
     clicks,
     clicks_all: clicks,
     link_clicks: clicks,
-    ctr_all: safeRatio(clicks, impressions),
-    ctr_link: safeRatio(clicks, impressions),
-    cpc_all: safeRatio(spend, clicks),
-    cpc_link: safeRatio(spend, clicks),
-    cpm: safeRatio(spend, impressions) * 1000,
+    ctr_all: ttRatioPercent(row, ["ctr"], safeRatio(clicks, impressions)),
+    ctr_link: ttRatioPercent(row, ["ctr"], safeRatio(clicks, impressions)),
+    cpc_all: firstFinite(ttNum(row, ["cpc"]), safeRatio(spend, clicks)),
+    cpc_link: firstFinite(ttNum(row, ["cpc"]), safeRatio(spend, clicks)),
+    cpm: firstFinite(ttNum(row, ["cpm"]), safeRatio(spend, impressions) * 1000),
     views: ttNum(row, ["video_watched_2s", "video_views"]),
     purchases,
     conversions: purchases,
@@ -411,35 +513,92 @@ function tiktokBase(row) {
     status: "active"
   };
 }
-function mapTikTokCampaign(row) {
+
+function mapTikTokCampaign(row, maps) {
   const id = String(ttVal(row, "campaign_id") || "");
-  const name = String(ttVal(row, "campaign_name") || id || "Unnamed TikTok campaign");
-  return { id: id ? `tiktok_campaign_${id}` : `tiktok_campaign_${name}`, tiktokCampaignId: id, artist: "Imported Artist", name, platform: "TikTok", type: "Traffic", customFields: {}, ...tiktokBase(row) };
+  const campaign = maps.campaignMap.get(id) || {};
+  const name = String(campaign.campaign_name || ttVal(row, "campaign_name") || id || "Unnamed TikTok campaign");
+
+  return {
+    id: id ? `tiktok_campaign_${id}` : `tiktok_campaign_${name}`,
+    tiktokCampaignId: id,
+    artist: "Imported Artist",
+    name,
+    platform: "TikTok",
+    type: campaign.objective_type || "Traffic",
+    customFields: {},
+    ...tiktokBase(row)
+  };
 }
-function mapTikTokAdgroup(row) {
-  const cid = String(ttVal(row, "campaign_id") || "");
-  const cname = String(ttVal(row, "campaign_name") || cid || "Unknown TikTok campaign");
+
+function mapTikTokAdgroup(row, maps) {
   const id = String(ttVal(row, "adgroup_id") || "");
-  const name = String(ttVal(row, "adgroup_name") || id || "Unnamed TikTok ad group");
-  return { id: id ? `tiktok_adgroup_${id}` : `tiktok_adgroup_${name}`, tiktokCampaignId: cid, tiktokAdgroupId: id, campaign: cname, name, platform: "TikTok", customFields: {}, ...tiktokBase(row) };
+  const adgroup = maps.adgroupMap.get(id) || {};
+  const cid = String(adgroup.campaign_id || ttVal(row, "campaign_id") || "");
+  const campaign = maps.campaignMap.get(cid) || {};
+  const cname = String(campaign.campaign_name || cid || "Unknown TikTok campaign");
+  const name = String(adgroup.adgroup_name || ttVal(row, "adgroup_name") || id || "Unnamed TikTok ad group");
+
+  return {
+    id: id ? `tiktok_adgroup_${id}` : `tiktok_adgroup_${name}`,
+    tiktokCampaignId: cid,
+    tiktokAdgroupId: id,
+    campaign: cname,
+    name,
+    platform: "TikTok",
+    customFields: {},
+    ...tiktokBase(row)
+  };
 }
-function mapTikTokAd(row) {
-  const cid = String(ttVal(row, "campaign_id") || "");
-  const cname = String(ttVal(row, "campaign_name") || cid || "Unknown TikTok campaign");
-  const gid = String(ttVal(row, "adgroup_id") || "");
-  const gname = String(ttVal(row, "adgroup_name") || gid || "Unknown TikTok ad group");
+
+function mapTikTokAd(row, maps) {
   const id = String(ttVal(row, "ad_id") || "");
-  const name = String(ttVal(row, "ad_name") || id || "Unnamed TikTok ad");
-  return { id: id ? `tiktok_ad_${id}` : `tiktok_ad_${name}`, tiktokCampaignId: cid, tiktokAdgroupId: gid, tiktokAdId: id, campaign: cname, adset: gname, name, platform: "TikTok", customFields: {}, ...tiktokBase(row) };
+  const ad = maps.adMap.get(id) || {};
+  const gid = String(ad.adgroup_id || ttVal(row, "adgroup_id") || "");
+  const adgroup = maps.adgroupMap.get(gid) || {};
+  const cid = String(ad.campaign_id || adgroup.campaign_id || ttVal(row, "campaign_id") || "");
+  const campaign = maps.campaignMap.get(cid) || {};
+  const cname = String(campaign.campaign_name || cid || "Unknown TikTok campaign");
+  const gname = String(adgroup.adgroup_name || gid || "Unknown TikTok ad group");
+  const name = String(ad.ad_name || ttVal(row, "ad_name") || id || "Unnamed TikTok ad");
+
+  return {
+    id: id ? `tiktok_ad_${id}` : `tiktok_ad_${name}`,
+    tiktokCampaignId: cid,
+    tiktokAdgroupId: gid,
+    tiktokAdId: id,
+    campaign: cname,
+    adset: gname,
+    name,
+    platform: "TikTok",
+    customFields: {},
+    ...tiktokBase(row)
+  };
 }
+
 async function syncTikTok() {
+  if (!TIKTOK_ACCESS_TOKEN || !TIKTOK_ADVERTISER_ID) {
+    debug.tiktok.status = "skipped";
+    debug.tiktok.reason = "Missing TIKTOK_ACCESS_TOKEN or TIKTOK_ADVERTISER_ID";
+    return { campaigns: [], adsets: [], ads: [] };
+  }
+
+  const maps = await buildTikTokEntityMaps();
+
   const [campaignRaw, adgroupRaw, adRaw] = await Promise.all([
     fetchTikTokReport("campaign"),
     fetchTikTokReport("adgroup"),
     fetchTikTokReport("ad")
   ]);
-  return { campaigns: campaignRaw.map(mapTikTokCampaign), adsets: adgroupRaw.map(mapTikTokAdgroup), ads: adRaw.map(mapTikTokAd) };
+
+  const campaigns = campaignRaw.map(row => mapTikTokCampaign(row, maps));
+  const adsets = adgroupRaw.map(row => mapTikTokAdgroup(row, maps));
+  const ads = adRaw.map(row => mapTikTokAd(row, maps));
+
+  debug.tiktok.mappedRows = { campaigns: campaigns.length, adsets: adsets.length, ads: ads.length };
+  return { campaigns, adsets, ads };
 }
+
 
 const meta = await syncMeta();
 const tiktok = await syncTikTok();
