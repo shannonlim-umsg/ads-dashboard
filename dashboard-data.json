@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-02T03:43:17.040Z",
+  "generatedAt": "2026-06-02T04:16:54.376Z",
   "source": "Meta Marketing API + TikTok Business API",
   "dateRange": "last_30d",
   "weeks": [
@@ -5776,9 +5776,9 @@
     }
   ],
   "lastSyncStatus": {
-    "campaigns": 21,
-    "adsets": 55,
-    "ads": 135,
-    "totalRows": 211
+    "campaigns": 0,
+    "adsets": 0,
+    "ads": 0,
+    "totalRows": 0
   }
 }

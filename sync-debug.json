@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-02T03:43:01.328Z",
+  "generatedAt": "2026-06-02T04:16:52.843Z",
   "datePreset": "last_30d",
   "dateRange": {
     "startDate": "2026-05-04",
@@ -12,19 +12,19 @@
     "graphVersion": "v24.0",
     "levels": {
       "campaign": {
-        "status": "ok",
-        "fieldMode": "full",
-        "rows": 21
+        "status": "error",
+        "fieldMode": "core",
+        "message": "{\n  \"error\": {\n    \"message\": \"Error validating access token: Session has expired on Monday, 01-Jun-26 21:00:00 PDT. The current time is Monday, 01-Jun-26 21:16:53 PDT.\",\n    \"type\": \"OAuthException\",\n    \"code\": 190,\n    \"error_subcode\": 463,\n    \"fbtrace_id\": \"AulUZWc4E2oe3HTR8GyOFGr\"\n  }\n}"
       },
       "adset": {
-        "status": "ok",
-        "fieldMode": "full",
-        "rows": 55
+        "status": "error",
+        "fieldMode": "core",
+        "message": "{\n  \"error\": {\n    \"message\": \"Error validating access token: Session has expired on Monday, 01-Jun-26 21:00:00 PDT. The current time is Monday, 01-Jun-26 21:16:53 PDT.\",\n    \"type\": \"OAuthException\",\n    \"code\": 190,\n    \"error_subcode\": 463,\n    \"fbtrace_id\": \"AFA24xKpw-ytBb0ujP5EnkO\"\n  }\n}"
       },
       "ad": {
-        "status": "ok",
-        "fieldMode": "full",
-        "rows": 135
+        "status": "error",
+        "fieldMode": "core",
+        "message": "{\n  \"error\": {\n    \"message\": \"Error validating access token: Session has expired on Monday, 01-Jun-26 21:00:00 PDT. The current time is Monday, 01-Jun-26 21:16:53 PDT.\",\n    \"type\": \"OAuthException\",\n    \"code\": 190,\n    \"error_subcode\": 463,\n    \"fbtrace_id\": \"AbAYrAIgDfw9qFaXPVKV3C-\"\n  }\n}"
       }
     }
   },
@@ -41,17 +41,7 @@
           "impressions",
           "clicks"
         ],
-        "message": "{\n  \"code\": 40105,\n  \"message\": \"Access token is incorrect or has been revoked.\",\n  \"request_id\": \"2026060211431613213F4B0BCE06EECCE6\",\n  \"data\": {}\n}"
-      },
-      "campaign": {
-        "status": "error",
-        "metricSet": 3,
-        "metrics": [
-          "spend",
-          "impressions",
-          "clicks"
-        ],
-        "message": "{\n  \"code\": 40105,\n  \"message\": \"Access token is incorrect or has been revoked.\",\n  \"request_id\": \"2026060211431686525A98ECDB595AA31B\",\n  \"data\": {}\n}"
+        "message": "{\n  \"code\": 40105,\n  \"message\": \"Access token is incorrect or has been revoked.\",\n  \"request_id\": \"20260602121654003114762D9DDE63FDE4\",\n  \"data\": {}\n}"
       },
       "ad": {
         "status": "error",
@@ -61,20 +51,30 @@
           "impressions",
           "clicks"
         ],
-        "message": "{\n  \"code\": 40105,\n  \"message\": \"Access token is incorrect or has been revoked.\",\n  \"request_id\": \"20260602114316085B368B7D513751BC74\",\n  \"data\": {}\n}"
+        "message": "{\n  \"code\": 40105,\n  \"message\": \"Access token is incorrect or has been revoked.\",\n  \"request_id\": \"20260602121654F86A57990D0797658E42\",\n  \"data\": {}\n}"
+      },
+      "campaign": {
+        "status": "error",
+        "metricSet": 3,
+        "metrics": [
+          "spend",
+          "impressions",
+          "clicks"
+        ],
+        "message": "{\n  \"code\": 40105,\n  \"message\": \"Access token is incorrect or has been revoked.\",\n  \"request_id\": \"20260602121654C8749F3EDC403B5F6EB6\",\n  \"data\": {}\n}"
       }
-    },
-    "campaignGet": {
-      "status": "error",
-      "message": "{\n  \"code\": 40105,\n  \"message\": \"Access token is incorrect or has been revoked.\",\n  \"request_id\": \"20260602114315BE248A5E0AE05D5D3968\",\n  \"data\": {}\n}"
-    },
-    "adgroupGet": {
-      "status": "error",
-      "message": "{\n  \"code\": 40105,\n  \"message\": \"Access token is incorrect or has been revoked.\",\n  \"request_id\": \"20260602114315AFDD0AAD98F1D45E9C32\",\n  \"data\": {}\n}"
     },
     "adGet": {
       "status": "error",
-      "message": "{\n  \"code\": 40105,\n  \"message\": \"Access token is incorrect or has been revoked.\",\n  \"request_id\": \"202606021143153F1EFD4C1D27837AE13A\",\n  \"data\": {}\n}"
+      "message": "{\n  \"code\": 40105,\n  \"message\": \"Access token is incorrect or has been revoked.\",\n  \"request_id\": \"2026060212165311A074AD4B66EA5DE9B2\",\n  \"data\": {}\n}"
+    },
+    "campaignGet": {
+      "status": "error",
+      "message": "{\n  \"code\": 40105,\n  \"message\": \"Access token is incorrect or has been revoked.\",\n  \"request_id\": \"20260602121653BE6D2D5CBBA9F477B59B\",\n  \"data\": {}\n}"
+    },
+    "adgroupGet": {
+      "status": "error",
+      "message": "{\n  \"code\": 40105,\n  \"message\": \"Access token is incorrect or has been revoked.\",\n  \"request_id\": \"20260602121653B0D5E62BB0AB07635A74\",\n  \"data\": {}\n}"
     },
     "mappedRows": {
       "campaigns": 0,
@@ -83,9 +83,9 @@
     }
   },
   "summary": {
-    "campaigns": 21,
-    "adsets": 55,
-    "ads": 135,
-    "totalRows": 211
+    "campaigns": 0,
+    "adsets": 0,
+    "ads": 0,
+    "totalRows": 0
   }
 }
