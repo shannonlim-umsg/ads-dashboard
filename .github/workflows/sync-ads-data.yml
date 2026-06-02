@@ -21,7 +21,7 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Pull Meta and TikTok Ads data
+      - name: Pull Meta and TikTok Ads Data
         env:
           META_ACCESS_TOKEN: ${{ secrets.META_ACCESS_TOKEN }}
           META_AD_ACCOUNT_ID: ${{ secrets.META_AD_ACCOUNT_ID }}
@@ -29,8 +29,8 @@ jobs:
           TIKTOK_ADVERTISER_ID: ${{ secrets.TIKTOK_ADVERTISER_ID }}
         run: node scripts/sync-ads-data.mjs
 
-      - name: Commit updated dashboard data and debug log
+      - name: Commit updated data and debug files
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Update ads dashboard data"
+          commit_message: "Update ads dashboard data and debug"
           file_pattern: dashboard-data.json sync-debug.json
