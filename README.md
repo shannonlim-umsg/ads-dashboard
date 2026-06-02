@@ -1,127 +1,60 @@
-# Meta + TikTok Ads Dashboard for GitHub Pages
+# UMG Meta + TikTok Ads Dashboard — Debug Sync Package
 
-This package publishes the dashboard on GitHub Pages and syncs paid ads data from Meta and TikTok using GitHub Actions.
+This package is designed to diagnose why Meta and/or TikTok data is not pulling.
 
-## Included files
+## Replace these files in your GitHub repo
 
 ```text
 index.html
-dashboard-data.json
 scripts/sync-ads-data.mjs
 .github/workflows/sync-ads-data.yml
-README.md
 ```
 
-## What it syncs
-
-The workflow pulls the past 30 days of data and stores it in `dashboard-data.json`.
-
-### Meta
-
-- Campaign level
-- Ad Set level
-- Ad level
-
-### TikTok
-
-- Campaign level
-- Ad Group level, mapped into the dashboard as `Ad Set / Ad Group`
-- Ad level
-
-The dashboard table nests data like this:
+Also keep these files in the repo root:
 
 ```text
-Campaign
-  > Ad Set / Ad Group
-      > Ad
+dashboard-data.json
+sync-debug.json
 ```
 
-## GitHub setup
+## Required GitHub secrets
 
-Upload all files to the root of your GitHub repository.
-
-Make sure the workflow file is located exactly here:
-
-```text
-.github/workflows/sync-ads-data.yml
-```
-
-If GitHub does not show hidden folders on upload, create the file manually in GitHub by clicking:
-
-```text
-Add file > Create new file
-```
-
-Then type the filename as:
-
-```text
-.github/workflows/sync-ads-data.yml
-```
-
-## Repository secrets
-
-Go to:
-
-```text
-Settings > Secrets and variables > Actions > New repository secret
-```
-
-Add whichever platforms you want to sync.
-
-### Meta secrets
+Meta:
 
 ```text
 META_ACCESS_TOKEN
 META_AD_ACCOUNT_ID
 ```
 
-`META_AD_ACCOUNT_ID` should be numeric only, without `act_`.
-
-### TikTok secrets
+TikTok:
 
 ```text
 TIKTOK_ACCESS_TOKEN
 TIKTOK_ADVERTISER_ID
 ```
 
-`TIKTOK_ADVERTISER_ID` should be the numeric TikTok advertiser ID.
-
-## Enable GitHub Pages
-
-Go to:
+Optional Meta version override:
 
 ```text
-Settings > Pages
+META_GRAPH_VERSION
 ```
 
-Choose:
+Leave this blank unless you need to force a version such as `v24.0`.
 
-```text
-Source: Deploy from a branch
-Branch: main
-Folder: /root
-```
+## How to test
 
-## Run the sync
+1. Commit these files.
+2. Go to GitHub Actions.
+3. Run `Sync Ads Data (Meta + TikTok)`.
+4. After it finishes, open `sync-debug.json` in the repo.
 
-Go to:
+The debug file will show:
 
-```text
-Actions > Sync Ads Data (Meta + TikTok) > Run workflow
-```
-
-When the workflow finishes, open the GitHub Pages dashboard and click:
-
-```text
-Sync GitHub Data
-```
-
-The dashboard will load `dashboard-data.json` and retain the data in browser localStorage.
+- whether each secret was present
+- whether Meta was skipped, errored, or returned rows
+- whether TikTok was skipped, errored, or returned rows
+- row counts for campaign, ad set/ad group, and ad levels
 
 ## Notes
 
-- If only Meta secrets are present, the workflow syncs Meta and skips TikTok.
-- If only TikTok secrets are present, the workflow syncs TikTok and skips Meta.
-- If neither platform has secrets, the workflow fails to prevent committing empty data.
-- TikTok calls the middle level `Ad Group`; the dashboard displays it as `Ad Set / Ad Group` for consistency with Meta.
-- Revenue may be `0` unless purchase value is available from the platform reporting data.
+The workflow no longer fails just because an API returns zero rows. It writes `sync-debug.json` so you can see the exact issue.

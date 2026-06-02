@@ -1,15 +1,36 @@
 import fs from "node:fs";
 
 const META_ACCESS_TOKEN = process.env.META_ACCESS_TOKEN || "";
-const META_AD_ACCOUNT_ID = process.env.META_AD_ACCOUNT_ID || "";
+const META_AD_ACCOUNT_ID_RAW = process.env.META_AD_ACCOUNT_ID || "";
+const META_AD_ACCOUNT_ID = META_AD_ACCOUNT_ID_RAW.replace(/^act_/, "");
 const META_GRAPH_VERSION = process.env.META_GRAPH_VERSION || "v24.0";
 
 const TIKTOK_ACCESS_TOKEN = process.env.TIKTOK_ACCESS_TOKEN || "";
 const TIKTOK_ADVERTISER_ID = process.env.TIKTOK_ADVERTISER_ID || "";
 
-const DATE_PRESET = "last_30d";
+const DATE_PRESET = process.env.ADS_DATE_PRESET || "last_30d";
 const syncDate = new Date().toISOString().slice(0, 10);
 const { startDate, endDate } = lastNDaysRange(30);
+
+const debug = {
+  generatedAt: new Date().toISOString(),
+  datePreset: DATE_PRESET,
+  dateRange: { startDate, endDate },
+  meta: {
+    enabled: Boolean(META_ACCESS_TOKEN && META_AD_ACCOUNT_ID),
+    tokenPresent: Boolean(META_ACCESS_TOKEN),
+    adAccountIdPresent: Boolean(META_AD_ACCOUNT_ID),
+    graphVersion: META_GRAPH_VERSION,
+    levels: {}
+  },
+  tiktok: {
+    enabled: Boolean(TIKTOK_ACCESS_TOKEN && TIKTOK_ADVERTISER_ID),
+    tokenPresent: Boolean(TIKTOK_ACCESS_TOKEN),
+    advertiserIdPresent: Boolean(TIKTOK_ADVERTISER_ID),
+    levels: {}
+  },
+  summary: {}
+};
 
 function lastNDaysRange(days) {
   const end = new Date();
@@ -25,24 +46,15 @@ function readExistingData() {
   if (!fs.existsSync("dashboard-data.json")) {
     return { generatedAt: null, source: "Meta + TikTok APIs", dateRange: DATE_PRESET, weeks: [] };
   }
-  return JSON.parse(fs.readFileSync("dashboard-data.json", "utf8"));
+  try {
+    return JSON.parse(fs.readFileSync("dashboard-data.json", "utf8"));
+  } catch {
+    return { generatedAt: null, source: "Meta + TikTok APIs", dateRange: DATE_PRESET, weeks: [] };
+  }
 }
 
-function writeMergedWeek(nextWeek) {
-  const existing = readExistingData();
-  const weeks = existing.weeks || [];
-  const previous = weeks.find(w => w.id === nextWeek.id);
-  const retained = weeks.filter(w => w.id !== nextWeek.id);
-
-  const merged = {
-    ...existing,
-    generatedAt: new Date().toISOString(),
-    source: "Meta Marketing API + TikTok Business API",
-    dateRange: DATE_PRESET,
-    weeks: [...retained, preserveCustomFields(previous, nextWeek)]
-  };
-
-  fs.writeFileSync("dashboard-data.json", JSON.stringify(merged, null, 2));
+function writeJson(path, value) {
+  fs.writeFileSync(path, JSON.stringify(value, null, 2));
 }
 
 function preserveCustomFields(oldWeek, newWeek) {
@@ -56,6 +68,29 @@ function preserveCustomFields(oldWeek, newWeek) {
   return newWeek;
 }
 
+function writeMergedWeek(nextWeek, syncStatus) {
+  const existing = readExistingData();
+  const rows = [nextWeek.campaigns, nextWeek.adsets, nextWeek.ads].flat().length;
+
+  let weeks = existing.weeks || [];
+  if (rows > 0) {
+    const previous = weeks.find(w => w.id === nextWeek.id);
+    const retained = weeks.filter(w => w.id !== nextWeek.id);
+    weeks = [...retained, preserveCustomFields(previous, nextWeek)];
+  }
+
+  const merged = {
+    ...existing,
+    generatedAt: new Date().toISOString(),
+    source: "Meta Marketing API + TikTok Business API",
+    dateRange: DATE_PRESET,
+    lastSyncStatus: syncStatus,
+    weeks
+  };
+
+  writeJson("dashboard-data.json", merged);
+}
+
 function actionValue(actions, types) {
   if (!Array.isArray(actions)) return 0;
   for (const type of types) {
@@ -65,84 +100,7 @@ function actionValue(actions, types) {
   return 0;
 }
 
-/* ═══════════════════════════════════════════════
-   Meta Ads Insights
-   Pulls campaign, ad set, and ad levels for last 30 days.
-   ═══════════════════════════════════════════════ */
-const metaMetricFields = [
-  "impressions",
-  "reach",
-  "clicks",
-  "ctr",
-  "cpc",
-  "cpm",
-  "spend",
-
-  // Link-click fields from Meta Ads Insights.
-  // Some accounts/campaign types return inline link clicks, while others only expose link clicks
-  // through actions/cost_per_action_type or outbound click stats.
-  "inline_link_clicks",
-  "inline_link_click_ctr",
-  "cost_per_inline_link_click",
-  "unique_inline_link_clicks",
-  "unique_link_clicks_ctr",
-  "outbound_clicks",
-  "outbound_clicks_ctr",
-  "cost_per_outbound_click",
-  "website_ctr",
-  "cost_per_action_type",
-
-  // Purchase / revenue / ROAS fields.
-  "actions",
-  "action_values",
-  "purchase_roas",
-  "website_purchase_roas",
-  "mobile_app_purchase_roas",
-
-  "video_play_actions",
-  "date_start",
-  "date_stop"
-];
-
-const metaLevelFields = {
-  campaign: ["campaign_id", "campaign_name", ...metaMetricFields],
-  adset: ["campaign_id", "campaign_name", "adset_id", "adset_name", ...metaMetricFields],
-  ad: ["campaign_id", "campaign_name", "adset_id", "adset_name", "ad_id", "ad_name", ...metaMetricFields]
-};
-
-async function fetchAllMetaPages(url) {
-  const all = [];
-  let next = url;
-
-  while (next) {
-    const res = await fetch(next);
-    const json = await res.json();
-
-    if (!res.ok || json.error) {
-      throw new Error("Meta API error: " + JSON.stringify(json.error || json, null, 2));
-    }
-
-    all.push(...(json.data || []));
-    next = json.paging?.next || null;
-  }
-
-  return all;
-}
-
-async function fetchMetaInsights(level) {
-  const fields = metaLevelFields[level].join(",");
-  const url =
-    `https://graph.facebook.com/${META_GRAPH_VERSION}/act_${META_AD_ACCOUNT_ID}/insights` +
-    `?fields=${encodeURIComponent(fields)}` +
-    `&level=${encodeURIComponent(level)}` +
-    `&date_preset=${encodeURIComponent(DATE_PRESET)}` +
-    `&limit=500` +
-    `&access_token=${encodeURIComponent(META_ACCESS_TOKEN)}`;
-
-  return fetchAllMetaPages(url);
-}
-
-function actionStatsValue(stats, types = []) {
+function statValue(stats, types = []) {
   if (!Array.isArray(stats) || !stats.length) return 0;
   if (types.length) {
     for (const type of types) {
@@ -153,12 +111,24 @@ function actionStatsValue(stats, types = []) {
   return Number(stats[0]?.value || 0);
 }
 
-function firstPositive(...values) {
+function firstFinite(...values) {
   for (const value of values) {
-    const n = Number(value || 0);
-    if (Number.isFinite(n) && n > 0) return n;
+    const n = Number(value);
+    if (Number.isFinite(n) && n !== 0) return n;
   }
   return 0;
+}
+
+function safeRatio(numerator, denominator) {
+  const n = Number(numerator || 0);
+  const d = Number(denominator || 0);
+  return d ? n / d : 0;
+}
+
+function percentToRatio(value) {
+  if (value === undefined || value === null || value === "") return 0;
+  const n = Number(value);
+  return Number.isFinite(n) ? n / 100 : 0;
 }
 
 const PURCHASE_ACTION_TYPES = [
@@ -179,312 +149,260 @@ const CONVERSION_ACTION_TYPES = [
   "complete_registration"
 ];
 
-function metaPurchases(row) {
-  return actionValue(row.actions, PURCHASE_ACTION_TYPES);
+/* Meta */
+const META_CORE_METRICS = [
+  "impressions", "reach", "clicks", "ctr", "cpc", "cpm", "spend",
+  "actions", "action_values", "video_play_actions", "date_start", "date_stop"
+];
+
+const META_FULL_METRICS = [
+  ...META_CORE_METRICS,
+  "inline_link_clicks",
+  "inline_link_click_ctr",
+  "cost_per_inline_link_click",
+  "unique_inline_link_clicks",
+  "unique_link_clicks_ctr",
+  "outbound_clicks",
+  "outbound_clicks_ctr",
+  "cost_per_outbound_click",
+  "website_ctr",
+  "cost_per_action_type",
+  "purchase_roas",
+  "website_purchase_roas",
+  "mobile_app_purchase_roas"
+];
+
+function metaFields(level, mode = "full") {
+  const metrics = mode === "full" ? META_FULL_METRICS : META_CORE_METRICS;
+  if (level === "campaign") return ["campaign_id", "campaign_name", ...metrics];
+  if (level === "adset") return ["campaign_id", "campaign_name", "adset_id", "adset_name", ...metrics];
+  return ["campaign_id", "campaign_name", "adset_id", "adset_name", "ad_id", "ad_name", ...metrics];
 }
 
-function metaConversions(row) {
-  return actionValue(row.actions, CONVERSION_ACTION_TYPES);
+async function fetchJson(url, options = {}) {
+  const res = await fetch(url, options);
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const err = new Error(JSON.stringify(json, null, 2));
+    err.status = res.status;
+    err.body = json;
+    throw err;
+  }
+  return json;
+}
+
+async function fetchAllMetaPages(url) {
+  const all = [];
+  let next = url;
+  while (next) {
+    const json = await fetchJson(next);
+    if (json.error) throw new Error(JSON.stringify(json.error, null, 2));
+    all.push(...(json.data || []));
+    next = json.paging?.next || null;
+  }
+  return all;
+}
+
+async function fetchMetaInsights(level) {
+  if (!META_ACCESS_TOKEN || !META_AD_ACCOUNT_ID) {
+    debug.meta.levels[level] = { status: "skipped", reason: "Missing META_ACCESS_TOKEN or META_AD_ACCOUNT_ID" };
+    return [];
+  }
+
+  for (const mode of ["full", "core"]) {
+    const fields = metaFields(level, mode).join(",");
+    const url =
+      `https://graph.facebook.com/${META_GRAPH_VERSION}/act_${META_AD_ACCOUNT_ID}/insights` +
+      `?fields=${encodeURIComponent(fields)}` +
+      `&level=${encodeURIComponent(level)}` +
+      `&date_preset=${encodeURIComponent(DATE_PRESET)}` +
+      `&limit=500` +
+      `&access_token=${encodeURIComponent(META_ACCESS_TOKEN)}`;
+
+    try {
+      const rows = await fetchAllMetaPages(url);
+      debug.meta.levels[level] = { status: "ok", fieldMode: mode, rows: rows.length };
+      return rows;
+    } catch (err) {
+      debug.meta.levels[level] = {
+        status: "error",
+        fieldMode: mode,
+        message: String(err.message || err).slice(0, 4000)
+      };
+      if (mode === "core") return [];
+      console.warn(`Meta ${level} full-field pull failed; retrying with core fields.`);
+    }
+  }
+  return [];
 }
 
 function metaRevenue(row) {
   return actionValue(row.action_values, PURCHASE_ACTION_TYPES);
 }
-
+function metaPurchases(row) {
+  return actionValue(row.actions, PURCHASE_ACTION_TYPES);
+}
+function metaConversions(row) {
+  return actionValue(row.actions, CONVERSION_ACTION_TYPES);
+}
 function metaViews(row) {
-  if (Array.isArray(row.video_play_actions) && row.video_play_actions.length) {
-    return Number(row.video_play_actions[0]?.value || 0);
-  }
-  return actionValue(row.actions, ["video_view"]);
+  return firstFinite(Number(row.video_play_actions?.[0]?.value || 0), actionValue(row.actions, ["video_view"]));
 }
-
-function metaPercentToRatio(value) {
-  if (value === undefined || value === null || value === "") return 0;
-  const n = Number(value || 0);
-  // Meta returns percentage strings such as "1.23"; the dashboard stores ratios such as 0.0123.
-  return Number.isFinite(n) ? n / 100 : 0;
-}
-
-function safeRatio(numerator, denominator) {
-  const n = Number(numerator || 0);
-  const d = Number(denominator || 0);
-  return d ? n / d : 0;
-}
-
 function metaLinkClicks(row) {
-  return firstPositive(
+  return firstFinite(
     row.inline_link_clicks,
     actionValue(row.actions, ["link_click"]),
-    actionStatsValue(row.outbound_clicks, ["outbound_click"]),
+    statValue(row.outbound_clicks, ["outbound_click"]),
     row.unique_inline_link_clicks
   );
 }
-
-function metaCtrAll(row) {
-  return firstPositive(
-    metaPercentToRatio(row.ctr),
-    safeRatio(row.clicks, row.impressions)
-  );
-}
-
-function metaCtrLink(row) {
-  return firstPositive(
-    metaPercentToRatio(row.inline_link_click_ctr),
-    safeRatio(metaLinkClicks(row), row.impressions),
-    metaPercentToRatio(actionStatsValue(row.outbound_clicks_ctr, ["outbound_click"])),
-    metaPercentToRatio(actionStatsValue(row.website_ctr, ["link_click", "outbound_click"]))
-  );
-}
-
-function metaCpcAll(row) {
-  return firstPositive(
-    row.cpc,
-    safeRatio(row.spend, row.clicks)
-  );
-}
-
-function metaCpcLink(row) {
-  return firstPositive(
-    row.cost_per_inline_link_click,
-    actionStatsValue(row.cost_per_action_type, ["link_click"]),
-    actionStatsValue(row.cost_per_outbound_click, ["outbound_click"]),
-    safeRatio(row.spend, metaLinkClicks(row))
-  );
-}
-
-function metaCpm(row) {
-  return firstPositive(
-    row.cpm,
-    safeRatio(row.spend, row.impressions) * 1000
-  );
-}
-
 function metaPurchaseRoas(row) {
-  return firstPositive(
-    actionStatsValue(row.purchase_roas, PURCHASE_ACTION_TYPES),
-    actionStatsValue(row.website_purchase_roas, PURCHASE_ACTION_TYPES),
-    actionStatsValue(row.mobile_app_purchase_roas, PURCHASE_ACTION_TYPES),
-    safeRatio(metaRevenue(row), row.spend)
+  const revenue = metaRevenue(row);
+  return firstFinite(
+    statValue(row.purchase_roas, PURCHASE_ACTION_TYPES),
+    statValue(row.website_purchase_roas, PURCHASE_ACTION_TYPES),
+    statValue(row.mobile_app_purchase_roas, PURCHASE_ACTION_TYPES),
+    safeRatio(revenue, row.spend)
   );
 }
-
-function metaBaseMetrics(row) {
+function metaBase(row) {
+  const spend = Number(row.spend || 0);
+  const impressions = Number(row.impressions || 0);
+  const clicks = Number(row.clicks || 0);
   const linkClicks = metaLinkClicks(row);
   const purchases = metaPurchases(row);
   const revenue = metaRevenue(row);
   return {
-    impressions: Number(row.impressions || 0),
+    impressions,
     reach: Number(row.reach || 0),
-    clicks: Number(row.clicks || 0),
-    clicks_all: Number(row.clicks || 0),
+    clicks,
+    clicks_all: clicks,
     link_clicks: linkClicks,
-    ctr_all: metaCtrAll(row),
-    ctr_link: metaCtrLink(row),
-    cpc_all: metaCpcAll(row),
-    cpc_link: metaCpcLink(row),
-    cpm: metaCpm(row),
+    ctr_all: firstFinite(percentToRatio(row.ctr), safeRatio(clicks, impressions)),
+    ctr_link: firstFinite(
+      percentToRatio(row.inline_link_click_ctr),
+      safeRatio(linkClicks, impressions),
+      percentToRatio(statValue(row.outbound_clicks_ctr, ["outbound_click"])),
+      percentToRatio(statValue(row.website_ctr, ["link_click", "outbound_click"]))
+    ),
+    cpc_all: firstFinite(row.cpc, safeRatio(spend, clicks)),
+    cpc_link: firstFinite(
+      row.cost_per_inline_link_click,
+      statValue(row.cost_per_action_type, ["link_click"]),
+      statValue(row.cost_per_outbound_click, ["outbound_click"]),
+      safeRatio(spend, linkClicks)
+    ),
+    cpm: firstFinite(row.cpm, safeRatio(spend, impressions) * 1000),
     views: metaViews(row),
     purchases,
     conversions: metaConversions(row),
-    spend: Number(row.spend || 0),
+    spend,
     revenue,
     purchase_roas: metaPurchaseRoas(row),
-    status: "active",
-
-    // Useful for debugging if Meta returns 0 for inline-link metrics.
-    outbound_clicks: actionStatsValue(row.outbound_clicks, ["outbound_click"]),
-    unique_inline_link_clicks: Number(row.unique_inline_link_clicks || 0)
+    status: "active"
   };
 }
-
 function mapMetaCampaign(row) {
-  return {
-    id: row.campaign_id ? `meta_campaign_${row.campaign_id}` : `meta_campaign_${row.campaign_name}`,
-    metaCampaignId: row.campaign_id || "",
-    artist: "Imported Artist",
-    name: row.campaign_name || "Unnamed Meta campaign",
-    platform: "Meta",
-    type: "Traffic",
-    customFields: {},
-    ...metaBaseMetrics(row)
-  };
+  return { id: row.campaign_id ? `meta_campaign_${row.campaign_id}` : `meta_campaign_${row.campaign_name}`, metaCampaignId: row.campaign_id || "", artist: "Imported Artist", name: row.campaign_name || row.campaign_id || "Unnamed Meta campaign", platform: "Meta", type: "Traffic", customFields: {}, ...metaBase(row) };
 }
-
 function mapMetaAdset(row) {
-  return {
-    id: row.adset_id ? `meta_adset_${row.adset_id}` : `meta_adset_${row.adset_name}`,
-    metaCampaignId: row.campaign_id || "",
-    metaAdsetId: row.adset_id || "",
-    campaign: row.campaign_name || "Unnamed Meta campaign",
-    name: row.adset_name || "Unnamed Meta ad set",
-    platform: "Meta",
-    customFields: {},
-    ...metaBaseMetrics(row)
-  };
+  return { id: row.adset_id ? `meta_adset_${row.adset_id}` : `meta_adset_${row.adset_name}`, metaCampaignId: row.campaign_id || "", metaAdsetId: row.adset_id || "", campaign: row.campaign_name || row.campaign_id || "Unnamed Meta campaign", name: row.adset_name || row.adset_id || "Unnamed Meta ad set", platform: "Meta", customFields: {}, ...metaBase(row) };
 }
-
 function mapMetaAd(row) {
-  return {
-    id: row.ad_id ? `meta_ad_${row.ad_id}` : `meta_ad_${row.ad_name}`,
-    metaCampaignId: row.campaign_id || "",
-    metaAdsetId: row.adset_id || "",
-    metaAdId: row.ad_id || "",
-    campaign: row.campaign_name || "Unnamed Meta campaign",
-    adset: row.adset_name || "Unnamed Meta ad set",
-    name: row.ad_name || "Unnamed Meta ad",
-    platform: "Meta",
-    customFields: {},
-    ...metaBaseMetrics(row)
-  };
+  return { id: row.ad_id ? `meta_ad_${row.ad_id}` : `meta_ad_${row.ad_name}`, metaCampaignId: row.campaign_id || "", metaAdsetId: row.adset_id || "", metaAdId: row.ad_id || "", campaign: row.campaign_name || row.campaign_id || "Unnamed Meta campaign", adset: row.adset_name || row.adset_id || "Unnamed Meta ad set", name: row.ad_name || row.ad_id || "Unnamed Meta ad", platform: "Meta", customFields: {}, ...metaBase(row) };
 }
-
 async function syncMeta() {
-  if (!META_ACCESS_TOKEN || !META_AD_ACCOUNT_ID) {
-    console.log("Skipping Meta sync because META_ACCESS_TOKEN or META_AD_ACCOUNT_ID is missing.");
-    return { campaigns: [], adsets: [], ads: [] };
-  }
-
   const [campaignRaw, adsetRaw, adRaw] = await Promise.all([
     fetchMetaInsights("campaign"),
     fetchMetaInsights("adset"),
     fetchMetaInsights("ad")
   ]);
-
-  console.log(`Meta campaign rows: ${campaignRaw.length}`);
-  console.log(`Meta ad set rows: ${adsetRaw.length}`);
-  console.log(`Meta ad rows: ${adRaw.length}`);
-
-  return {
-    campaigns: campaignRaw.map(mapMetaCampaign),
-    adsets: adsetRaw.map(mapMetaAdset),
-    ads: adRaw.map(mapMetaAd)
-  };
+  return { campaigns: campaignRaw.map(mapMetaCampaign), adsets: adsetRaw.map(mapMetaAdset), ads: adRaw.map(mapMetaAd) };
 }
 
-/* ═══════════════════════════════════════════════
-   TikTok Business API Reporting
-   Pulls campaign, ad group, and ad levels for last 30 days.
-   TikTok calls the middle level “Ad Group”; the dashboard stores it
-   as an ad set/ad group row for consistent nesting.
-   ═══════════════════════════════════════════════ */
-const TIKTOK_BASE_URL = "https://business-api.tiktok.com/open_api/v1.3/report/integrated/get/";
-
+/* TikTok */
+const TIKTOK_URL = "https://business-api.tiktok.com/open_api/v1.3/report/integrated/get/";
 const tiktokLevels = {
-  campaign: { dataLevel: "AUCTION_CAMPAIGN", dimension: "campaign_id" },
-  adgroup: { dataLevel: "AUCTION_ADGROUP", dimension: "adgroup_id" },
-  ad: { dataLevel: "AUCTION_AD", dimension: "ad_id" }
+  campaign: { dataLevel: "AUCTION_CAMPAIGN", dimensions: ["campaign_id"] },
+  adgroup: { dataLevel: "AUCTION_ADGROUP", dimensions: ["adgroup_id"] },
+  ad: { dataLevel: "AUCTION_AD", dimensions: ["ad_id"] }
 };
-
-const tiktokBroadMetrics = [
-  "campaign_name",
-  "campaign_id",
-  "adgroup_name",
-  "adgroup_id",
-  "ad_name",
-  "ad_id",
-  "spend",
-  "impressions",
-  "reach",
-  "clicks",
-  "conversion",
-  "real_time_conversion",
-  "result",
-  "video_watched_2s"
+const tiktokMetricSets = [
+  ["campaign_name", "campaign_id", "adgroup_name", "adgroup_id", "ad_name", "ad_id", "spend", "impressions", "reach", "clicks", "conversion", "real_time_conversion", "result", "video_watched_2s"],
+  ["spend", "impressions", "clicks", "conversion", "real_time_conversion", "result"],
+  ["spend", "impressions", "clicks"]
 ];
-
-const tiktokCoreMetrics = [
-  "campaign_name",
-  "campaign_id",
-  "adgroup_name",
-  "adgroup_id",
-  "ad_name",
-  "ad_id",
-  "spend",
-  "impressions",
-  "clicks",
-  "conversion"
-];
-
-function tiktokValue(row, key) {
-  return row?.metrics?.[key] ?? row?.dimensions?.[key] ?? row?.[key] ?? "";
-}
-
-function tiktokNumber(row, keys) {
-  for (const key of keys) {
-    const value = tiktokValue(row, key);
-    if (value !== undefined && value !== null && value !== "") return Number(value || 0);
-  }
-  return 0;
-}
-
-async function fetchTikTokReportOnce(levelConfig, metrics, page = 1) {
+async function fetchTikTokOnce(levelKey, metrics, page) {
+  const cfg = tiktokLevels[levelKey];
   const params = new URLSearchParams();
   params.set("advertiser_id", TIKTOK_ADVERTISER_ID);
+  params.set("service_type", "AUCTION");
   params.set("report_type", "BASIC");
-  params.set("data_level", levelConfig.dataLevel);
-  params.set("dimensions", JSON.stringify([levelConfig.dimension]));
+  params.set("data_level", cfg.dataLevel);
+  params.set("dimensions", JSON.stringify(cfg.dimensions));
   params.set("metrics", JSON.stringify(metrics));
   params.set("start_date", startDate);
   params.set("end_date", endDate);
   params.set("page", String(page));
   params.set("page_size", "1000");
-
-  const res = await fetch(`${TIKTOK_BASE_URL}?${params.toString()}`, {
-    headers: { "Access-Token": TIKTOK_ACCESS_TOKEN }
-  });
-
-  const json = await res.json();
-  if (!res.ok || (json.code !== undefined && Number(json.code) !== 0)) {
-    throw new Error(JSON.stringify(json, null, 2));
-  }
+  const json = await fetchJson(`${TIKTOK_URL}?${params.toString()}`, { headers: { "Access-Token": TIKTOK_ACCESS_TOKEN } });
+  if (json.code !== undefined && Number(json.code) !== 0) throw new Error(JSON.stringify(json, null, 2));
   return json;
 }
-
-async function fetchTikTokReport(levelKey, metrics = tiktokBroadMetrics) {
-  const levelConfig = tiktokLevels[levelKey];
-  const rows = [];
-  let page = 1;
-  let totalPage = 1;
-
-  while (page <= totalPage) {
-    const json = await fetchTikTokReportOnce(levelConfig, metrics, page);
-    const data = json.data || {};
-    rows.push(...(data.list || []));
-    totalPage = Number(data.page_info?.total_page || data.page_info?.total_pages || 1);
-    page += 1;
+async function fetchTikTokReport(levelKey) {
+  if (!TIKTOK_ACCESS_TOKEN || !TIKTOK_ADVERTISER_ID) {
+    debug.tiktok.levels[levelKey] = { status: "skipped", reason: "Missing TIKTOK_ACCESS_TOKEN or TIKTOK_ADVERTISER_ID" };
+    return [];
   }
-
-  return rows;
-}
-
-async function fetchTikTokReportWithFallback(levelKey) {
-  try {
-    return await fetchTikTokReport(levelKey, tiktokBroadMetrics);
-  } catch (err) {
-    console.warn(`TikTok ${levelKey} broad metric pull failed. Retrying with core metrics.`);
-    console.warn(String(err.message || err).slice(0, 1000));
-    return fetchTikTokReport(levelKey, tiktokCoreMetrics);
+  for (let i = 0; i < tiktokMetricSets.length; i++) {
+    const metrics = tiktokMetricSets[i];
+    const rows = [];
+    let page = 1;
+    let totalPage = 1;
+    try {
+      while (page <= totalPage) {
+        const json = await fetchTikTokOnce(levelKey, metrics, page);
+        const data = json.data || {};
+        rows.push(...(data.list || []));
+        totalPage = Number(data.page_info?.total_page || data.page_info?.total_pages || 1);
+        page += 1;
+      }
+      debug.tiktok.levels[levelKey] = { status: "ok", metricSet: i + 1, rows: rows.length };
+      return rows;
+    } catch (err) {
+      debug.tiktok.levels[levelKey] = { status: "error", metricSet: i + 1, message: String(err.message || err).slice(0, 4000) };
+      console.warn(`TikTok ${levelKey} metric set ${i + 1} failed; trying fallback.`);
+    }
   }
+  return [];
 }
-
-function tiktokBaseMetrics(row) {
-  const impressions = tiktokNumber(row, ["impressions", "show_cnt"]);
-  const clicks = tiktokNumber(row, ["clicks", "click_cnt"]);
-  const linkClicks = tiktokNumber(row, ["link_clicks", "clicks", "click_cnt"]);
-  const spend = tiktokNumber(row, ["spend", "cost"]);
-  const purchases = tiktokNumber(row, ["purchase", "purchases", "conversion", "real_time_conversion", "result"]);
+function ttVal(row, key) {
+  return row?.metrics?.[key] ?? row?.dimensions?.[key] ?? row?.[key] ?? "";
+}
+function ttNum(row, keys) {
+  for (const key of keys) {
+    const value = ttVal(row, key);
+    if (value !== undefined && value !== null && value !== "") return Number(value || 0);
+  }
+  return 0;
+}
+function tiktokBase(row) {
+  const impressions = ttNum(row, ["impressions", "show_cnt"]);
+  const clicks = ttNum(row, ["clicks", "click_cnt"]);
+  const spend = ttNum(row, ["spend", "cost"]);
+  const purchases = ttNum(row, ["purchase", "purchases", "conversion", "real_time_conversion", "result"]);
   return {
     impressions,
-    reach: tiktokNumber(row, ["reach"]),
+    reach: ttNum(row, ["reach"]),
     clicks,
     clicks_all: clicks,
-    link_clicks: linkClicks,
-    ctr_all: impressions ? clicks / impressions : 0,
-    ctr_link: impressions ? linkClicks / impressions : 0,
-    cpc_all: clicks ? spend / clicks : 0,
-    cpc_link: linkClicks ? spend / linkClicks : 0,
-    cpm: impressions ? spend / impressions * 1000 : 0,
-    views: tiktokNumber(row, ["video_watched_2s", "video_views", "video_play_actions"]),
+    link_clicks: clicks,
+    ctr_all: safeRatio(clicks, impressions),
+    ctr_link: safeRatio(clicks, impressions),
+    cpc_all: safeRatio(spend, clicks),
+    cpc_link: safeRatio(spend, clicks),
+    cpm: safeRatio(spend, impressions) * 1000,
+    views: ttNum(row, ["video_watched_2s", "video_views"]),
     purchases,
     conversions: purchases,
     spend,
@@ -493,87 +411,38 @@ function tiktokBaseMetrics(row) {
     status: "active"
   };
 }
-
 function mapTikTokCampaign(row) {
-  const campaignId = String(tiktokValue(row, "campaign_id") || "");
-  const campaignName = String(tiktokValue(row, "campaign_name") || campaignId || "Unnamed TikTok campaign");
-  return {
-    id: campaignId ? `tiktok_campaign_${campaignId}` : `tiktok_campaign_${campaignName}`,
-    tiktokCampaignId: campaignId,
-    artist: "Imported Artist",
-    name: campaignName,
-    platform: "TikTok",
-    type: "Traffic",
-    customFields: {},
-    ...tiktokBaseMetrics(row)
-  };
+  const id = String(ttVal(row, "campaign_id") || "");
+  const name = String(ttVal(row, "campaign_name") || id || "Unnamed TikTok campaign");
+  return { id: id ? `tiktok_campaign_${id}` : `tiktok_campaign_${name}`, tiktokCampaignId: id, artist: "Imported Artist", name, platform: "TikTok", type: "Traffic", customFields: {}, ...tiktokBase(row) };
 }
-
 function mapTikTokAdgroup(row) {
-  const campaignId = String(tiktokValue(row, "campaign_id") || "");
-  const campaignName = String(tiktokValue(row, "campaign_name") || "");
-  const adgroupId = String(tiktokValue(row, "adgroup_id") || "");
-  const adgroupName = String(tiktokValue(row, "adgroup_name") || adgroupId || "Unnamed TikTok ad group");
-  return {
-    id: adgroupId ? `tiktok_adgroup_${adgroupId}` : `tiktok_adgroup_${adgroupName}`,
-    tiktokCampaignId: campaignId,
-    tiktokAdgroupId: adgroupId,
-    campaign: campaignName || campaignId || "Unnamed TikTok campaign",
-    name: adgroupName,
-    platform: "TikTok",
-    customFields: {},
-    ...tiktokBaseMetrics(row)
-  };
+  const cid = String(ttVal(row, "campaign_id") || "");
+  const cname = String(ttVal(row, "campaign_name") || cid || "Unknown TikTok campaign");
+  const id = String(ttVal(row, "adgroup_id") || "");
+  const name = String(ttVal(row, "adgroup_name") || id || "Unnamed TikTok ad group");
+  return { id: id ? `tiktok_adgroup_${id}` : `tiktok_adgroup_${name}`, tiktokCampaignId: cid, tiktokAdgroupId: id, campaign: cname, name, platform: "TikTok", customFields: {}, ...tiktokBase(row) };
 }
-
 function mapTikTokAd(row) {
-  const campaignId = String(tiktokValue(row, "campaign_id") || "");
-  const campaignName = String(tiktokValue(row, "campaign_name") || "");
-  const adgroupId = String(tiktokValue(row, "adgroup_id") || "");
-  const adgroupName = String(tiktokValue(row, "adgroup_name") || "");
-  const adId = String(tiktokValue(row, "ad_id") || "");
-  const adName = String(tiktokValue(row, "ad_name") || adId || "Unnamed TikTok ad");
-  return {
-    id: adId ? `tiktok_ad_${adId}` : `tiktok_ad_${adName}`,
-    tiktokCampaignId: campaignId,
-    tiktokAdgroupId: adgroupId,
-    tiktokAdId: adId,
-    campaign: campaignName || campaignId || "Unnamed TikTok campaign",
-    adset: adgroupName || adgroupId || "Unnamed TikTok ad group",
-    name: adName,
-    platform: "TikTok",
-    customFields: {},
-    ...tiktokBaseMetrics(row)
-  };
+  const cid = String(ttVal(row, "campaign_id") || "");
+  const cname = String(ttVal(row, "campaign_name") || cid || "Unknown TikTok campaign");
+  const gid = String(ttVal(row, "adgroup_id") || "");
+  const gname = String(ttVal(row, "adgroup_name") || gid || "Unknown TikTok ad group");
+  const id = String(ttVal(row, "ad_id") || "");
+  const name = String(ttVal(row, "ad_name") || id || "Unnamed TikTok ad");
+  return { id: id ? `tiktok_ad_${id}` : `tiktok_ad_${name}`, tiktokCampaignId: cid, tiktokAdgroupId: gid, tiktokAdId: id, campaign: cname, adset: gname, name, platform: "TikTok", customFields: {}, ...tiktokBase(row) };
 }
-
 async function syncTikTok() {
-  if (!TIKTOK_ACCESS_TOKEN || !TIKTOK_ADVERTISER_ID) {
-    console.log("Skipping TikTok sync because TIKTOK_ACCESS_TOKEN or TIKTOK_ADVERTISER_ID is missing.");
-    return { campaigns: [], adsets: [], ads: [] };
-  }
-
   const [campaignRaw, adgroupRaw, adRaw] = await Promise.all([
-    fetchTikTokReportWithFallback("campaign"),
-    fetchTikTokReportWithFallback("adgroup"),
-    fetchTikTokReportWithFallback("ad")
+    fetchTikTokReport("campaign"),
+    fetchTikTokReport("adgroup"),
+    fetchTikTokReport("ad")
   ]);
-
-  console.log(`TikTok campaign rows: ${campaignRaw.length}`);
-  console.log(`TikTok ad group rows: ${adgroupRaw.length}`);
-  console.log(`TikTok ad rows: ${adRaw.length}`);
-
-  return {
-    campaigns: campaignRaw.map(mapTikTokCampaign),
-    adsets: adgroupRaw.map(mapTikTokAdgroup),
-    ads: adRaw.map(mapTikTokAd)
-  };
+  return { campaigns: campaignRaw.map(mapTikTokCampaign), adsets: adgroupRaw.map(mapTikTokAdgroup), ads: adRaw.map(mapTikTokAd) };
 }
 
-/* ═══════════════════════════════════════════════
-   Main combined sync
-   ═══════════════════════════════════════════════ */
-const [meta, tiktok] = await Promise.all([syncMeta(), syncTikTok()]);
+const meta = await syncMeta();
+const tiktok = await syncTikTok();
 
 const nextWeek = {
   id: `ads_last_30d_${syncDate}`,
@@ -588,13 +457,21 @@ const nextWeek = {
   ads: [...meta.ads, ...tiktok.ads]
 };
 
-if (!nextWeek.campaigns.length && !nextWeek.adsets.length && !nextWeek.ads.length) {
-  throw new Error("No Meta or TikTok rows were synced. Add API secrets or check account permissions.");
+debug.summary = {
+  campaigns: nextWeek.campaigns.length,
+  adsets: nextWeek.adsets.length,
+  ads: nextWeek.ads.length,
+  totalRows: nextWeek.campaigns.length + nextWeek.adsets.length + nextWeek.ads.length
+};
+
+writeMergedWeek(nextWeek, debug.summary);
+writeJson("sync-debug.json", debug);
+
+console.log("Sync summary:", JSON.stringify(debug.summary, null, 2));
+console.log("Meta levels:", JSON.stringify(debug.meta.levels, null, 2));
+console.log("TikTok levels:", JSON.stringify(debug.tiktok.levels, null, 2));
+console.log("Wrote dashboard-data.json and sync-debug.json.");
+
+if (debug.summary.totalRows === 0) {
+  console.warn("No rows were returned. Check sync-debug.json for exact Meta/TikTok API errors or missing secrets.");
 }
-
-writeMergedWeek(nextWeek);
-
-console.log(`Combined campaigns: ${nextWeek.campaigns.length}`);
-console.log(`Combined ad sets/ad groups: ${nextWeek.adsets.length}`);
-console.log(`Combined ads: ${nextWeek.ads.length}`);
-console.log("Updated dashboard-data.json and retained previous snapshots/custom fields.");
