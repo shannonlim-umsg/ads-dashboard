@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-06-03T18:13:22.124Z",
+  "generatedAt": "2026-06-04T12:30:11.922Z",
   "datePreset": "last_30d",
   "dateRange": {
-    "startDate": "2026-05-05",
-    "endDate": "2026-06-03"
+    "startDate": "2026-05-06",
+    "endDate": "2026-06-04"
   },
   "meta": {
     "enabled": true,
@@ -14,17 +14,17 @@
       "adset": {
         "status": "error",
         "fieldMode": "core",
-        "message": "{\n  \"error\": {\n    \"message\": \"Error validating access token: Session has expired on Monday, 01-Jun-26 21:00:00 PDT. The current time is Wednesday, 03-Jun-26 11:13:22 PDT.\",\n    \"type\": \"OAuthException\",\n    \"code\": 190,\n    \"error_subcode\": 463,\n    \"fbtrace_id\": \"AjCI9-dNGn4LRtV9o7Kqt1l\"\n  }\n}"
-      },
-      "ad": {
-        "status": "error",
-        "fieldMode": "core",
-        "message": "{\n  \"error\": {\n    \"message\": \"Error validating access token: Session has expired on Monday, 01-Jun-26 21:00:00 PDT. The current time is Wednesday, 03-Jun-26 11:13:22 PDT.\",\n    \"type\": \"OAuthException\",\n    \"code\": 190,\n    \"error_subcode\": 463,\n    \"fbtrace_id\": \"AV_FvSSRYEDySK4ffXjBULd\"\n  }\n}"
+        "message": "{\n  \"error\": {\n    \"message\": \"Error validating access token: Session has expired on Monday, 01-Jun-26 21:00:00 PDT. The current time is Thursday, 04-Jun-26 05:30:12 PDT.\",\n    \"type\": \"OAuthException\",\n    \"code\": 190,\n    \"error_subcode\": 463,\n    \"fbtrace_id\": \"AFgElIYOaDUvyECnS4nSo1S\"\n  }\n}"
       },
       "campaign": {
         "status": "error",
         "fieldMode": "core",
-        "message": "{\n  \"error\": {\n    \"message\": \"Error validating access token: Session has expired on Monday, 01-Jun-26 21:00:00 PDT. The current time is Wednesday, 03-Jun-26 11:13:22 PDT.\",\n    \"type\": \"OAuthException\",\n    \"code\": 190,\n    \"error_subcode\": 463,\n    \"fbtrace_id\": \"ANlh5P4SKgYrzl7dKpqPCvG\"\n  }\n}"
+        "message": "{\n  \"error\": {\n    \"message\": \"Error validating access token: Session has expired on Monday, 01-Jun-26 21:00:00 PDT. The current time is Thursday, 04-Jun-26 05:30:12 PDT.\",\n    \"type\": \"OAuthException\",\n    \"code\": 190,\n    \"error_subcode\": 463,\n    \"fbtrace_id\": \"AYqTFCpLD53r-vye-e88TVN\"\n  }\n}"
+      },
+      "ad": {
+        "status": "error",
+        "fieldMode": "core",
+        "message": "{\n  \"error\": {\n    \"message\": \"Error validating access token: Session has expired on Monday, 01-Jun-26 21:00:00 PDT. The current time is Thursday, 04-Jun-26 05:30:12 PDT.\",\n    \"type\": \"OAuthException\",\n    \"code\": 190,\n    \"error_subcode\": 463,\n    \"fbtrace_id\": \"AxI2oObTB93gVn4WBuIhASN\"\n  }\n}"
       }
     }
   },
@@ -33,16 +33,6 @@
     "tokenPresent": true,
     "advertiserIdPresent": true,
     "levels": {
-      "ad": {
-        "status": "error",
-        "metricSet": 3,
-        "metrics": [
-          "spend",
-          "impressions",
-          "clicks"
-        ],
-        "message": "{\n  \"code\": 40001,\n  \"message\": \"Permission error: The access token lacks the required scope for endpoint '/report/integrated/get/(method=GET)'. Please first check if the request method is correct then ask the user to generate a new access token and reauthorize your API App with the necessary API scopes.\",\n  \"request_id\": \"2026060402132567B990824FB2E9DBAF63\",\n  \"data\": {}\n}"
-      },
       "adgroup": {
         "status": "error",
         "metricSet": 3,
@@ -51,7 +41,17 @@
           "impressions",
           "clicks"
         ],
-        "message": "{\n  \"code\": 40001,\n  \"message\": \"Permission error: The access token lacks the required scope for endpoint '/report/integrated/get/(method=GET)'. Please first check if the request method is correct then ask the user to generate a new access token and reauthorize your API App with the necessary API scopes.\",\n  \"request_id\": \"202606040213261DFEAA6A6FAAC6E23D72\",\n  \"data\": {}\n}"
+        "message": "{\n  \"code\": 40001,\n  \"message\": \"Permission error: The access token lacks the required scope for endpoint '/report/integrated/get/(method=GET)'. Please first check if the request method is correct then ask the user to generate a new access token and reauthorize your API App with the necessary API scopes.\",\n  \"request_id\": \"202606042030165F1F75DA3BEE73339842\",\n  \"data\": {}\n}"
+      },
+      "ad": {
+        "status": "error",
+        "metricSet": 3,
+        "metrics": [
+          "spend",
+          "impressions",
+          "clicks"
+        ],
+        "message": "{\n  \"code\": 40001,\n  \"message\": \"Permission error: The access token lacks the required scope for endpoint '/report/integrated/get/(method=GET)'. Please first check if the request method is correct then ask the user to generate a new access token and reauthorize your API App with the necessary API scopes.\",\n  \"request_id\": \"20260604203016360A4FA9AFD46B150EA4\",\n  \"data\": {}\n}"
       },
       "campaign": {
         "status": "error",
@@ -61,20 +61,20 @@
           "impressions",
           "clicks"
         ],
-        "message": "{\n  \"code\": 40001,\n  \"message\": \"Permission error: The access token lacks the required scope for endpoint '/report/integrated/get/(method=GET)'. Please first check if the request method is correct then ask the user to generate a new access token and reauthorize your API App with the necessary API scopes.\",\n  \"request_id\": \"20260604021326D7F69A8C85FE74E7A8BF\",\n  \"data\": {}\n}"
+        "message": "{\n  \"code\": 40001,\n  \"message\": \"Permission error: The access token lacks the required scope for endpoint '/report/integrated/get/(method=GET)'. Please first check if the request method is correct then ask the user to generate a new access token and reauthorize your API App with the necessary API scopes.\",\n  \"request_id\": \"20260604203016586EA5529D243B0AFF7B\",\n  \"data\": {}\n}"
       }
     },
     "campaignGet": {
       "status": "ok",
       "rows": 253
     },
-    "adGet": {
-      "status": "ok",
-      "rows": 662
-    },
     "adgroupGet": {
       "status": "ok",
       "rows": 321
+    },
+    "adGet": {
+      "status": "ok",
+      "rows": 668
     },
     "mappedRows": {
       "campaigns": 0,
