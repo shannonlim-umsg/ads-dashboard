@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-06-11T15:00:10.743Z",
+  "generatedAt": "2026-06-12T12:43:12.012Z",
   "datePreset": "last_30d",
   "dateRange": {
-    "startDate": "2026-05-13",
-    "endDate": "2026-06-11"
+    "startDate": "2026-05-14",
+    "endDate": "2026-06-12"
   },
   "meta": {
     "enabled": true,
@@ -11,20 +11,20 @@
     "adAccountIdPresent": true,
     "graphVersion": "v24.0",
     "levels": {
-      "ad": {
-        "status": "error",
-        "fieldMode": "core",
-        "message": "{\n  \"error\": {\n    \"message\": \"Error validating access token: Session has expired on Monday, 01-Jun-26 21:00:00 PDT. The current time is Thursday, 11-Jun-26 08:00:11 PDT.\",\n    \"type\": \"OAuthException\",\n    \"code\": 190,\n    \"error_subcode\": 463,\n    \"fbtrace_id\": \"ArIa_4q10oDYJXhYM3XWkwP\"\n  }\n}"
-      },
       "adset": {
         "status": "error",
         "fieldMode": "core",
-        "message": "{\n  \"error\": {\n    \"message\": \"Error validating access token: Session has expired on Monday, 01-Jun-26 21:00:00 PDT. The current time is Thursday, 11-Jun-26 08:00:11 PDT.\",\n    \"type\": \"OAuthException\",\n    \"code\": 190,\n    \"error_subcode\": 463,\n    \"fbtrace_id\": \"ATAm2sT6BxXRKGzd7m09gD-\"\n  }\n}"
+        "message": "{\n  \"error\": {\n    \"message\": \"Error validating access token: Session has expired on Monday, 01-Jun-26 21:00:00 PDT. The current time is Friday, 12-Jun-26 05:43:12 PDT.\",\n    \"type\": \"OAuthException\",\n    \"code\": 190,\n    \"error_subcode\": 463,\n    \"fbtrace_id\": \"AVJKlVIzOAtuAqi5Y8_dVIC\"\n  }\n}"
       },
       "campaign": {
         "status": "error",
         "fieldMode": "core",
-        "message": "{\n  \"error\": {\n    \"message\": \"Error validating access token: Session has expired on Monday, 01-Jun-26 21:00:00 PDT. The current time is Thursday, 11-Jun-26 08:00:11 PDT.\",\n    \"type\": \"OAuthException\",\n    \"code\": 190,\n    \"error_subcode\": 463,\n    \"fbtrace_id\": \"ADM3eePaYPqHvTfean1_zie\"\n  }\n}"
+        "message": "{\n  \"error\": {\n    \"message\": \"Error validating access token: Session has expired on Monday, 01-Jun-26 21:00:00 PDT. The current time is Friday, 12-Jun-26 05:43:12 PDT.\",\n    \"type\": \"OAuthException\",\n    \"code\": 190,\n    \"error_subcode\": 463,\n    \"fbtrace_id\": \"A9j0ijqTRnIFStuPaCWTILj\"\n  }\n}"
+      },
+      "ad": {
+        "status": "error",
+        "fieldMode": "core",
+        "message": "{\n  \"error\": {\n    \"message\": \"Error validating access token: Session has expired on Monday, 01-Jun-26 21:00:00 PDT. The current time is Friday, 12-Jun-26 05:43:12 PDT.\",\n    \"type\": \"OAuthException\",\n    \"code\": 190,\n    \"error_subcode\": 463,\n    \"fbtrace_id\": \"AgIxgXholZa-pb-yfIcwOzt\"\n  }\n}"
       }
     }
   },
@@ -33,16 +33,6 @@
     "tokenPresent": true,
     "advertiserIdPresent": true,
     "levels": {
-      "adgroup": {
-        "status": "error",
-        "metricSet": 3,
-        "metrics": [
-          "spend",
-          "impressions",
-          "clicks"
-        ],
-        "message": "{\n  \"code\": 40001,\n  \"message\": \"Permission error: The access token lacks the required scope for endpoint '/report/integrated/get/(method=GET)'. Please first check if the request method is correct then ask the user to generate a new access token and reauthorize your API App with the necessary API scopes.\",\n  \"request_id\": \"20260611230015BD0D33753ECD1B74E189\",\n  \"data\": {}\n}"
-      },
       "campaign": {
         "status": "error",
         "metricSet": 3,
@@ -51,7 +41,17 @@
           "impressions",
           "clicks"
         ],
-        "message": "{\n  \"code\": 40001,\n  \"message\": \"Permission error: The access token lacks the required scope for endpoint '/report/integrated/get/(method=GET)'. Please first check if the request method is correct then ask the user to generate a new access token and reauthorize your API App with the necessary API scopes.\",\n  \"request_id\": \"2026061123001582A85F4781220476490E\",\n  \"data\": {}\n}"
+        "message": "{\n  \"code\": 40001,\n  \"message\": \"Permission error: The access token lacks the required scope for endpoint '/report/integrated/get/(method=GET)'. Please first check if the request method is correct then ask the user to generate a new access token and reauthorize your API App with the necessary API scopes.\",\n  \"request_id\": \"20260612204317B5B491EE7B20AEBCFA6D\",\n  \"data\": {}\n}"
+      },
+      "adgroup": {
+        "status": "error",
+        "metricSet": 3,
+        "metrics": [
+          "spend",
+          "impressions",
+          "clicks"
+        ],
+        "message": "{\n  \"code\": 40001,\n  \"message\": \"Permission error: The access token lacks the required scope for endpoint '/report/integrated/get/(method=GET)'. Please first check if the request method is correct then ask the user to generate a new access token and reauthorize your API App with the necessary API scopes.\",\n  \"request_id\": \"20260612204317F0E814D251C689BF8E09\",\n  \"data\": {}\n}"
       },
       "ad": {
         "status": "error",
@@ -61,7 +61,7 @@
           "impressions",
           "clicks"
         ],
-        "message": "{\n  \"code\": 40001,\n  \"message\": \"Permission error: The access token lacks the required scope for endpoint '/report/integrated/get/(method=GET)'. Please first check if the request method is correct then ask the user to generate a new access token and reauthorize your API App with the necessary API scopes.\",\n  \"request_id\": \"20260611230015E5B205FFFDB285831FD2\",\n  \"data\": {}\n}"
+        "message": "{\n  \"code\": 40001,\n  \"message\": \"Permission error: The access token lacks the required scope for endpoint '/report/integrated/get/(method=GET)'. Please first check if the request method is correct then ask the user to generate a new access token and reauthorize your API App with the necessary API scopes.\",\n  \"request_id\": \"202606122043185AAB4BC3014C99BC4704\",\n  \"data\": {}\n}"
       }
     },
     "campaignGet": {
