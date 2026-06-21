@@ -1,4 +1,33 @@
 {
-  "generatedAt": null,
-  "message": "This file is overwritten by GitHub Actions and will show Meta API errors/row counts."
+  "generatedAt": "2026-06-21T15:20:10.932Z",
+  "datePreset": "last_30d",
+  "meta": {
+    "enabled": true,
+    "tokenPresent": true,
+    "adAccountIdPresent": true,
+    "graphVersion": "v24.0",
+    "levels": {
+      "campaign": {
+        "status": "ok",
+        "fieldMode": "full",
+        "rows": 18
+      },
+      "adset": {
+        "status": "ok",
+        "fieldMode": "full",
+        "rows": 46
+      },
+      "ad": {
+        "status": "ok",
+        "fieldMode": "full",
+        "rows": 103
+      }
+    }
+  },
+  "summary": {
+    "campaigns": 18,
+    "adsets": 46,
+    "ads": 103,
+    "totalRows": 167
+  }
 }
