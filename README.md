@@ -1,60 +1,90 @@
-# UMG Meta + TikTok Ads Dashboard — Debug Sync Package
+# UMG Meta Ads Dashboard — GitHub Pages
 
-This package is designed to diagnose why Meta and/or TikTok data is not pulling.
+This package is Meta-only. TikTok API code and TikTok secrets have been removed.
 
-## Replace these files in your GitHub repo
+## Files
+
+Upload these files to your GitHub repo root:
 
 ```text
 index.html
-scripts/sync-ads-data.mjs
-.github/workflows/sync-ads-data.yml
-```
-
-Also keep these files in the repo root:
-
-```text
 dashboard-data.json
 sync-debug.json
+scripts/sync-meta-ads.mjs
+.github/workflows/sync-meta.yml
+README.md
 ```
 
-## Required GitHub secrets
+## GitHub Secrets
 
-Meta:
+Go to:
+
+```text
+Settings > Secrets and variables > Actions
+```
+
+Add:
 
 ```text
 META_ACCESS_TOKEN
 META_AD_ACCOUNT_ID
 ```
 
-TikTok:
-
-```text
-TIKTOK_ACCESS_TOKEN
-TIKTOK_ADVERTISER_ID
-```
-
-Optional Meta version override:
+Optional:
 
 ```text
 META_GRAPH_VERSION
+META_DATE_PRESET
 ```
 
-Leave this blank unless you need to force a version such as `v24.0`.
+Default values:
 
-## How to test
+```text
+META_GRAPH_VERSION = v24.0
+META_DATE_PRESET = last_30d
+```
 
-1. Commit these files.
-2. Go to GitHub Actions.
-3. Run `Sync Ads Data (Meta + TikTok)`.
-4. After it finishes, open `sync-debug.json` in the repo.
+## Run sync
 
-The debug file will show:
+Go to:
 
-- whether each secret was present
-- whether Meta was skipped, errored, or returned rows
-- whether TikTok was skipped, errored, or returned rows
-- row counts for campaign, ad set/ad group, and ad levels
+```text
+Actions > Sync Meta Ads Data > Run workflow
+```
 
-## Notes
+The workflow writes:
 
-The workflow no longer fails just because an API returns zero rows. It writes `sync-debug.json` so you can see the exact issue.
+```text
+dashboard-data.json
+sync-debug.json
+```
+
+## Open dashboard
+
+Enable GitHub Pages:
+
+```text
+Settings > Pages > Deploy from branch > main > /root
+```
+
+Open the Pages URL and click:
+
+```text
+Sync GitHub Data
+```
+
+The dashboard also auto-loads `dashboard-data.json` through:
+
+```js
+loadRemoteData(true)
+```
+
+## Important localStorage fix
+
+This package uses:
+
+```text
+umg_meta_ads_dashboard_v1
+```
+
+as the localStorage key. It merges synced `dashboard-data.json` weeks into localStorage, so data is retained and does not disappear on refresh.
