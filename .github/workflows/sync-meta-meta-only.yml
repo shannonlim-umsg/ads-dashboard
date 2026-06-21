@@ -1,0 +1,36 @@
+name: Sync Meta Ads Data
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 1 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  sync-meta-ads:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Pull Meta Ads Data
+        env:
+          META_ACCESS_TOKEN: ${{ secrets.META_ACCESS_TOKEN }}
+          META_AD_ACCOUNT_ID: ${{ secrets.META_AD_ACCOUNT_ID }}
+          META_GRAPH_VERSION: ${{ secrets.META_GRAPH_VERSION }}
+          META_DATE_PRESET: ${{ secrets.META_DATE_PRESET }}
+        run: node scripts/sync-meta-ads.mjs
+
+      - name: Commit updated dashboard data
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Update Meta Ads dashboard data"
+          file_pattern: dashboard-data.json sync-debug.json
