@@ -343,7 +343,43 @@ function saveCustomCell(td){const week=state.weeks.find(w=>w.id===td.dataset.wee
 function findObjectInWeek(w,id){return [...w.campaigns,...w.adsets,...w.ads].find(o=>o.id===id);}
 function hideColumn(key){state.columns=state.columns.map(c=>c.key===key?{...c,visible:false}:c);save();render();}
 function enableDrag(container,selector,attr,onSave){let dragged=null;container.querySelectorAll(selector).forEach(el=>{el.addEventListener('dragstart',e=>{dragged=el;el.classList.add('dragging');e.dataTransfer.effectAllowed='move';});el.addEventListener('dragend',()=>{el.classList.remove('dragging');container.querySelectorAll(selector).forEach(x=>x.classList.remove('drop-target'));onSave([...container.querySelectorAll(selector)].map(x=>x.dataset[attr]));});el.addEventListener('dragover',e=>{e.preventDefault();if(el!==dragged)el.classList.add('drop-target');});el.addEventListener('dragleave',()=>el.classList.remove('drop-target'));el.addEventListener('drop',e=>{e.preventDefault();el.classList.remove('drop-target');if(!dragged||dragged===el)return;const items=[...container.querySelectorAll(selector)];const from=items.indexOf(dragged),to=items.indexOf(el);if(from<to)el.after(dragged);else el.before(dragged);});});}
-async function loadRemoteData(auto=true){try{const res=await fetch(REMOTE_JSON+'?ts='+Date.now());if(!res.ok)throw new Error('dashboard-data.json not found');const data=await res.json();if(!Array.isArray(data.weeks))throw new Error('No weeks array in dashboard-data.json');mergeRemoteWeeks(data.weeks);save();render();setStatus('Synced GitHub data');if(!auto)alert('GitHub-synced data loaded and retained in this browser.');}catch(e){console.warn(e);setStatus(auto?'No remote data loaded':'Sync failed');if(!auto)alert('Could not load dashboard-data.json. Make sure GitHub Actions has run.');}}
+async function loadRemoteData(auto=true){
+  try {
+    const res = await fetch(REMOTE_JSON + '?ts=' + Date.now());
+
+    if (!res.ok) {
+      throw new Error('dashboard-data.json not found');
+    }
+
+    const data = await res.json();
+
+    if (!Array.isArray(data.weeks)) {
+      throw new Error('No weeks array in dashboard-data.json');
+    }
+
+    if (!data.weeks.length) {
+      throw new Error('dashboard-data.json has no synced weeks');
+    }
+
+    mergeRemoteWeeks(data.weeks);
+    save();
+    render();
+
+    setStatus('Synced GitHub data');
+
+    if (!auto) {
+      alert('GitHub-synced data loaded and retained in this browser.');
+    }
+
+  } catch (e) {
+    console.warn(e);
+    setStatus(auto ? 'No remote data loaded' : 'Sync failed');
+
+    if (!auto) {
+      alert('Could not load dashboard-data.json. Open dashboard-data.json directly and confirm it has a weeks array with campaign data.');
+    }
+  }
+}
 function mergeRemoteWeeks(weeks){weeks.map(normalizeWeek).forEach(w=>{const i=state.weeks.findIndex(x=>x.id===w.id);if(i>=0)state.weeks[i]=preserveCustomFields(state.weeks[i],w);else state.weeks.push(w);});}
 function preserveCustomFields(oldW,newW){['campaigns','adsets','ads'].forEach(k=>{newW[k]=newW[k].map(n=>{const old=(oldW[k]||[]).find(o=>o.id===n.id);return old?{...n,customFields:old.customFields||n.customFields||{}}:n;});});return newW;}
 function openWeekEditor(existing){const w=existing?state.weeks.find(x=>x.id===getVal('weekFilter'))||state.weeks[state.weeks.length-1]:null;editingWeekId=w?.id||null;document.getElementById('weekModalTitle').textContent=w?'Edit Week':'Add / Update Week';document.getElementById('weekLabel').value=w?.label||'Manual Week '+todayISO();document.getElementById('weekStart').value=w?.dateFrom||'';document.getElementById('weekEnd').value=w?.dateTo||todayISO();document.getElementById('weekPeriod').value=w?.period||'Manual entry';document.getElementById('campaignEditRows').innerHTML='';document.getElementById('adsetEditRows').innerHTML='';document.getElementById('adEditRows').innerHTML='';(w?.campaigns||[]).forEach(addCampaignEditRow);(w?.adsets||[]).forEach(addAdsetEditRow);(w?.ads||[]).forEach(addAdEditRow);if(!w)addCampaignEditRow();switchWeekTab('campaigns');openModal('weekModal');}
