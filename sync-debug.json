@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-21T15:20:10.932Z",
+  "generatedAt": "2026-06-22T06:17:45.972Z",
   "datePreset": "last_30d",
   "meta": {
     "enabled": true,
@@ -7,27 +7,27 @@
     "adAccountIdPresent": true,
     "graphVersion": "v24.0",
     "levels": {
-      "campaign": {
-        "status": "ok",
-        "fieldMode": "full",
-        "rows": 18
-      },
       "adset": {
-        "status": "ok",
-        "fieldMode": "full",
-        "rows": 46
+        "status": "error",
+        "fieldMode": "core",
+        "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"ArnkJUBGKO7B9K84m7YEWMs\"\n}"
       },
       "ad": {
-        "status": "ok",
-        "fieldMode": "full",
-        "rows": 103
+        "status": "error",
+        "fieldMode": "core",
+        "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"Ah2BNZBL7AGzKw1QPoJiSGD\"\n}"
+      },
+      "campaign": {
+        "status": "error",
+        "fieldMode": "core",
+        "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"ARz48fPDLn04ez4saqiyQuK\"\n}"
       }
     }
   },
   "summary": {
-    "campaigns": 18,
-    "adsets": 46,
-    "ads": 103,
-    "totalRows": 167
+    "campaigns": 0,
+    "adsets": 0,
+    "ads": 0,
+    "totalRows": 0
   }
 }
