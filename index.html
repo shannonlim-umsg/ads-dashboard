@@ -160,6 +160,7 @@ tr.campaign-row-main,tr.adset-row-main{cursor:pointer}tr.campaign-row-main td:fi
 <script>
 const STORAGE_KEY='umg_meta_ads_dashboard_v1';
 const REMOTE_JSON='./dashboard-data.json';
+const SYNC_DEBUG_JSON='./sync-debug.json';
 let state={weeks:[],cards:null,metrics:null,columns:null,customSections:[],sectionOrder:null,meta:{title:'UMG Meta Ads Dashboard',subtitle:'Meta campaign, ad set, and ad results · Last 30 days · Editable dashboard · Safe update',footer:'Data is stored locally in this browser and merged with GitHub-synced dashboard-data.json.'}};
 let charts={}, editingExisting=false, editingIndex=-1, selectedSectionType='stat';
 if(typeof structuredClone==='undefined') window.structuredClone=o=>JSON.parse(JSON.stringify(o));
@@ -175,7 +176,7 @@ const slugify=s=>String(s||'').toLowerCase().trim().replace(/[^a-z0-9]+/g,'_').r
 function todayISO(){return new Date().toISOString().slice(0,10)}
 function isoWeek(d){const s=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const day=s.getUTCDay()||7;s.setUTCDate(s.getUTCDate()+4-day);const y=new Date(Date.UTC(s.getUTCFullYear(),0,1));return Math.ceil((((s-y)/86400000)+1)/7)}
 function periodText(d){const mon=new Date(d);mon.setDate(d.getDate()-(d.getDay()||7)+1);const sun=new Date(mon);sun.setDate(mon.getDate()+6);return mon.toLocaleDateString('en-US',{month:'short',day:'numeric'})+'–'+sun.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}
-function setStatus(t){document.getElementById('saveState').textContent=t}
+function setSaveStatus(t){document.getElementById('saveState').textContent=t}
 
 const DEFAULT_METRICS=[
  {key:'spend',label:'Spend',type:'currency',enabled:true,editable:true,base:true},
@@ -210,8 +211,20 @@ const DEFAULT_COLS=[
 ];
 
 function defaultCards(){return enabledMetrics().filter(m=>['spend','impressions','reach','clicks_all','ctr_all','cpc_all','cpm','link_clicks','ctr_link','cpc_link','purchases','purchase_roas','revenue','roas','conversions'].includes(m.key)).map(m=>({id:m.key,label:m.label,note:m.editable?'Meta metric':'Calculated',visible:true})).concat([{id:'rows',label:'Rows',note:'Matching campaign rows',visible:true}])}
-function load(){try{const s=JSON.parse(localStorage.getItem(STORAGE_KEY));if(s)state={...state,...s}}catch{}; if(!state.metrics)state.metrics=structuredClone(DEFAULT_METRICS); if(!state.columns)state.columns=structuredClone(DEFAULT_COLS); if(!state.cards)state.cards=defaultCards(); if(!state.sectionOrder)state.sectionOrder=['trend','platform','clickConv','spendRevenue','rank','table'];}
-function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state));setStatus('Saved in this browser')}
+function hasRows(w){return (w?.campaigns?.length||0)+(w?.adsets?.length||0)+(w?.ads?.length||0)>0}
+function normalizeState(){
+  if(!state.metrics)state.metrics=structuredClone(DEFAULT_METRICS);
+  if(!state.columns)state.columns=structuredClone(DEFAULT_COLS);
+  const defaults=defaultCards();
+  if(!state.cards||!state.cards.length)state.cards=defaults;
+  const missing=defaults.filter(d=>!state.cards.some(c=>c.id===d.id));
+  if(missing.length)state.cards=[...state.cards,...missing];
+  if(!state.cards.some(c=>c.visible))state.cards=defaults;
+  if(!state.sectionOrder)state.sectionOrder=['trend','platform','clickConv','spendRevenue','rank','table'];
+  state.weeks=(state.weeks||[]).filter(hasRows);
+}
+function load(){try{const s=JSON.parse(localStorage.getItem(STORAGE_KEY));if(s)state={...state,...s}}catch{}; normalizeState();}
+function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state));setSaveStatus('Saved in this browser')}
 function enabledMetrics(){return (state.metrics||DEFAULT_METRICS).filter(m=>m.enabled)}
 function editableMetrics(){return (state.metrics||DEFAULT_METRICS).filter(m=>m.enabled&&m.editable)}
 function metricByKey(k){return (state.metrics||DEFAULT_METRICS).find(m=>m.key===k)||{key:k,label:k,type:'number'}}
@@ -225,6 +238,8 @@ function getMetricRaw(row,key){return calcMetric(key,row)}
 
 function mergeRemoteWeeks(weeks){
   if(!Array.isArray(weeks))return;
+  weeks=weeks.filter(hasRows);
+  if(!weeks.length)return;
   const existing=state.weeks||[];
   const merged=[...existing];
   weeks.forEach(w=>{
@@ -235,22 +250,40 @@ function mergeRemoteWeeks(weeks){
   });
   state.weeks=merged;
 }
+async function loadSyncDebug(){
+  try{
+    const res=await fetch(SYNC_DEBUG_JSON+'?ts='+Date.now());
+    if(!res.ok)return null;
+    return await res.json();
+  }catch{return null}
+}
+function syncErrorMessage(debug){
+  const levels=debug?.meta?.levels||{};
+  const failed=Object.values(levels).find(x=>x?.status==='error');
+  if(!failed)return 'Could not load dashboard-data.json.';
+  if(String(failed.message||'').includes('Error validating access token'))return 'Meta sync failed: refresh the META_ACCESS_TOKEN GitHub secret.';
+  return 'Meta sync failed. Check sync-debug.json for details.';
+}
 async function loadRemoteData(auto=true){
   try{
     const res=await fetch(REMOTE_JSON+'?ts='+Date.now());
     if(!res.ok)throw new Error('dashboard-data.json not found');
     const data=await res.json();
     if(!Array.isArray(data.weeks))throw new Error('No weeks array in dashboard-data.json');
-    if(!data.weeks.length)throw new Error('dashboard-data.json has no synced weeks');
-    mergeRemoteWeeks(data.weeks);
+    const usableWeeks=data.weeks.filter(hasRows);
+    if(!usableWeeks.length)throw new Error('dashboard-data.json has no synced weeks with rows');
+    mergeRemoteWeeks(usableWeeks);
+    normalizeState();
     save();
     render();
-    setStatus('Synced GitHub data');
+    setSaveStatus('Synced GitHub data');
     if(!auto)alert('GitHub-synced Meta data loaded and retained in this browser.');
   }catch(e){
     console.warn(e);
-    setStatus(auto?'No remote data loaded':'Sync failed');
-    if(!auto)alert('Could not load dashboard-data.json. Open dashboard-data.json directly and confirm it has a weeks array with campaign data.');
+    const debug=await loadSyncDebug();
+    const message=syncErrorMessage(debug);
+    setSaveStatus(auto?(state.weeks?.length?'Using last good data':'No remote data loaded'):'Sync failed');
+    if(!auto)alert(message);
   }
 }
 
@@ -274,7 +307,7 @@ function deltaHtml(c,p){if(p===undefined||p===null)return'';const d=c-p;if(d===0
 
 function buildFilters(){const sec=document.getElementById('filtersSection');sec.innerHTML=`<div class="filter"><label>Week</label><select id="weekFilter"></select></div><div class="filter"><label>Artist</label><select id="artistFilter"></select></div><div class="filter"><label>Platform</label><select id="platformFilter"></select></div><div class="filter"><label>Campaign Type</label><select id="typeFilter"></select></div><div class="filter"><label>Campaign</label><select id="campaignFilter"></select></div><div class="filter"><label>Rank chart by</label><select id="metricFilter"></select></div>`;['weekFilter','artistFilter','platformFilter','typeFilter','campaignFilter','metricFilter'].forEach(id=>document.getElementById(id).addEventListener('change',render))}
 function refreshFilters(){const weeks=state.weeks||[],rows=allRows();function fill(id,vals,all){const sel=document.getElementById(id);const cur=sel.value||'All';sel.innerHTML=`<option value="All">${all}</option>`+vals.map(v=>`<option value="${esc(v.value??v)}">${esc(v.label??v)}</option>`).join('');if([...sel.options].some(o=>o.value===cur))sel.value=cur}fill('weekFilter',weeks.map((w,i)=>({value:String(i),label:`${w.label} · ${w.period||''}`})),'All weeks');fill('artistFilter',uniq(rows.map(r=>r.artist)).map(v=>({value:v,label:v})),'All artists');fill('platformFilter',uniq(rows.map(r=>r.platform)).map(v=>({value:v,label:v})),'All platforms');fill('typeFilter',uniq(rows.map(r=>r.type)).map(v=>({value:v,label:v})),'All types');fill('campaignFilter',uniq(rows.map(r=>r.name)).map(v=>({value:v,label:v})),'All campaigns');fill('metricFilter',enabledMetrics().map(m=>({value:m.key,label:m.label})),'Spend');if(getFilterVal('metricFilter')==='All')document.getElementById('metricFilter').value='spend'}
-function renderKpis(rows){const t=totalize(rows),p=totalize(prevRows(rows));const vmap={};enabledMetrics().forEach(m=>{const cur=calcMetric(m.key,t),prev=calcMetric(m.key,p);const sd=['spend','revenue','clicks_all','link_clicks','purchases','conversions'].includes(m.key);vmap[m.key]={value:fmtMetric(m.key,cur),delta:sd?deltaHtml(cur,prev):''}});vmap.rows={value:num(rows.length),delta:''};document.getElementById('kpis').innerHTML=(state.cards||defaultCards()).filter(c=>c.visible).map(c=>{const v=c.staticValue?{value:c.staticValue,delta:''}:(vmap[c.id]||{value:'—',delta:''});return`<div class="card draggable" draggable="true" data-card-id="${c.id}"><div class="card-tools"><div class="kpi-label">${esc(c.label)}</div><div class="card-actions"><button class="icon-btn" onclick="hideCard('${c.id}')">×</button><span class="drag-handle">⋮⋮</span></div></div><div class="kpi-value">${v.value}</div>${v.delta}<div class="kpi-note">${esc(c.note||'')}</div></div>`}).join('');enableCardDrag()}
+function renderKpis(rows){const t=totalize(rows),p=totalize(prevRows(rows));const vmap={};enabledMetrics().forEach(m=>{const cur=calcMetric(m.key,t),prev=calcMetric(m.key,p);const sd=['spend','revenue','clicks_all','link_clicks','purchases','conversions'].includes(m.key);vmap[m.key]={value:fmtMetric(m.key,cur),delta:sd?deltaHtml(cur,prev):''}});vmap.rows={value:num(rows.length),delta:''};let cards=(state.cards||defaultCards()).filter(c=>c.visible);if(!cards.length){state.cards=defaultCards();cards=state.cards}document.getElementById('kpis').innerHTML=cards.map(c=>{const v=c.staticValue?{value:c.staticValue,delta:''}:(vmap[c.id]||{value:'—',delta:''});return`<div class="card draggable" draggable="true" data-card-id="${c.id}"><div class="card-tools"><div class="kpi-label">${esc(c.label)}</div><div class="card-actions"><button class="icon-btn" onclick="hideCard('${c.id}')">×</button><span class="drag-handle">⋮⋮</span></div></div><div class="kpi-value">${v.value}</div>${v.delta}<div class="kpi-note">${esc(c.note||'')}</div></div>`}).join('');enableCardDrag()}
 function enableCardDrag(){const wrap=document.getElementById('kpis');let dragged=null;wrap.querySelectorAll('.card.draggable').forEach(card=>{card.addEventListener('dragstart',e=>{dragged=card;card.classList.add('dragging')});card.addEventListener('dragend',()=>{card.classList.remove('dragging');persistCardOrder()});card.addEventListener('dragover',e=>{e.preventDefault()});card.addEventListener('drop',e=>{e.preventDefault();if(!dragged||dragged===card)return;const cards=[...wrap.querySelectorAll('.card.draggable')];const f=cards.indexOf(dragged),t=cards.indexOf(card);if(f<t)card.after(dragged);else card.before(dragged);persistCardOrder()})})}
 function persistCardOrder(){const order=[...document.querySelectorAll('#kpis .card.draggable')].map(el=>el.dataset.cardId);state.cards.sort((a,b)=>{const ai=order.indexOf(a.id),bi=order.indexOf(b.id);if(ai===-1&&bi===-1)return 0;if(ai===-1)return 1;if(bi===-1)return-1;return ai-bi});save()}
 function hideCard(id){state.cards=state.cards.map(c=>c.id===id?{...c,visible:false}:c);save();render()}
@@ -312,8 +345,8 @@ function openEditor(existing){const weeks=state.weeks||[];editingExisting=!!exis
 function closeEditor(){document.getElementById('editModal').classList.remove('open')}
 function updatePeriodFromDates(){const f=document.getElementById('dateFrom').value,t=document.getElementById('dateTo').value;if(f&&t){const fd=new Date(f+'T00:00:00'),td=new Date(t+'T00:00:00');const opts={month:'short',day:'numeric'};document.getElementById('weekPeriod').value=fd.toLocaleDateString('en-US',opts)+'–'+td.toLocaleDateString('en-US',{...opts,year:'numeric'})}}
 function opt(vals,sel){return vals.map(v=>`<option ${v===sel?'selected':''}>${v}</option>`).join('')}
-function addEditorRow(data={}){const d={artist:'',name:'New campaign',platform:'Meta',type:'Traffic',status:'active',...data};const div=document.createElement('div');div.className='campaign-block';div.innerHTML=`<div class="campaign-block-header"><div class="campaign-block-title"><span>▶</span><span class="cb-name-display">${esc(d.name)||'New campaign'}</span></div><div class="toggle"><button type="button" onclick="setStatus(this,'active')" class="${d.status!=='paused'?'sel':''}">Active</button><button type="button" onclick="setStatus(this,'paused')" class="paused ${d.status==='paused'?'sel':''}">Paused</button><button type="button" class="danger" onclick="this.closest('.campaign-block').remove()">Remove</button></div></div><div class="campaign-block-body"><div class="row-top"><div><div class="mini">Artist</div><input class="artist" value="${esc(d.artist)}"/></div><div><div class="mini">Campaign name</div><input class="name" value="${esc(d.name)}" oninput="this.closest('.campaign-block').querySelector('.cb-name-display').textContent=this.value||'New campaign'"/></div><div><div class="mini">Platform</div><select class="platform">${opt(['Meta'],d.platform)}</select></div><div><div class="mini">Campaign type</div><select class="type">${opt(['Traffic','Reach','Views','KOL Boost','Conversions','Brand Awareness'],d.type)}</select></div><div></div></div><div class="row-metrics">${editableMetrics().map(m=>`<div><div class="mini">${esc(m.label)}</div><input class="metric-input" data-metric="${esc(m.key)}" type="number" step="${m.type==='currency'||m.type==='percent'||m.type==='ratio'?'0.01':'1'}" value="${d[m.key]||0}"/></div>`).join('')}</div></div>`;document.getElementById('editorRows').appendChild(div)}
-function setStatus(btn,status){const row=btn.closest('.toggle');row.querySelectorAll('button').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel')}
+function addEditorRow(data={}){const d={artist:'',name:'New campaign',platform:'Meta',type:'Traffic',status:'active',...data};const div=document.createElement('div');div.className='campaign-block';div.innerHTML=`<div class="campaign-block-header"><div class="campaign-block-title"><span>▶</span><span class="cb-name-display">${esc(d.name)||'New campaign'}</span></div><div class="toggle"><button type="button" onclick="setCampaignStatus(this,'active')" class="${d.status!=='paused'?'sel':''}">Active</button><button type="button" onclick="setCampaignStatus(this,'paused')" class="paused ${d.status==='paused'?'sel':''}">Paused</button><button type="button" class="danger" onclick="this.closest('.campaign-block').remove()">Remove</button></div></div><div class="campaign-block-body"><div class="row-top"><div><div class="mini">Artist</div><input class="artist" value="${esc(d.artist)}"/></div><div><div class="mini">Campaign name</div><input class="name" value="${esc(d.name)}" oninput="this.closest('.campaign-block').querySelector('.cb-name-display').textContent=this.value||'New campaign'"/></div><div><div class="mini">Platform</div><select class="platform">${opt(['Meta'],d.platform)}</select></div><div><div class="mini">Campaign type</div><select class="type">${opt(['Traffic','Reach','Views','KOL Boost','Conversions','Brand Awareness'],d.type)}</select></div><div></div></div><div class="row-metrics">${editableMetrics().map(m=>`<div><div class="mini">${esc(m.label)}</div><input class="metric-input" data-metric="${esc(m.key)}" type="number" step="${m.type==='currency'||m.type==='percent'||m.type==='ratio'?'0.01':'1'}" value="${d[m.key]||0}"/></div>`).join('')}</div></div>`;document.getElementById('editorRows').appendChild(div)}
+function setCampaignStatus(btn,status){const row=btn.closest('.toggle');row.querySelectorAll('button').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel')}
 function getCampaignNames(){return[...document.querySelectorAll('#editorRows .campaign-block .name')].map(i=>i.value.trim()).filter(Boolean)}
 function getAdsetNames(){return[...document.querySelectorAll('#adsetEditorRows .adset-row-editor .as-name')].map(i=>i.value.trim()).filter(Boolean)}
 function addAdsetRow(data={}){const d={campaign:'',name:'Ad Set 1',platform:'Meta',status:'active',...data};const campNames=getCampaignNames();const div=document.createElement('div');div.className='adset-row-editor';div.innerHTML=`<div><div class="mini">Campaign</div><select class="as-campaign">${[...new Set([d.campaign,...campNames].filter(Boolean))].map(n=>`<option ${n===d.campaign?'selected':''}>${esc(n)}</option>`).join('')}</select></div><div><div class="mini">Ad set name</div><input class="as-name" value="${esc(d.name)}"/></div><div><div class="mini">Platform</div><select class="as-platform">${opt(['Meta'],d.platform)}</select></div>${editableMetrics().map(m=>`<div><div class="mini">${esc(m.label)}</div><input class="as-metric" data-key="${esc(m.key)}" type="number" step="${m.type==='currency'||m.type==='percent'||m.type==='ratio'?'0.01':'1'}" value="${d[m.key]||0}"/></div>`).join('')}<div><button class="danger" onclick="this.closest('.adset-row-editor').remove()">×</button></div>`;document.getElementById('adsetEditorRows').appendChild(div)}

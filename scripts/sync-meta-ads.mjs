@@ -71,6 +71,8 @@ const debug = {
   }
 };
 
+let hadFetchError = false;
+
 async function fetchAllPages(url) {
   const all = [];
   let next = url;
@@ -109,6 +111,7 @@ async function fetchInsights(level, fieldMode = "full") {
       debug.meta.levels[level] = { status: "retrying_core_fields", fieldMode, message: error.message };
       return fetchInsights(level, "core");
     }
+    hadFetchError = true;
     debug.meta.levels[level] = { status: "error", fieldMode, message: error.message };
     return [];
   }
@@ -292,6 +295,7 @@ const [campaignRaw, adsetRaw, adRaw] = await Promise.all([
 const campaigns = campaignRaw.map(mapCampaign);
 const adsets = adsetRaw.map(mapAdset);
 const ads = adRaw.map(mapAd);
+const totalRows = campaigns.length + adsets.length + ads.length;
 
 const today = new Date().toISOString().slice(0, 10);
 const week = {
@@ -330,8 +334,21 @@ debug.summary = {
   campaigns: campaigns.length,
   adsets: adsets.length,
   ads: ads.length,
-  totalRows: campaigns.length + adsets.length + ads.length
+  totalRows
 };
+
+if (hadFetchError || totalRows === 0) {
+  debug.summary.skippedDashboardDataUpdate = true;
+  debug.summary.reason = hadFetchError
+    ? "Meta API returned an error. Existing dashboard-data.json was left unchanged."
+    : "Meta API returned zero rows. Existing dashboard-data.json was left unchanged.";
+  fs.writeFileSync("sync-debug.json", JSON.stringify(debug, null, 2));
+  console.log("Skipped dashboard-data.json update because Meta did not return usable rows.");
+  console.log(`Meta campaigns: ${campaigns.length}`);
+  console.log(`Meta ad sets: ${adsets.length}`);
+  console.log(`Meta ads: ${ads.length}`);
+  process.exit(0);
+}
 
 fs.writeFileSync("dashboard-data.json", JSON.stringify(output, null, 2));
 fs.writeFileSync("sync-debug.json", JSON.stringify(debug, null, 2));

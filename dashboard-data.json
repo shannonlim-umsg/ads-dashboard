@@ -4398,30 +4398,6 @@
       ],
       "source": "Meta Marketing API",
       "syncedAt": "2026-06-21T15:20:23.800Z"
-    },
-    {
-      "id": "meta_last_30d_2026-06-22",
-      "label": "Meta last 30d 2026-06-22",
-      "period": "last_30d",
-      "dateFrom": "",
-      "dateTo": "",
-      "campaigns": [],
-      "adsets": [],
-      "ads": [],
-      "source": "Meta Marketing API",
-      "syncedAt": "2026-06-22T06:17:46.500Z"
-    },
-    {
-      "id": "meta_last_30d_2026-06-23",
-      "label": "Meta last 30d 2026-06-23",
-      "period": "last_30d",
-      "dateFrom": "",
-      "dateTo": "",
-      "campaigns": [],
-      "adsets": [],
-      "ads": [],
-      "source": "Meta Marketing API",
-      "syncedAt": "2026-06-23T04:53:01.133Z"
     }
   ]
 }
