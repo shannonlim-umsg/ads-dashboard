@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-22T06:17:46.501Z",
+  "generatedAt": "2026-06-23T04:53:01.134Z",
   "source": "Meta Marketing API",
   "datePreset": "last_30d",
   "weeks": [
@@ -4410,6 +4410,18 @@
       "ads": [],
       "source": "Meta Marketing API",
       "syncedAt": "2026-06-22T06:17:46.500Z"
+    },
+    {
+      "id": "meta_last_30d_2026-06-23",
+      "label": "Meta last 30d 2026-06-23",
+      "period": "last_30d",
+      "dateFrom": "",
+      "dateTo": "",
+      "campaigns": [],
+      "adsets": [],
+      "ads": [],
+      "source": "Meta Marketing API",
+      "syncedAt": "2026-06-23T04:53:01.133Z"
     }
   ]
 }

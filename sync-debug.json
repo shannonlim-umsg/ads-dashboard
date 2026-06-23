@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-22T06:17:45.972Z",
+  "generatedAt": "2026-06-23T04:53:00.721Z",
   "datePreset": "last_30d",
   "meta": {
     "enabled": true,
@@ -7,20 +7,20 @@
     "adAccountIdPresent": true,
     "graphVersion": "v24.0",
     "levels": {
-      "adset": {
-        "status": "error",
-        "fieldMode": "core",
-        "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"ArnkJUBGKO7B9K84m7YEWMs\"\n}"
-      },
       "ad": {
         "status": "error",
         "fieldMode": "core",
-        "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"Ah2BNZBL7AGzKw1QPoJiSGD\"\n}"
+        "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AiRLQpdVVBOFW5KeZmtN1sl\"\n}"
       },
       "campaign": {
         "status": "error",
         "fieldMode": "core",
-        "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"ARz48fPDLn04ez4saqiyQuK\"\n}"
+        "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"Aw665JjNY0zzouXkQMpIiby\"\n}"
+      },
+      "adset": {
+        "status": "error",
+        "fieldMode": "core",
+        "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"ASUyazd-dBVf2rI5G-ezpkS\"\n}"
       }
     }
   },
