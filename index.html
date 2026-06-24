@@ -58,12 +58,12 @@ tr.campaign-row-main,tr.adset-row-main{cursor:pointer}tr.campaign-row-main td:fi
   <div>
     <h1 id="dashTitle" contenteditable="true" spellcheck="false">UMG Meta Ads Dashboard</h1>
     <div class="sub" id="dashSubtitle" contenteditable="true" spellcheck="false">Meta campaign, ad set, and ad results · Last 30 days · Editable dashboard · Safe update</div>
-    <div class="badge"><span class="dot"></span><span id="saveState">Saved in this browser</span></div>
+    <div class="badge"><span class="dot"></span><span id="saveState">Loading live data</span></div>
   </div>
   <div class="actions">
     <button onclick="openHistory()">📅 Weeks</button>
     <button class="primary" onclick="openEditor(false)">＋ Update this week</button>
-    <button onclick="loadRemoteData(false)">Sync GitHub Data</button>
+    <button onclick="loadRemoteData(false)">Refresh Live Data</button>
     <button onclick="openCardSettings()">⚙️ Cards</button>
     <button onclick="openMetricSettings()">📐 Metrics</button>
     <button onclick="openColSettings()">⬜ Table columns</button>
@@ -75,7 +75,7 @@ tr.campaign-row-main,tr.adset-row-main{cursor:pointer}tr.campaign-row-main td:fi
 
 <div id="emptyState" class="empty" style="display:none">
   <div style="font-size:38px">📊</div><h2>No data yet</h2>
-  <p>The dashboard controls and cards are visible below. Click <b>Sync GitHub Data</b> after the workflow runs, or <b>＋ Update this week</b> to add data manually.</p>
+  <p>The dashboard controls and cards are visible below. Click <b>Refresh Live Data</b> after the workflow runs.</p>
 </div>
 
 <div id="dash">
@@ -89,7 +89,7 @@ tr.campaign-row-main,tr.adset-row-main{cursor:pointer}tr.campaign-row-main td:fi
   <button class="add-section-btn" onclick="openAddSection()">＋ Add new section</button>
 </div>
 
-<div class="footer" id="dashFooter" contenteditable="true" spellcheck="false">Data is stored locally in this browser and merged with GitHub-synced dashboard-data.json.</div>
+<div class="footer" id="dashFooter" contenteditable="true" spellcheck="false">Dashboard data is loaded from GitHub-synced dashboard-data.json so every visitor sees the same results. Browser storage is used only for display preferences.</div>
 </div>
 
 <div class="modal-backdrop" id="editModal"><div class="modal">
@@ -161,7 +161,7 @@ tr.campaign-row-main,tr.adset-row-main{cursor:pointer}tr.campaign-row-main td:fi
 const STORAGE_KEY='umg_meta_ads_dashboard_v1';
 const REMOTE_JSON='./dashboard-data.json';
 const SYNC_DEBUG_JSON='./sync-debug.json';
-let state={weeks:[],cards:null,metrics:null,columns:null,customSections:[],sectionOrder:null,meta:{title:'UMG Meta Ads Dashboard',subtitle:'Meta campaign, ad set, and ad results · Last 30 days · Editable dashboard · Safe update',footer:'Data is stored locally in this browser and merged with GitHub-synced dashboard-data.json.'}};
+let state={weeks:[],cards:null,metrics:null,columns:null,customSections:[],sectionOrder:null,meta:{title:'UMG Meta Ads Dashboard',subtitle:'Meta campaign, ad set, and ad results · Last 30 days · Editable dashboard · Safe update',footer:'Dashboard data is loaded from GitHub-synced dashboard-data.json so every visitor sees the same results. Browser storage is used only for display preferences.'}};
 let charts={}, editingExisting=false, editingIndex=-1, selectedSectionType='stat';
 if(typeof structuredClone==='undefined') window.structuredClone=o=>JSON.parse(JSON.stringify(o));
 
@@ -223,8 +223,8 @@ function normalizeState(){
   if(!state.sectionOrder)state.sectionOrder=['trend','platform','clickConv','spendRevenue','rank','table'];
   state.weeks=(state.weeks||[]).filter(hasRows);
 }
-function load(){try{const s=JSON.parse(localStorage.getItem(STORAGE_KEY));if(s)state={...state,...s}}catch{}; normalizeState();}
-function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state));setSaveStatus('Saved in this browser')}
+function load(){try{const s=JSON.parse(localStorage.getItem(STORAGE_KEY));if(s){const {cards,metrics,columns,customSections,sectionOrder,meta}=s;state={...state,cards,metrics,columns,customSections,sectionOrder,meta}}}catch{}; normalizeState();}
+function save(){const {cards,metrics,columns,customSections,sectionOrder,meta}=state;localStorage.setItem(STORAGE_KEY,JSON.stringify({cards,metrics,columns,customSections,sectionOrder,meta}));setSaveStatus('Display preferences saved')}
 function enabledMetrics(){return (state.metrics||DEFAULT_METRICS).filter(m=>m.enabled)}
 function editableMetrics(){return (state.metrics||DEFAULT_METRICS).filter(m=>m.enabled&&m.editable)}
 function metricByKey(k){return (state.metrics||DEFAULT_METRICS).find(m=>m.key===k)||{key:k,label:k,type:'number'}}
@@ -236,19 +236,11 @@ function getCellValue(r,key){if(key==='week'||key==='period'||key==='artist'||ke
 function isNumCol(key){return !['week','period','artist','name','platform','type','status'].includes(key)}
 function getMetricRaw(row,key){return calcMetric(key,row)}
 
-function mergeRemoteWeeks(weeks){
+function setRemoteWeeks(weeks){
   if(!Array.isArray(weeks))return;
   weeks=weeks.filter(hasRows);
   if(!weeks.length)return;
-  const existing=state.weeks||[];
-  const merged=[...existing];
-  weeks.forEach(w=>{
-    const id=w.id||w.label;
-    const idx=merged.findIndex(x=>(x.id||x.label)===id);
-    if(idx>=0)merged[idx]={...merged[idx],...w};
-    else merged.push(w);
-  });
-  state.weeks=merged;
+  state.weeks=weeks;
 }
 async function loadSyncDebug(){
   try{
@@ -272,17 +264,17 @@ async function loadRemoteData(auto=true){
     if(!Array.isArray(data.weeks))throw new Error('No weeks array in dashboard-data.json');
     const usableWeeks=data.weeks.filter(hasRows);
     if(!usableWeeks.length)throw new Error('dashboard-data.json has no synced weeks with rows');
-    mergeRemoteWeeks(usableWeeks);
+    setRemoteWeeks(usableWeeks);
     normalizeState();
     save();
     render();
-    setSaveStatus('Synced GitHub data');
-    if(!auto)alert('GitHub-synced Meta data loaded and retained in this browser.');
+    setSaveStatus('Live GitHub data loaded');
+    if(!auto)alert('Live GitHub-synced Meta data loaded.');
   }catch(e){
     console.warn(e);
     const debug=await loadSyncDebug();
     const message=syncErrorMessage(debug);
-    setSaveStatus(auto?(state.weeks?.length?'Using last good data':'No remote data loaded'):'Sync failed');
+    setSaveStatus(auto?(state.weeks?.length?'Keeping current live data':'No remote data loaded'):'Sync failed');
     if(!auto)alert(message);
   }
 }
