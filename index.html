@@ -50,6 +50,41 @@ tr.campaign-row-main,tr.adset-row-main{cursor:pointer}tr.campaign-row-main td:fi
 [contenteditable=true]{outline:none;cursor:text;border-radius:6px;padding:1px 3px;transition:background .15s}[contenteditable=true]:hover{background:rgba(49,71,255,.07)}[contenteditable=true]:focus{background:rgba(49,71,255,.1);box-shadow:0 0 0 2px rgba(49,71,255,.25)}
 .tabs{display:flex;gap:4px;margin-bottom:14px;border-bottom:1px solid var(--line)}.tab{padding:9px 16px;border-radius:10px 10px 0 0;font-size:13px;font-weight:700;cursor:pointer;border:1px solid transparent;border-bottom:none;background:transparent;color:var(--muted);margin-bottom:-1px;box-shadow:none}.tab.active{background:#fff;border-color:var(--line);color:var(--ink)}.tab-panel{display:none}.tab-panel.active{display:block}.add-section-btn{width:100%;padding:14px;border:2px dashed var(--line);background:transparent;color:var(--muted);border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;margin-top:12px;box-shadow:none}.add-section-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(49,71,255,.04)}.section-type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}.section-type-btn{border:2px solid var(--line);border-radius:14px;padding:18px 14px;text-align:center;cursor:pointer;transition:all .15s;background:#fff;box-shadow:none}.section-type-btn:hover,.section-type-btn.sel{border-color:var(--accent);background:#eef4ff;color:var(--accent)}.section-type-icon{font-size:28px;display:block;margin-bottom:8px}.section-type-label{font-size:13px;font-weight:800}.section-type-desc{font-size:11px;color:var(--muted);margin-top:4px}.custom-stat-card{background:#f8fafc;border:1px solid var(--line);border-radius:14px;padding:18px}.custom-stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-top:12px}.remove-section-btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:3px 10px;font-size:12px;cursor:pointer;opacity:.6;box-shadow:none}.remove-section-btn:hover{opacity:1;border-color:var(--danger);color:var(--danger)}
 
+/* Editable custom KPI cards */
+.kpi-label[contenteditable="true"],
+.kpi-value[contenteditable="true"],
+.kpi-note[contenteditable="true"] {
+  outline: none;
+  border-radius: 6px;
+  padding: 2px 4px;
+}
+.kpi-label[contenteditable="true"]:hover,
+.kpi-value[contenteditable="true"]:hover,
+.kpi-note[contenteditable="true"]:hover {
+  background: rgba(49, 71, 255, 0.07);
+}
+.kpi-label[contenteditable="true"]:focus,
+.kpi-value[contenteditable="true"]:focus,
+.kpi-note[contenteditable="true"]:focus {
+  background: rgba(49, 71, 255, 0.1);
+  box-shadow: 0 0 0 2px rgba(49, 71, 255, 0.25);
+}
+.section-type-grid { grid-template-columns: repeat(4, 1fr); }
+.custom-results-table-toolbar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: end;
+  margin: 0 0 12px;
+  padding: 12px;
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+.custom-results-table-toolbar > div { min-width: 160px; }
+@media(max-width: 900px) { .section-type-grid { grid-template-columns: repeat(2, 1fr); } }
+@media(max-width: 620px) { .section-type-grid { grid-template-columns: 1fr; } }
+
 .live-sync-note{font-size:12px;color:var(--muted);margin-top:7px;line-height:1.4}
 
 @media(max-width:1050px){.filters{grid-template-columns:repeat(2,1fr)}.kpis{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.row-top,.row-metrics,.week-meta{grid-template-columns:1fr 1fr}.table-toolbar{align-items:stretch}.table-toolbar>div{min-width:calc(50% - 10px)}}@media(max-width:620px){.wrap{padding:18px}.filters,.kpis,.row-top,.row-metrics,.week-meta{grid-template-columns:1fr}header{flex-direction:column}.kpi-value{font-size:25px}.table-toolbar>div{min-width:100%}}
@@ -84,7 +119,10 @@ tr.campaign-row-main,tr.adset-row-main{cursor:pointer}tr.campaign-row-main td:fi
 <div id="dash">
   <section class="customize-bar">
     <div class="customize-note">Drag KPI cards to reorder · Click × to hide a card · Use Metrics / Columns to customize</div>
-    <button onclick="resetCardLayout()">Reset card layout</button>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button onclick="addEditableKpiCard()">＋ Add editable KPI card</button>
+      <button onclick="resetCardLayout()">Reset card layout</button>
+    </div>
   </section>
   <section class="kpis" id="kpis"></section>
   <div class="layout-note">Drag ⋮⋮ handles to reorder sections.</div>
@@ -155,6 +193,7 @@ tr.campaign-row-main,tr.adset-row-main{cursor:pointer}tr.campaign-row-main td:fi
     <div class="section-type-btn sel" onclick="selectSectionType('stat',this)" id="stype-stat"><span class="section-type-icon">🔢</span><div class="section-type-label">Stat cards</div><div class="section-type-desc">Custom KPI cards with editable text</div></div>
     <div class="section-type-btn" onclick="selectSectionType('text',this)" id="stype-text"><span class="section-type-icon">📝</span><div class="section-type-label">Text block</div><div class="section-type-desc">Notes or summary</div></div>
     <div class="section-type-btn" onclick="selectSectionType('chart',this)" id="stype-chart"><span class="section-type-icon">📊</span><div class="section-type-label">Chart</div><div class="section-type-desc">Custom chart from data</div></div>
+    <div class="section-type-btn" onclick="selectSectionType('resultsTable',this)" id="stype-table"><span class="section-type-icon">📋</span><div class="section-type-label">Campaign table</div><div class="section-type-desc">Another nested Campaign / Ad Set / Ad table</div></div>
   </div>
   <div id="sectionTypeConfig"></div>
   <div class="modal-footer"><button onclick="closeAddSection()">Cancel</button><button class="primary" onclick="confirmAddSection()">Add section</button></div>
@@ -419,7 +458,59 @@ function deltaHtml(c,p){if(p===undefined||p===null)return'';const d=c-p;if(d===0
 
 function buildFilters(){const sec=document.getElementById('filtersSection');sec.innerHTML=`<div class="filter"><label>Week</label><select id="weekFilter"></select></div><div class="filter"><label>Artist</label><select id="artistFilter"></select></div><div class="filter"><label>Platform</label><select id="platformFilter"></select></div><div class="filter"><label>Campaign Type</label><select id="typeFilter"></select></div><div class="filter"><label>Campaign</label><select id="campaignFilter"></select></div><div class="filter"><label>Rank chart by</label><select id="metricFilter"></select></div>`;['weekFilter','artistFilter','platformFilter','typeFilter','campaignFilter','metricFilter'].forEach(id=>document.getElementById(id).addEventListener('change',render))}
 function refreshFilters(){const weeks=state.weeks||[],rows=allRows();function fill(id,vals,all){const sel=document.getElementById(id);const cur=sel.value||'All';sel.innerHTML=`<option value="All">${all}</option>`+vals.map(v=>`<option value="${esc(v.value??v)}">${esc(v.label??v)}</option>`).join('');if([...sel.options].some(o=>o.value===cur))sel.value=cur}fill('weekFilter',weeks.map((w,i)=>({value:String(i),label:`${w.label} · ${w.period||''}`})),'All weeks');fill('artistFilter',uniq(rows.map(r=>r.artist)).map(v=>({value:v,label:v})),'All artists');fill('platformFilter',uniq(rows.map(r=>r.platform)).map(v=>({value:v,label:v})),'All platforms');fill('typeFilter',uniq(rows.map(r=>r.type)).map(v=>({value:v,label:v})),'All types');fill('campaignFilter',uniq(rows.map(r=>r.name)).map(v=>({value:v,label:v})),'All campaigns');fill('metricFilter',enabledMetrics().map(m=>({value:m.key,label:m.label})),'Spend');if(getFilterVal('metricFilter')==='All')document.getElementById('metricFilter').value='spend'}
-function renderKpis(rows){const t=totalize(rows),p=totalize(prevRows(rows));const vmap={};enabledMetrics().forEach(m=>{const cur=calcMetric(m.key,t),prev=calcMetric(m.key,p);const sd=['spend','revenue','clicks_all','link_clicks','purchases','conversions'].includes(m.key);vmap[m.key]={value:fmtMetric(m.key,cur),delta:sd?deltaHtml(cur,prev):''}});vmap.rows={value:num(rows.length),delta:''};let cards=(state.cards||defaultCards()).filter(c=>c.visible);if(!cards.length){state.cards=defaultCards();cards=state.cards}document.getElementById('kpis').innerHTML=cards.map(c=>{const v=c.staticValue?{value:c.staticValue,delta:''}:(vmap[c.id]||{value:'—',delta:''});return`<div class="card draggable" draggable="true" data-card-id="${c.id}"><div class="card-tools"><div class="kpi-label">${esc(c.label)}</div><div class="card-actions"><button class="icon-btn" onclick="hideCard('${c.id}')">×</button><span class="drag-handle">⋮⋮</span></div></div><div class="kpi-value">${v.value}</div>${v.delta}<div class="kpi-note">${esc(c.note||'')}</div></div>`}).join('');enableCardDrag()}
+function renderKpis(rows){
+  const t = totalize(rows);
+  const p = totalize(prevRows(rows));
+  const vmap = {};
+
+  enabledMetrics().forEach(m => {
+    const cur = calcMetric(m.key, t);
+    const prev = calcMetric(m.key, p);
+    const showDelta = ['spend','revenue','clicks_all','link_clicks','purchases','conversions'].includes(m.key);
+    vmap[m.key] = { value: fmtMetric(m.key, cur), delta: showDelta ? deltaHtml(cur, prev) : '' };
+  });
+
+  vmap.rows = { value: num(rows.length), delta: '' };
+
+  let cards = (state.cards || defaultCards()).filter(c => c.visible);
+  if (!cards.length) {
+    state.cards = defaultCards();
+    cards = state.cards;
+  }
+
+  document.getElementById('kpis').innerHTML = cards.map(c => {
+    const isCustom = c.custom || c.staticValue !== undefined;
+    const v = isCustom ? { value: c.staticValue || '0', delta: '' } : (vmap[c.id] || { value: '—', delta: '' });
+
+    return `
+      <div class="card draggable" draggable="true" data-card-id="${c.id}">
+        <div class="card-tools">
+          <div class="kpi-label" contenteditable="true" spellcheck="false" onblur="updateCardField('${c.id}','label',this.innerText)">${esc(c.label)}</div>
+          <div class="card-actions">
+            <button class="icon-btn" onclick="hideCard('${c.id}')">×</button>
+            <span class="drag-handle">⋮⋮</span>
+          </div>
+        </div>
+        <div class="kpi-value" ${isCustom ? 'contenteditable="true" spellcheck="false"' : ''} ${isCustom ? `onblur="updateCardField('${c.id}','staticValue',this.innerText)"` : ''}>${v.value}</div>
+        ${v.delta}
+        <div class="kpi-note" contenteditable="true" spellcheck="false" onblur="updateCardField('${c.id}','note',this.innerText)">${esc(c.note || '')}</div>
+      </div>
+    `;
+  }).join('');
+
+  enableCardDrag();
+}
+function addEditableKpiCard(){
+  const id = 'custom_card_' + Date.now();
+  state.cards = state.cards || [];
+  state.cards.push({ id, label: 'New card', note: 'Click to edit', staticValue: '0', visible: true, custom: true });
+  save();
+  render();
+}
+function updateCardField(id, field, value){
+  state.cards = (state.cards || []).map(card => card.id === id ? { ...card, [field]: String(value || '').trim() } : card);
+  save();
+}
 function enableCardDrag(){const wrap=document.getElementById('kpis');let dragged=null;wrap.querySelectorAll('.card.draggable').forEach(card=>{card.addEventListener('dragstart',e=>{dragged=card;card.classList.add('dragging')});card.addEventListener('dragend',()=>{card.classList.remove('dragging');persistCardOrder()});card.addEventListener('dragover',e=>{e.preventDefault()});card.addEventListener('drop',e=>{e.preventDefault();if(!dragged||dragged===card)return;const cards=[...wrap.querySelectorAll('.card.draggable')];const f=cards.indexOf(dragged),t=cards.indexOf(card);if(f<t)card.after(dragged);else card.before(dragged);persistCardOrder()})})}
 function persistCardOrder(){const order=[...document.querySelectorAll('#kpis .card.draggable')].map(el=>el.dataset.cardId);state.cards.sort((a,b)=>{const ai=order.indexOf(a.id),bi=order.indexOf(b.id);if(ai===-1&&bi===-1)return 0;if(ai===-1)return 1;if(bi===-1)return-1;return ai-bi});save()}
 function hideCard(id){state.cards=state.cards.map(c=>c.id===id?{...c,visible:false}:c);save();render()}
@@ -468,30 +559,118 @@ function openHistory(){const sel=getFilterVal('weekFilter');document.getElementB
 function closeHistory(){document.getElementById('historyModal').classList.remove('open')}function viewWeek(i){document.getElementById('weekFilter').value=String(i);closeHistory();render()}function editWeek(i){document.getElementById('weekFilter').value=String(i);closeHistory();openEditor(true)}function deleteWeek(i){if(!confirm('Delete this week?'))return;state.weeks.splice(i,1);save();closeHistory();render()}
 function downloadCSV(){const hdrs=['Level','Week','Period','Artist','Campaign','Ad Set','Ad','Platform','Type',...enabledMetrics().map(m=>m.label),'Status'];const csv=[hdrs.join(',')].concat(allRows().flatMap(r=>{const main=['Campaign',r.week,r.period,r.artist,r.name,'','',r.platform,r.type,...enabledMetrics().map(m=>calcMetric(m.key,r)),r.status].map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',');const adsetRows=(r._adsets||[]).flatMap(a=>{const line=['Ad Set',r.week,r.period,'',r.name,a.name,'',a.platform,'Ad Set',...enabledMetrics().map(m=>calcMetric(m.key,a)),a.status].map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',');const adLines=(a._ads||[]).map(ad=>['Ad',r.week,r.period,'',r.name,a.name,ad.name,ad.platform,'Ad',...enabledMetrics().map(m=>calcMetric(m.key,ad)),ad.status].map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(','));return[line,...adLines]});const directAds=(r._directAds||[]).map(ad=>['Ad',r.week,r.period,'',r.name,'',ad.name,ad.platform,'Ad',...enabledMetrics().map(m=>calcMetric(m.key,ad)),ad.status].map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(','));return[main,...adsetRows,...directAds]})).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='meta_ads_dashboard_data.csv';a.click();URL.revokeObjectURL(a.href)}
 function openAddSection(){selectedSectionType='stat';document.querySelectorAll('.section-type-btn').forEach(b=>b.classList.remove('sel'));document.getElementById('stype-stat').classList.add('sel');renderSectionTypeConfig();document.getElementById('addSectionModal').classList.add('open')}function closeAddSection(){document.getElementById('addSectionModal').classList.remove('open')}function selectSectionType(type,btn){selectedSectionType=type;document.querySelectorAll('.section-type-btn').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');renderSectionTypeConfig()}
-function renderSectionTypeConfig(){const el=document.getElementById('sectionTypeConfig');if(selectedSectionType==='stat')el.innerHTML=`<div><label>Section title</label><input id="newSecTitle" value="Custom Stats"/></div><div id="newStatCards" style="display:grid;gap:8px;margin-top:8px"><div class="stat-row" style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px"><input placeholder="Label"><input placeholder="Value"><input placeholder="Note"><button onclick="this.closest('.stat-row').remove()">×</button></div></div><button onclick="addNewStatRow()" style="margin-top:8px">＋ Add card</button>`;else if(selectedSectionType==='text')el.innerHTML=`<div><label>Section title</label><input id="newSecTitle" value="Notes"/></div><div style="margin-top:8px"><label>Content</label><textarea id="newTextContent"></textarea></div>`;else el.innerHTML=`<div><label>Section title</label><input id="newSecTitle" value="Custom Chart"/></div><div style="margin-top:8px"><label>Chart type</label><select id="newChartType"><option value="bar">Bar</option><option value="line">Line</option><option value="doughnut">Doughnut</option></select></div><div><label>Metric</label><select id="newChartMetric">${enabledMetrics().map(m=>`<option value="${m.key}">${esc(m.label)}</option>`).join('')}</select></div><div><label>Group by</label><select id="newChartGroup"><option value="name">Campaign</option><option value="platform">Platform</option><option value="type">Type</option><option value="artist">Artist</option></select></div>`}
+function renderSectionTypeConfig(){
+  const el = document.getElementById('sectionTypeConfig');
+
+  if (selectedSectionType === 'stat') {
+    el.innerHTML = `<div><label>Section title</label><input id="newSecTitle" value="Custom Stats"/></div><div id="newStatCards" style="display:grid;gap:8px;margin-top:8px"><div class="stat-row" style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px"><input placeholder="Label"><input placeholder="Value"><input placeholder="Note"><button onclick="this.closest('.stat-row').remove()">×</button></div></div><button onclick="addNewStatRow()" style="margin-top:8px">＋ Add card</button>`;
+  }
+  else if (selectedSectionType === 'text') {
+    el.innerHTML = `<div><label>Section title</label><input id="newSecTitle" value="Notes"/></div><div style="margin-top:8px"><label>Content</label><textarea id="newTextContent"></textarea></div>`;
+  }
+  else if (selectedSectionType === 'chart') {
+    el.innerHTML = `<div><label>Section title</label><input id="newSecTitle" value="Custom Chart"/></div><div style="margin-top:8px"><label>Chart type</label><select id="newChartType"><option value="bar">Bar</option><option value="line">Line</option><option value="doughnut">Doughnut</option></select></div><div><label>Metric</label><select id="newChartMetric">${enabledMetrics().map(m => `<option value="${m.key}">${esc(m.label)}</option>`).join('')}</select></div><div><label>Group by</label><select id="newChartGroup"><option value="name">Campaign</option><option value="platform">Platform</option><option value="type">Type</option><option value="artist">Artist</option></select></div>`;
+  }
+  else if (selectedSectionType === 'resultsTable') {
+    el.innerHTML = `<div><label>Section title</label><input id="newSecTitle" value="Campaign Results Table"/></div><div style="margin-top:8px"><label>Rank campaigns by</label><select id="newTableRankMetric">${enabledMetrics().map(m => `<option value="${m.key}">${esc(m.label)}</option>`).join('')}</select></div><div><label>Order</label><select id="newTableRankOrder"><option value="desc">Highest first</option><option value="asc">Lowest first</option></select></div><div><label>Show</label><select id="newTableRankLimit"><option value="all">All campaigns</option><option value="5">Top 5</option><option value="10">Top 10</option><option value="20">Top 20</option></select></div>`;
+  }
+}
 function addNewStatRow(){const d=document.createElement('div');d.className='stat-row';d.style.cssText='display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px';d.innerHTML=`<input placeholder="Label"><input placeholder="Value"><input placeholder="Note"><button onclick="this.closest('.stat-row').remove()">×</button>`;document.getElementById('newStatCards').appendChild(d)}
-function confirmAddSection(){const title=document.getElementById('newSecTitle')?.value.trim()||'Section';const id='cs_'+Date.now();let sec={id,type:selectedSectionType,title};if(selectedSectionType==='stat')sec.cards=[...document.querySelectorAll('#newStatCards .stat-row')].map(r=>{const i=r.querySelectorAll('input');return{label:i[0].value,value:i[1].value,note:i[2].value}}).filter(c=>c.label);else if(selectedSectionType==='text')sec.content=document.getElementById('newTextContent').value;else{sec.chartType=document.getElementById('newChartType').value;sec.metric=document.getElementById('newChartMetric').value;sec.groupBy=document.getElementById('newChartGroup').value}state.customSections.push(sec);save();closeAddSection();render()}
+function confirmAddSection(){
+  const title = document.getElementById('newSecTitle')?.value.trim() || 'Section';
+  const id = 'cs_' + Date.now();
+  let sec = { id, type: selectedSectionType, title };
+
+  if (selectedSectionType === 'stat') {
+    sec.cards = [...document.querySelectorAll('#newStatCards .stat-row')]
+      .map(row => { const inputs = row.querySelectorAll('input'); return { label: inputs[0].value, value: inputs[1].value, note: inputs[2].value }; })
+      .filter(card => card.label || card.value || card.note);
+  }
+  else if (selectedSectionType === 'text') {
+    sec.content = document.getElementById('newTextContent').value;
+  }
+  else if (selectedSectionType === 'chart') {
+    sec.chartType = document.getElementById('newChartType').value;
+    sec.metric = document.getElementById('newChartMetric').value;
+    sec.groupBy = document.getElementById('newChartGroup').value;
+  }
+  else if (selectedSectionType === 'resultsTable') {
+    sec.rankMetric = document.getElementById('newTableRankMetric').value || 'spend';
+    sec.rankOrder = document.getElementById('newTableRankOrder').value || 'desc';
+    sec.rankLimit = document.getElementById('newTableRankLimit').value || 'all';
+  }
+
+  state.customSections = state.customSections || [];
+  state.customSections.push(sec);
+  save();
+  closeAddSection();
+  render();
+}
 function removeCustomSection(id){state.customSections=state.customSections.filter(s=>s.id!==id);save();render()}
+function updateCustomResultsTableSetting(sectionId, key, value){
+  state.customSections = (state.customSections || []).map(sec => sec.id === sectionId ? { ...sec, [key]: value } : sec);
+  save();
+  render();
+}
+function buildNestedResultsTableHTML(sectionId, rows, sec){
+  const rankMetric = sec.rankMetric || 'spend';
+  const order = sec.rankOrder || 'desc';
+  const limit = sec.rankLimit || 'all';
+  let rankedRows = [...rows].sort((a, b) => {
+    const av = getMetricRaw(a, rankMetric);
+    const bv = getMetricRaw(b, rankMetric);
+    return order === 'asc' ? av - bv : bv - av;
+  });
+  if (limit !== 'all') rankedRows = rankedRows.slice(0, Number(limit));
+  const cols = visibleCols();
+  const tableId = 'custom_results_table_' + sectionId;
+  const thead = `<thead><tr>${cols.map(c => `<th class="${isNumCol(c.key) ? 'num' : ''}"><div class="th-inner">${esc(c.label)}</div></th>`).join('')}</tr></thead>`;
+  const tbody = rankedRows.map((r, ri) => {
+    const campaignId = `${tableId}_campaign_${ri}`;
+    const adsets = r._adsets || [];
+    const directAds = r._directAds || [];
+    const hasChildren = adsets.length > 0 || directAds.length > 0;
+    const campaignRow = `<tr class="campaign-row-main${hasChildren ? ' expandable' : ''}" id="${campaignId}" ${hasChildren ? `onclick="toggleCampaignAccordion('${campaignId}')"` : ''}>${cols.map(c => { const val = c.key === 'name' ? `<span class="level-pill">Campaign</span>${getCellValue(r, c.key)}` : getCellValue(r, c.key); return `<td class="${isNumCol(c.key) ? 'num' : ''}">${val}</td>`; }).join('')}</tr>`;
+    const adsetRows = adsets.map((a, ai) => {
+      const adsetId = `${campaignId}_adset_${ai}`;
+      const ads = a._ads || [];
+      const adsetRow = `<tr class="adset-row-main${ads.length ? ' expandable' : ''}" id="${adsetId}" data-parent="${campaignId}" style="display:none" ${ads.length ? `onclick="event.stopPropagation();toggleAdsetAccordion('${adsetId}')"` : ''}>${cols.map(c => { let val; if (c.key === 'name') val = `<span class="level-pill adset">Ad Set</span>${esc(a.name || 'Unnamed ad set')}`; else if (c.key === 'artist') val = '↳'; else if (c.key === 'type') val = 'Ad Set'; else if (c.key === 'week' || c.key === 'period') val = ''; else val = getCellValue(a, c.key); return `<td class="${isNumCol(c.key) ? 'num' : ''}">${val}</td>`; }).join('')}</tr>`;
+      const adRows = ads.map(ad => `<tr class="ad-row" data-parent="${adsetId}" data-campaign-parent="${campaignId}" style="display:none">${cols.map(c => { let val; if (c.key === 'name') val = `<span class="level-pill ad">Ad</span>${esc(ad.name || 'Unnamed ad')}`; else if (c.key === 'artist') val = '↳ ↳'; else if (c.key === 'type') val = 'Ad'; else if (c.key === 'week' || c.key === 'period') val = ''; else val = getCellValue(ad, c.key); return `<td class="${isNumCol(c.key) ? 'num' : ''}">${val}</td>`; }).join('')}</tr>`).join('');
+      return adsetRow + adRows;
+    }).join('');
+    const directAdRows = directAds.map(ad => `<tr class="ad-row" data-parent="${campaignId}" style="display:none">${cols.map(c => { let val; if (c.key === 'name') val = `<span class="level-pill ad">Ad</span>${esc(ad.name || 'Unnamed ad')}`; else if (c.key === 'artist') val = '↳'; else if (c.key === 'type') val = 'Ad'; else if (c.key === 'week' || c.key === 'period') val = ''; else val = getCellValue(ad, c.key); return `<td class="${isNumCol(c.key) ? 'num' : ''}">${val}</td>`; }).join('')}</tr>`).join('');
+    return campaignRow + adsetRows + directAdRows;
+  }).join('');
+  return `<div class="custom-results-table-toolbar"><div><label>Rank campaigns by</label><select onchange="updateCustomResultsTableSetting('${sectionId}','rankMetric',this.value)">${enabledMetrics().map(m => `<option value="${m.key}" ${m.key === rankMetric ? 'selected' : ''}>${esc(m.label)}</option>`).join('')}</select></div><div><label>Order</label><select onchange="updateCustomResultsTableSetting('${sectionId}','rankOrder',this.value)"><option value="desc" ${order === 'desc' ? 'selected' : ''}>Highest first</option><option value="asc" ${order === 'asc' ? 'selected' : ''}>Lowest first</option></select></div><div><label>Show</label><select onchange="updateCustomResultsTableSetting('${sectionId}','rankLimit',this.value)"><option value="all" ${limit === 'all' ? 'selected' : ''}>All campaigns</option><option value="5" ${limit === '5' ? 'selected' : ''}>Top 5</option><option value="10" ${limit === '10' ? 'selected' : ''}>Top 10</option><option value="20" ${limit === '20' ? 'selected' : ''}>Top 20</option></select></div></div><div class="tablewrap"><table id="${tableId}">${thead}<tbody>${tbody}</tbody></table></div>`;
+}
 function renderCustomSections(rows){
-  document.querySelectorAll('.custom-section-mount').forEach(el=>el.remove());
-  const grid=document.getElementById('sectionsGrid');
-  (state.customSections||[]).forEach(sec=>{
-    const el=document.createElement('section');
-    el.className='card wide section-card custom-section-mount';
-    el.dataset.customSectionId=sec.id;
-    let inner='';
-    if(sec.type==='stat'){
-      inner=`<div class="custom-stats-grid">${(sec.cards||[]).map((c,i)=>`<div class="custom-stat-card" data-stat-index="${i}"><div data-stat-field="label" style="font-size:13px;font-weight:800;color:var(--muted);margin-bottom:8px" contenteditable="true">${esc(c.label)}</div><div data-stat-field="value" style="font-size:26px;font-weight:900;letter-spacing:-.04em" contenteditable="true">${esc(c.value)}</div><div data-stat-field="note" style="font-size:12px;color:var(--muted);margin-top:4px" contenteditable="true">${esc(c.note||'')}</div></div>`).join('')}</div>`;
-    }else if(sec.type==='text'){
-      inner=`<div data-custom-field="content" contenteditable="true" style="font-size:15px;line-height:1.7;color:var(--muted);min-height:60px">${esc(sec.content||'Click to edit...')}</div>`;
-    }else{
-      inner=`<div style="height:280px"><canvas id="chart_${sec.id}"></canvas></div>`;
+  document.querySelectorAll('.custom-section-mount').forEach(el => el.remove());
+  const grid = document.getElementById('sectionsGrid');
+  (state.customSections || []).forEach(sec => {
+    const el = document.createElement('section');
+    el.className = 'card wide section-card custom-section-mount';
+    el.dataset.customSectionId = sec.id;
+    let inner = '';
+
+    if (sec.type === 'stat') {
+      inner = `<div class="custom-stats-grid">${(sec.cards || []).map((c, i) => `<div class="custom-stat-card" data-stat-index="${i}"><div data-stat-field="label" style="font-size:13px;font-weight:800;color:var(--muted);margin-bottom:8px" contenteditable="true">${esc(c.label)}</div><div data-stat-field="value" style="font-size:26px;font-weight:900;letter-spacing:-.04em" contenteditable="true">${esc(c.value)}</div><div data-stat-field="note" style="font-size:12px;color:var(--muted);margin-top:4px" contenteditable="true">${esc(c.note || '')}</div></div>`).join('')}</div>`;
     }
-    el.innerHTML=`<div class="section-title"><h2 contenteditable="true">${esc(sec.title)}</h2><div class="section-tools"><button class="remove-section-btn" onclick="removeCustomSection('${sec.id}')">Remove</button></div></div>${inner}`;
+    else if (sec.type === 'text') {
+      inner = `<div data-custom-field="content" contenteditable="true" style="font-size:15px;line-height:1.7;color:var(--muted);min-height:60px">${esc(sec.content || 'Click to edit...')}</div>`;
+    }
+    else if (sec.type === 'chart') {
+      inner = `<div style="height:280px"><canvas id="chart_${sec.id}"></canvas></div>`;
+    }
+    else if (sec.type === 'resultsTable') {
+      inner = buildNestedResultsTableHTML(sec.id, rows, sec);
+    }
+
+    el.innerHTML = `<div class="section-title"><h2 contenteditable="true">${esc(sec.title)}</h2><div class="section-tools"><button class="remove-section-btn" onclick="removeCustomSection('${sec.id}')">Remove</button></div></div>${inner}`;
     grid.appendChild(el);
-    if(sec.type==='chart'){
-      const groups=Object.entries(groupBy(rows,sec.groupBy||'name')).map(([label,rs])=>({label,value:sum(rs,sec.metric||'spend')})).slice(0,10);
-      charts['custom_'+sec.id]=new Chart(document.getElementById('chart_'+sec.id),{type:sec.chartType||'bar',data:{labels:groups.map(g=>g.label),datasets:[{label:sec.metric,data:groups.map(g=>g.value)}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:sec.chartType==='doughnut'?{}:{y:{beginAtZero:true}}}})
+
+    if (sec.type === 'chart') {
+      const groups = Object.entries(groupBy(rows, sec.groupBy || 'name')).map(([label, rs]) => ({ label, value: sum(rs, sec.metric || 'spend') })).slice(0, 10);
+      charts['custom_' + sec.id] = new Chart(document.getElementById('chart_' + sec.id), { type: sec.chartType || 'bar', data: { labels: groups.map(g => g.label), datasets: [{ label: sec.metric, data: groups.map(g => g.value) }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, scales: sec.chartType === 'doughnut' ? {} : { y: { beginAtZero: true } } } });
     }
   });
 }
