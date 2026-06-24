@@ -167,7 +167,7 @@ tr.campaign-row-main,tr.adset-row-main{cursor:pointer}tr.campaign-row-main td:fi
 const STORAGE_KEY='umg_meta_ads_dashboard_v1';
 const REMOTE_JSON='./dashboard-data.json';
 const SYNC_DEBUG_JSON='./sync-debug.json';
-let state={weeks:[],cards:null,metrics:null,columns:null,customSections:[],sectionOrder:null,sectionTitles:{},meta:{title:'UMG Meta Ads Dashboard',subtitle:'Meta campaign, ad set, and ad results · Last 30 days · Editable dashboard · Live shared edits',footer:'Dashboard data is loaded from GitHub-synced dashboard-data.json and all page edits are shared live through Firebase Realtime Database.'}};
+let state={weeks:[],cards:null,metrics:null,columns:null,customSections:[],sectionOrder:null,sectionTitles:{},meta:{title:'UMG Meta Ads Dashboard',subtitle:'Meta campaign, ad set, and ad results · Live shared edits across browsers',footer:'Dashboard data is loaded from GitHub-synced dashboard-data.json and all page edits are shared live through Firebase Realtime Database.'}};
 let charts={}, editingExisting=false, editingIndex=-1, selectedSectionType='stat';
 let liveDb=null, liveRef=null, liveReady=false, liveApplying=false, liveSaveTimer=null;
 const CLIENT_ID=localStorage.getItem(STORAGE_KEY+'_client_id')||('client_'+Math.random().toString(36).slice(2));
@@ -302,8 +302,11 @@ function saveSharedNow(){
   const payload=exportSharedState();
   return liveRef.set(payload).then(()=>setSaveStatus('Live shared changes saved')).catch(err=>{console.error(err);setSaveStatus('Live save failed')});
 }
+function getFirebaseConfig(){
+  return window.FIREBASE_CONFIG || (typeof firebaseConfig !== 'undefined' ? firebaseConfig : null);
+}
 function firebaseConfigIsValid(){
-  const cfg=window.FIREBASE_CONFIG;
+  const cfg=getFirebaseConfig();
   return !!(cfg&&cfg.apiKey&&cfg.databaseURL&&!String(cfg.apiKey).includes('PASTE_')&&!String(cfg.databaseURL).includes('PASTE_'));
 }
 function initSharedSync(){
@@ -312,7 +315,7 @@ function initSharedSync(){
     return;
   }
   try{
-    if(!firebase.apps.length)firebase.initializeApp(window.FIREBASE_CONFIG);
+    if(!firebase.apps.length)firebase.initializeApp(getFirebaseConfig());
     liveDb=firebase.database();
     const path=(window.DASHBOARD_LIVE_PATH||'dashboards/umg-meta-dashboard/state').replace(/^\/+|\/+$/g,'');
     liveRef=liveDb.ref(path);
