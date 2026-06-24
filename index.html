@@ -164,6 +164,76 @@ tr.campaign-row-main,tr.adset-row-main{cursor:pointer}tr.campaign-row-main td:fi
 .section-col-item{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--ink);text-transform:none;cursor:pointer;padding:6px 8px;border-radius:8px;background:#fff;border:1px solid var(--line);transition:border-color .15s}
 .section-col-item:hover{border-color:var(--accent)}
 .section-col-item input[type=checkbox]{width:14px;height:14px;accent-color:var(--accent);cursor:pointer;flex-shrink:0}
+
+
+/* Manual / editable custom Campaign Results Table sections */
+.manual-table-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-items:center;
+  margin:0 0 12px;
+}
+.manual-table-actions button{
+  box-shadow:none;
+  padding:7px 10px;
+  font-size:12px;
+}
+.manual-cell-wrap{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  min-width:160px;
+}
+.manual-cell-input,
+.manual-cell-select{
+  width:100%;
+  min-width:92px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:6px 8px;
+  font-size:12px;
+  background:#fff;
+  color:var(--ink);
+  font-family:inherit;
+}
+.manual-name-input{min-width:180px;}
+.manual-row-btn{
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:8px;
+  padding:4px 7px;
+  font-size:11px;
+  cursor:pointer;
+  box-shadow:none;
+  white-space:nowrap;
+}
+.manual-row-btn:hover{border-color:var(--accent);color:var(--accent)}
+.manual-row-btn.danger-mini:hover{border-color:var(--danger);color:var(--danger)}
+.empty-manual-row td{
+  text-align:center;
+  color:var(--muted);
+  padding:24px;
+  background:#fff;
+}
+.table-source-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  font-size:10px;
+  font-weight:800;
+  padding:3px 8px;
+  border-radius:999px;
+  background:#ecfdf3;
+  color:#067647;
+  border:1px solid #abefc6;
+}
+.table-source-pill.dashboard{
+  background:#eef4ff;
+  color:#3538cd;
+  border-color:#c7d7fe;
+}
+
 </style>
 </head>
 <body>
@@ -475,9 +545,27 @@ function visibleCols(){return (state.columns||DEFAULT_COLS).filter(c=>c.visible)
 function calcMetric(key,t){if(key==='roas')return t.spend?t.revenue/t.spend:0;if(key==='ctr')return t.impressions?t.clicks_all/t.impressions:0;if(key==='cpc')return t.clicks_all?t.spend/t.clicks_all:0;if(key==='cpa')return t.conversions?t.spend/t.conversions:0;return Number(t[key]||0)}
 function fmtMetric(key,v){const t=metricByKey(key).type;if(t==='currency')return money(v,(key==='spend'||key==='revenue')?0:2);if(t==='percent')return pct(v);if(t==='ratio')return ratio(v);return num(v)}
 function totalize(rows){const out={};editableMetrics().forEach(m=>out[m.key]=sum(rows,m.key));return out}
-function getCellValue(r,key){if(key==='week'||key==='period'||key==='artist'||key==='name'||key==='platform'||key==='type')return esc(r[key]??'');if(key==='status')return `<span class="pill ${r.status==='paused'?'paused':''}">${esc(r.status||'active')}</span>`;return fmtMetric(key,calcMetric(key,r))}
-function isNumCol(key){return !['week','period','artist','name','platform','type','status'].includes(key)}
-function getMetricRaw(row,key){return calcMetric(key,row)}
+function columnByKey(key){
+  return (state.columns||DEFAULT_COLS).find(c=>c.key===key) ||
+    (state.metrics||DEFAULT_METRICS).find(m=>m.key===key) ||
+    DEFAULT_COLS.find(c=>c.key===key) ||
+    {key,label:key,type:'text'};
+}
+function getCellValue(r,key){
+  if(key==='status')return `<span class="pill ${r.status==='paused'?'paused':''}">${esc(r.status||'active')}</span>`;
+  const col=columnByKey(key);
+  if(['week','period','artist','name','platform','type'].includes(key) || col.type==='text')return esc(r[key]??'');
+  return fmtMetric(key,calcMetric(key,r));
+}
+function isNumCol(key){
+  const col=columnByKey(key);
+  return !['week','period','artist','name','platform','type','status'].includes(key) && col.type!=='text';
+}
+function getMetricRaw(row,key){
+  const col=columnByKey(key);
+  if(col.type==='text')return String(row[key]??'').toLowerCase();
+  return calcMetric(key,row);
+}
 
 function setRemoteWeeks(weeks){
   if(!Array.isArray(weeks))return;
@@ -598,30 +686,42 @@ function saveEditor(){const campaigns=[...document.querySelectorAll('#editorRows
 function openHistory(){const sel=getFilterVal('weekFilter');document.getElementById('historyList').innerHTML=(state.weeks||[]).length?state.weeks.map((w,i)=>`<div class="week-item ${String(i)===sel?'current':''}"><div><b>${esc(w.label)}</b><div class="hint">${esc(w.period||'')} · ${(w.campaigns||[]).length} campaigns · ${(w.adsets||[]).length} ad sets · ${(w.ads||[]).length} ads</div></div><div class="week-actions"><button onclick="viewWeek(${i})">View</button><button onclick="editWeek(${i})">Edit</button><button class="danger" onclick="deleteWeek(${i})">Delete</button></div></div>`).join(''):'<div class="hint">No saved weeks yet.</div>';document.getElementById('historyModal').classList.add('open')}
 function closeHistory(){document.getElementById('historyModal').classList.remove('open')}function viewWeek(i){document.getElementById('weekFilter').value=String(i);closeHistory();render()}function editWeek(i){document.getElementById('weekFilter').value=String(i);closeHistory();openEditor(true)}function deleteWeek(i){if(!confirm('Delete this week?'))return;state.weeks.splice(i,1);save();closeHistory();render()}
 function downloadCSV(){const hdrs=['Level','Week','Period','Artist','Campaign','Ad Set','Ad','Platform','Type',...enabledMetrics().map(m=>m.label),'Status'];const csv=[hdrs.join(',')].concat(allRows().flatMap(r=>{const main=['Campaign',r.week,r.period,r.artist,r.name,'','',r.platform,r.type,...enabledMetrics().map(m=>calcMetric(m.key,r)),r.status].map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',');const adsetRows=(r._adsets||[]).flatMap(a=>{const line=['Ad Set',r.week,r.period,'',r.name,a.name,'',a.platform,'Ad Set',...enabledMetrics().map(m=>calcMetric(m.key,a)),a.status].map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',');const adLines=(a._ads||[]).map(ad=>['Ad',r.week,r.period,'',r.name,a.name,ad.name,ad.platform,'Ad',...enabledMetrics().map(m=>calcMetric(m.key,ad)),ad.status].map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(','));return[line,...adLines]});const directAds=(r._directAds||[]).map(ad=>['Ad',r.week,r.period,'',r.name,'',ad.name,ad.platform,'Ad',...enabledMetrics().map(m=>calcMetric(m.key,ad)),ad.status].map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(','));return[main,...adsetRows,...directAds]})).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='meta_ads_dashboard_data.csv';a.click();URL.revokeObjectURL(a.href)}
+function allAvailableSectionTableColumns(){
+  const seen=new Map();
+  [...DEFAULT_COLS,...(state.columns||[])].forEach(col=>{
+    if(!col||!col.key||col.key==='name')return;
+    seen.set(col.key,{...col,label:col.label||col.key,type:col.type||'text'});
+  });
+  return [...seen.values()];
+}
+function defaultSectionTableColKeys(){
+  return ['artist','platform','type','spend','impressions','clicks_all','link_clicks','purchases','purchase_roas','revenue','conversions','roas','cpa'];
+}
 function sectionColSelectorHtml(prefix,selectedKeys){
-  const baseCols=[
-    {key:'artist',label:'Artist'},
-    {key:'platform',label:'Platform'},
-    {key:'type',label:'Campaign Type'},
-    {key:'status',label:'Status'},
-    {key:'period',label:'Period'}
-  ];
-  const metricCols=enabledMetrics().map(m=>({key:m.key,label:m.label}));
-  const allCols=[...baseCols,...metricCols];
+  const allCols=allAvailableSectionTableColumns();
   const hasSelected=Array.isArray(selectedKeys)&&selectedKeys.length>0;
-  const defaultOn=new Set(['artist','platform','type','spend','impressions','clicks_all','link_clicks','purchases','purchase_roas','revenue','conversions','roas','cpa']);
+  const selectedSet=new Set(hasSelected?selectedKeys:defaultSectionTableColKeys());
   return '<div class="section-col-selector" id="'+prefix+'SectionCols">'+
-    allCols.map(function(col){
-      var checked=hasSelected?selectedKeys.includes(col.key):defaultOn.has(col.key);
-      return '<label class="section-col-item"><input type="checkbox" data-seccol="'+prefix+'_'+col.key+'" '+(checked?'checked':'')+'>'+esc(col.label)+'</label>';
+    allCols.map(col=>{
+      const checked=selectedSet.has(col.key);
+      return '<label class="section-col-item"><input type="checkbox" data-seccol="'+prefix+'_'+esc(col.key)+'" '+(checked?'checked':'')+'>'+esc(col.label)+'</label>';
     }).join('')+
   '</div>';
 }
 function readSectionColKeys(prefix){
-  var sel=document.getElementById(prefix+'SectionCols');
+  const sel=document.getElementById(prefix+'SectionCols');
   if(!sel)return null;
-  var keys=Array.from(sel.querySelectorAll('input[type=checkbox]:checked')).map(function(cb){return(cb.dataset.seccol||'').replace(prefix+'_','')});
+  const keys=Array.from(sel.querySelectorAll('input[type=checkbox]:checked')).map(cb=>(cb.dataset.seccol||'').replace(prefix+'_',''));
   return keys.length>0?keys:null;
+}
+function getSectionTableColumns(sec){
+  const nameCol={key:'name',label:'Campaign / Ad Set / Ad',type:'text',visible:true,base:true};
+  if(Array.isArray(sec.selectedColKeys)&&sec.selectedColKeys.length>0){
+    const allCols=allAvailableSectionTableColumns();
+    return [nameCol,...allCols.filter(col=>sec.selectedColKeys.includes(col.key))];
+  }
+  const globalCols=visibleCols().filter(c=>c.key!=='name');
+  return [nameCol,...globalCols];
 }
 function sectionUsesDashboardFilter(sec){
   return sec.filterWithDashboard !== false;
@@ -725,7 +825,7 @@ function renderSectionTypeConfig(){
   }else if(selectedSectionType==='chart'){
     el.innerHTML=`<div class="section-editor-grid"><div><label>Section title</label><input id="newSecTitle" value="Custom Chart"/></div>${sharedFilterToggle}${scopedFilters}<div><label>Chart type</label><select id="newChartType"><option value="bar">Bar</option><option value="line">Line</option><option value="doughnut">Doughnut</option></select></div><div><label>Metric</label><select id="newChartMetric">${metricOptions('spend')}</select></div><div><label>Group by</label><select id="newChartGroup"><option value="name">Campaign</option><option value="artist">Artist</option><option value="platform">Platform</option><option value="type">Campaign Type</option></select></div></div>`;
   }else if(selectedSectionType==='resultsTable'){
-    el.innerHTML=`<div class="section-editor-grid"><div><label>Section title</label><input id="newSecTitle" value="Campaign Results Table"/></div>${sharedFilterToggle}<div><label>Columns to show</label><div class="section-data-note">Select which columns appear in this section&#39;s table. Artist, Platform and Campaign Type are column options below.</div>${sectionColSelectorHtml('new')}</div><div><label>Rank campaigns by</label><select id="newTableRankMetric"><option value="">— None (natural order) —</option>${metricOptions('')}</select></div><div><label>Order</label><select id="newTableRankOrder"><option value="desc">Highest first</option><option value="asc">Lowest first</option></select></div><div><label>Show</label><select id="newTableRankLimit"><option value="all">All campaigns</option><option value="5">Top 5</option><option value="10">Top 10</option><option value="20">Top 20</option></select></div></div>`;
+    el.innerHTML=`<div class="section-editor-grid"><div><label>Section title</label><input id="newSecTitle" value="Campaign Results Table"/></div>${sharedFilterToggle}<div><label>Data source</label><select id="newTableDataMode"><option value="manual" selected>Empty editable table</option><option value="dashboard">Dashboard campaign data</option></select><div class="section-data-note">Empty editable tables start blank and let you add campaign, ad set and ad rows directly inside the section.</div></div><div><label>Columns to show</label><div class="section-data-note">Select which columns appear in this section's table. Custom columns from the main Table Columns settings are synced here automatically.</div>${sectionColSelectorHtml('new')}</div><div><label>Rank campaigns by</label><select id="newTableRankMetric"><option value="">— None (natural order) —</option>${metricOptions('')}</select></div><div><label>Order</label><select id="newTableRankOrder"><option value="desc">Highest first</option><option value="asc">Lowest first</option></select></div><div><label>Show</label><select id="newTableRankLimit"><option value="all">All campaigns</option><option value="5">Top 5</option><option value="10">Top 10</option><option value="20">Top 20</option></select></div></div>`;
   }
 }
 function addNewStatRow(containerId='newStatCards'){
@@ -744,7 +844,9 @@ function confirmAddSection(){
   }else if(selectedSectionType==='chart'){
     sec.chartType=document.getElementById('newChartType').value;sec.metric=document.getElementById('newChartMetric').value;sec.groupBy=document.getElementById('newChartGroup').value;
   }else if(selectedSectionType==='resultsTable'){
+    sec.tableDataMode=document.getElementById('newTableDataMode')?.value||'manual';
     sec.rankMetric=document.getElementById('newTableRankMetric').value||'';sec.rankOrder=document.getElementById('newTableRankOrder').value||'desc';sec.rankLimit=document.getElementById('newTableRankLimit').value||'all';sec.selectedColKeys=readSectionColKeys('new');
+    if(sec.tableDataMode==='manual')ensureManualTableData(sec);
   }
   state.customSections=state.customSections||[];state.customSections.push(sec);save();closeAddSection();render();
 }
@@ -768,7 +870,7 @@ function renderEditSectionConfig(sec){
   }else if(sec.type==='chart'){
     el.innerHTML=`<div class="section-editor-grid">${scopedFilters}<div><label>Chart type</label><select id="editChartType"><option value="bar" ${sec.chartType==='bar'?'selected':''}>Bar</option><option value="line" ${sec.chartType==='line'?'selected':''}>Line</option><option value="doughnut" ${sec.chartType==='doughnut'?'selected':''}>Doughnut</option></select></div><div><label>Metric</label><select id="editChartMetric">${metricOptions(sec.metric||'spend')}</select></div><div><label>Group by</label><select id="editChartGroup"><option value="name" ${sec.groupBy==='name'?'selected':''}>Campaign</option><option value="artist" ${sec.groupBy==='artist'?'selected':''}>Artist</option><option value="platform" ${sec.groupBy==='platform'?'selected':''}>Platform</option><option value="type" ${sec.groupBy==='type'?'selected':''}>Campaign Type</option></select></div></div>`;
   }else if(sec.type==='resultsTable'){
-    el.innerHTML=`<div class="section-editor-grid"><div><label>Columns to show</label><div class="section-data-note">Choose which columns appear in this section's table. Artist, Platform and Campaign Type are column options here.</div>${sectionColSelectorHtml('edit',sec.selectedColKeys)}</div><div><label>Rank campaigns by</label><select id="editTableRankMetric"><option value="" ${!sec.rankMetric?'selected':''}>— None (natural order) —</option>${metricOptions(sec.rankMetric||'')}</select></div><div><label>Order</label><select id="editTableRankOrder"><option value="desc" ${sec.rankOrder!=='asc'?'selected':''}>Highest first</option><option value="asc" ${sec.rankOrder==='asc'?'selected':''}>Lowest first</option></select></div><div><label>Show</label><select id="editTableRankLimit"><option value="all" ${sec.rankLimit==='all'?'selected':''}>All campaigns</option><option value="5" ${sec.rankLimit==='5'?'selected':''}>Top 5</option><option value="10" ${sec.rankLimit==='10'?'selected':''}>Top 10</option><option value="20" ${sec.rankLimit==='20'?'selected':''}>Top 20</option></select></div></div>`;
+    el.innerHTML=`<div class="section-editor-grid"><div><label>Data source</label><select id="editTableDataMode"><option value="manual" ${(sec.tableDataMode||'dashboard')==='manual'?'selected':''}>Empty editable table</option><option value="dashboard" ${(sec.tableDataMode||'dashboard')!=='manual'?'selected':''}>Dashboard campaign data</option></select><div class="section-data-note">Manual tables can be edited directly in the section. Dashboard data tables mirror the main synced campaign/ad set/ad results.</div></div><div><label>Columns to show</label><div class="section-data-note">Choose which columns appear in this section's table. Custom columns from the main Table Columns settings are available here.</div>${sectionColSelectorHtml('edit',sec.selectedColKeys)}</div><div><label>Rank campaigns by</label><select id="editTableRankMetric"><option value="" ${!sec.rankMetric?'selected':''}>— None (natural order) —</option>${metricOptions(sec.rankMetric||'')}</select></div><div><label>Order</label><select id="editTableRankOrder"><option value="desc" ${sec.rankOrder!=='asc'?'selected':''}>Highest first</option><option value="asc" ${sec.rankOrder==='asc'?'selected':''}>Lowest first</option></select></div><div><label>Show</label><select id="editTableRankLimit"><option value="all" ${sec.rankLimit==='all'?'selected':''}>All campaigns</option><option value="5" ${sec.rankLimit==='5'?'selected':''}>Top 5</option><option value="10" ${sec.rankLimit==='10'?'selected':''}>Top 10</option><option value="20" ${sec.rankLimit==='20'?'selected':''}>Top 20</option></select></div></div>`;
   }
 }
 function saveEditSection(){
@@ -780,7 +882,11 @@ function saveEditSection(){
     next.statLayout=document.getElementById('editStatLayout')?.value || 'card';
   }else if(original.type==='text')next.content=document.getElementById('editTextContent')?.value||'';
   else if(original.type==='chart'){next.chartType=document.getElementById('editChartType').value;next.metric=document.getElementById('editChartMetric').value;next.groupBy=document.getElementById('editChartGroup').value;}
-  else if(original.type==='resultsTable'){next.rankMetric=document.getElementById('editTableRankMetric').value||'';next.rankOrder=document.getElementById('editTableRankOrder').value||'desc';next.rankLimit=document.getElementById('editTableRankLimit').value||'all';next.selectedColKeys=readSectionColKeys('edit');}
+  else if(original.type==='resultsTable'){
+    next.tableDataMode=document.getElementById('editTableDataMode')?.value||'dashboard';
+    next.rankMetric=document.getElementById('editTableRankMetric').value||'';next.rankOrder=document.getElementById('editTableRankOrder').value||'desc';next.rankLimit=document.getElementById('editTableRankLimit').value||'all';next.selectedColKeys=readSectionColKeys('edit');
+    if(next.tableDataMode==='manual')ensureManualTableData(next);
+  }
   state.customSections=(state.customSections||[]).map(sec=>sec.id===id?next:sec);save();closeEditSection();render();
 }
 function saveCustomSectionField(id,field,value){state.customSections=(state.customSections||[]).map(sec=>sec.id===id?{...sec,[field]:String(value||'').trim()}:sec);save()}
@@ -797,30 +903,139 @@ function renderStatSection(sec, sectionRows){
   }
   return `<div class="custom-stats-grid">${cards.map((card,i)=>{const isMetric=card.source==='metric';const displayValue=computeStatCardValue(card,sectionRows);return `<div class="custom-stat-card" data-stat-index="${i}"><div data-stat-field="label" style="font-size:13px;font-weight:800;color:var(--muted);margin-bottom:8px" contenteditable="true" onblur="saveCustomStatField('${sec.id}',${i},'label',this.innerText)">${esc(card.label)}</div><div data-stat-field="value" style="font-size:26px;font-weight:900;letter-spacing:-.04em" ${isMetric?'':'contenteditable="true"'} ${isMetric?'':`onblur="saveCustomStatField('${sec.id}',${i},'value',this.innerText)"`}>${esc(displayValue)}</div><div data-stat-field="note" style="font-size:12px;color:var(--muted);margin-top:4px" contenteditable="true" onblur="saveCustomStatField('${sec.id}',${i},'note',this.innerText)">${esc(card.note||'')}</div></div>`}).join('')}</div>`;
 }
+
+function tableSectionUsesManualData(sec){return sec.tableDataMode==='manual'}
+function ensureManualTableData(sec){
+  sec.manualCampaigns=Array.isArray(sec.manualCampaigns)?sec.manualCampaigns:[];
+  sec.manualAdsets=Array.isArray(sec.manualAdsets)?sec.manualAdsets:[];
+  sec.manualAds=Array.isArray(sec.manualAds)?sec.manualAds:[];
+  return sec;
+}
+function manualId(prefix){return prefix+'_'+Date.now()+'_'+Math.random().toString(36).slice(2,7)}
+function sectionById(sectionId){return (state.customSections||[]).find(s=>s.id===sectionId)}
+function manualRowsForSection(sec){
+  ensureManualTableData(sec);
+  const adsets=sec.manualAdsets||[], ads=sec.manualAds||[];
+  return (sec.manualCampaigns||[]).map((c,idx)=>{
+    const campaignId=c.id||c.manualId||String(idx);
+    const nestedAdsets=adsets.filter(a=>a.campaignId===campaignId).map(a=>{
+      const adsetId=a.id||a.manualId||'';
+      return {...a,campaign:c.name,_ads:ads.filter(ad=>ad.adsetId===adsetId)};
+    });
+    const directAds=ads.filter(ad=>ad.campaignId===campaignId&&!ad.adsetId);
+    return {...c,platform:c.platform||'Meta',week:c.week||'',period:c.period||'',_adsets:nestedAdsets,_directAds:directAds};
+  });
+}
+function addManualTableCampaign(sectionId){
+  const sec=sectionById(sectionId);if(!sec)return;
+  ensureManualTableData(sec);
+  const id=manualId('campaign');
+  sec.manualCampaigns.push({id,artist:'',name:'New campaign',platform:'Meta',type:'Traffic',status:'active'});
+  editableMetrics().forEach(m=>{sec.manualCampaigns[sec.manualCampaigns.length-1][m.key]=0});
+  save();render();
+}
+function addManualTableAdset(sectionId,campaignId){
+  const sec=sectionById(sectionId);if(!sec)return;
+  ensureManualTableData(sec);
+  if(!campaignId){
+    if(!sec.manualCampaigns.length)addManualTableCampaign(sectionId);
+    campaignId=sec.manualCampaigns[0]?.id;
+  }
+  const campaign=sec.manualCampaigns.find(c=>c.id===campaignId)||sec.manualCampaigns[0];
+  const row={id:manualId('adset'),campaignId:campaign?.id||'',campaign:campaign?.name||'',name:'New ad set',platform:'Meta',status:'active'};
+  editableMetrics().forEach(m=>{row[m.key]=0});
+  sec.manualAdsets.push(row);
+  save();render();
+}
+function addManualTableAd(sectionId,campaignId,adsetId=''){
+  const sec=sectionById(sectionId);if(!sec)return;
+  ensureManualTableData(sec);
+  if(!campaignId){
+    if(!sec.manualCampaigns.length)addManualTableCampaign(sectionId);
+    campaignId=sec.manualCampaigns[0]?.id;
+  }
+  const campaign=sec.manualCampaigns.find(c=>c.id===campaignId)||sec.manualCampaigns[0];
+  const adset=sec.manualAdsets.find(a=>a.id===adsetId);
+  const row={id:manualId('ad'),campaignId:campaign?.id||'',adsetId:adset?.id||'',campaign:campaign?.name||'',adset:adset?.name||'',name:'New ad',platform:'Meta',status:'active'};
+  editableMetrics().forEach(m=>{row[m.key]=0});
+  sec.manualAds.push(row);
+  save();render();
+}
+function deleteManualTableRow(sectionId,level,rowId){
+  const sec=sectionById(sectionId);if(!sec)return;
+  ensureManualTableData(sec);
+  if(level==='campaign'){
+    sec.manualCampaigns=sec.manualCampaigns.filter(r=>r.id!==rowId);
+    sec.manualAdsets=sec.manualAdsets.filter(r=>r.campaignId!==rowId);
+    sec.manualAds=sec.manualAds.filter(r=>r.campaignId!==rowId);
+  }else if(level==='adset'){
+    sec.manualAdsets=sec.manualAdsets.filter(r=>r.id!==rowId);
+    sec.manualAds=sec.manualAds.filter(r=>r.adsetId!==rowId);
+  }else if(level==='ad')sec.manualAds=sec.manualAds.filter(r=>r.id!==rowId);
+  save();render();
+}
+function updateManualTableCell(sectionId,level,rowId,key,value){
+  const sec=sectionById(sectionId);if(!sec)return;
+  ensureManualTableData(sec);
+  const list=level==='campaign'?sec.manualCampaigns:level==='adset'?sec.manualAdsets:sec.manualAds;
+  const row=list.find(r=>r.id===rowId);if(!row)return;
+  const col=columnByKey(key);
+  row[key]=(isNumCol(key)||col.type==='currency'||col.type==='percent'||col.type==='ratio'||col.type==='number')?Number(value||0):value;
+  if(level==='campaign'&&key==='name'){
+    sec.manualAdsets.forEach(a=>{if(a.campaignId===rowId)a.campaign=row.name});
+    sec.manualAds.forEach(a=>{if(a.campaignId===rowId)a.campaign=row.name});
+  }
+  if(level==='adset'&&key==='name')sec.manualAds.forEach(a=>{if(a.adsetId===rowId)a.adset=row.name});
+  save();
+}
+function manualCellHtml(sectionId,level,row,key){
+  const id=row.id;
+  if(key==='name'){
+    const pill=level==='campaign'?'Campaign':level==='adset'?'Ad Set':'Ad';
+    const cls=level==='campaign'?'':level==='adset'?' adset':' ad';
+    const buttons=level==='campaign'
+      ? `<button class="manual-row-btn" onclick="event.stopPropagation();addManualTableAdset('${sectionId}','${id}')">+ Ad Set</button><button class="manual-row-btn" onclick="event.stopPropagation();addManualTableAd('${sectionId}','${id}')">+ Ad</button><button class="manual-row-btn danger-mini" onclick="event.stopPropagation();deleteManualTableRow('${sectionId}','campaign','${id}')">Delete</button>`
+      : level==='adset'
+        ? `<button class="manual-row-btn" onclick="event.stopPropagation();addManualTableAd('${sectionId}','${row.campaignId||''}','${id}')">+ Ad</button><button class="manual-row-btn danger-mini" onclick="event.stopPropagation();deleteManualTableRow('${sectionId}','adset','${id}')">Delete</button>`
+        : `<button class="manual-row-btn danger-mini" onclick="event.stopPropagation();deleteManualTableRow('${sectionId}','ad','${id}')">Delete</button>`;
+    return `<div class="manual-cell-wrap"><span class="level-pill${cls}">${pill}</span><input class="manual-cell-input manual-name-input" value="${esc(row.name||'')}" onchange="updateManualTableCell('${sectionId}','${level}','${id}','name',this.value)">${buttons}</div>`;
+  }
+  if(key==='status')return `<select class="manual-cell-select" onchange="updateManualTableCell('${sectionId}','${level}','${id}','status',this.value)"><option value="active" ${row.status!=='paused'?'selected':''}>active</option><option value="paused" ${row.status==='paused'?'selected':''}>paused</option></select>`;
+  if(key==='platform')return `<input class="manual-cell-input" value="${esc(row.platform||'Meta')}" onchange="updateManualTableCell('${sectionId}','${level}','${id}','platform',this.value)">`;
+  if(key==='type')return level==='campaign'?`<input class="manual-cell-input" value="${esc(row.type||'Traffic')}" onchange="updateManualTableCell('${sectionId}','${level}','${id}','type',this.value)">`:(level==='adset'?'Ad Set':'Ad');
+  if(key==='week'||key==='period')return `<input class="manual-cell-input" value="${esc(row[key]||'')}" onchange="updateManualTableCell('${sectionId}','${level}','${id}','${key}',this.value)">`;
+  if(key==='artist')return level==='campaign'?`<input class="manual-cell-input" value="${esc(row.artist||'')}" onchange="updateManualTableCell('${sectionId}','${level}','${id}','artist',this.value)">`:'↳';
+  const col=columnByKey(key);
+  if(isNumCol(key)||col.type==='number'||col.type==='currency'||col.type==='percent'||col.type==='ratio')return `<input class="manual-cell-input" type="number" step="${col.type==='number'?'1':'0.01'}" value="${Number(row[key]||0)}" onchange="updateManualTableCell('${sectionId}','${level}','${id}','${key}',this.value)">`;
+  return `<input class="manual-cell-input" value="${esc(row[key]||'')}" onchange="updateManualTableCell('${sectionId}','${level}','${id}','${key}',this.value)">`;
+}
+
 function buildNestedResultsTableHTML(sectionId,rows,sec){
   const rankMetric=sec.rankMetric||'', order=sec.rankOrder||'desc', limit=sec.rankLimit||'all';
-  let rankedRows=[...rows];
-  if(rankMetric){rankedRows=[...rows].sort((a,b)=>{const av=getMetricRaw(a,rankMetric),bv=getMetricRaw(b,rankMetric);return order==='asc'?av-bv:bv-av});}
+  const isManual=tableSectionUsesManualData(sec);
+  let sourceRows=isManual?applySectionScopedFilters(manualRowsForSection(sec),sec):rows;
+  let rankedRows=[...sourceRows];
+  if(rankMetric){rankedRows=[...sourceRows].sort((a,b)=>{const av=getMetricRaw(a,rankMetric),bv=getMetricRaw(b,rankMetric);return order==='asc'?av-bv:bv-av});}
   if(limit!=='all')rankedRows=rankedRows.slice(0,Number(limit));
-  // Use section's selected cols if defined, otherwise fall back to global visible cols
-  let cols;
-  if(Array.isArray(sec.selectedColKeys)&&sec.selectedColKeys.length>0){
-    const allAvailCols=[
-      {key:'week',label:'Week',type:'text',visible:true,base:true},
-      {key:'period',label:'Period',type:'text',visible:true,base:true},
-      {key:'artist',label:'Artist',type:'text',visible:true,base:true},
-      {key:'platform',label:'Platform',type:'text',visible:true,base:true},
-      {key:'type',label:'Campaign Type',type:'text',visible:true,base:true},
-      {key:'status',label:'Status',type:'text',visible:true,base:true},
-      ...(state.metrics||DEFAULT_METRICS).map(m=>({key:m.key,label:m.label,type:m.type,visible:true,base:true}))
-    ];
-    cols=[{key:'name',label:'Campaign / Ad Set / Ad',type:'text',visible:true,base:true},
-          ...allAvailCols.filter(col=>col.key!=='name'&&sec.selectedColKeys.includes(col.key))];
-  }else{cols=visibleCols();}
-const tableId='custom_results_table_'+sectionId;
+  const cols=getSectionTableColumns(sec);
+  const tableId='custom_results_table_'+sectionId;
   const thead=`<thead><tr>${cols.map(c=>`<th class="${isNumCol(c.key)?'num':''}"><div class="th-inner">${esc(c.label)}</div></th>`).join('')}</tr></thead>`;
-  const tbody=rankedRows.map((r,ri)=>{const campaignId=`${tableId}_campaign_${ri}`;const adsets=r._adsets||[],directAds=r._directAds||[],hasChildren=adsets.length>0||directAds.length>0;const campaignRow=`<tr class="campaign-row-main${hasChildren?' expandable':''}" id="${campaignId}" ${hasChildren?`onclick="toggleCampaignAccordion('${campaignId}')"`:''}>${cols.map(c=>{const val=c.key==='name'?`<span class="level-pill">Campaign</span>${getCellValue(r,c.key)}`:getCellValue(r,c.key);return`<td class="${isNumCol(c.key)?'num':''}">${val}</td>`}).join('')}</tr>`;const adsetRows=adsets.map((a,ai)=>{const adsetId=`${campaignId}_adset_${ai}`;const ads=a._ads||[];const adsetRow=`<tr class="adset-row-main${ads.length?' expandable':''}" id="${adsetId}" data-parent="${campaignId}" style="display:none" ${ads.length?`onclick="event.stopPropagation();toggleAdsetAccordion('${adsetId}')"`:''}>${cols.map(c=>{let val;if(c.key==='name')val=`<span class="level-pill adset">Ad Set</span>${esc(a.name||'Unnamed ad set')}`;else if(c.key==='artist')val='↳';else if(c.key==='type')val='Ad Set';else if(c.key==='week'||c.key==='period')val='';else val=getCellValue(a,c.key);return`<td class="${isNumCol(c.key)?'num':''}">${val}</td>`}).join('')}</tr>`;const adRows=ads.map(ad=>`<tr class="ad-row" data-parent="${adsetId}" style="display:none">${cols.map(c=>{let val;if(c.key==='name')val=`<span class="level-pill ad">Ad</span>${esc(ad.name||'Unnamed ad')}`;else if(c.key==='artist')val='↳ ↳';else if(c.key==='type')val='Ad';else if(c.key==='week'||c.key==='period')val='';else val=getCellValue(ad,c.key);return`<td class="${isNumCol(c.key)?'num':''}">${val}</td>`}).join('')}</tr>`).join('');return adsetRow+adRows;}).join('');const directAdRows=directAds.map(ad=>`<tr class="ad-row" data-parent="${campaignId}" style="display:none">${cols.map(c=>{let val;if(c.key==='name')val=`<span class="level-pill ad">Ad</span>${esc(ad.name||'Unnamed ad')}`;else if(c.key==='artist')val='↳';else if(c.key==='type')val='Ad';else if(c.key==='week'||c.key==='period')val='';else val=getCellValue(ad,c.key);return`<td class="${isNumCol(c.key)?'num':''}">${val}</td>`}).join('')}</tr>`).join('');return campaignRow+adsetRows+directAdRows;}).join('');
-  return `${sectionFilterSummary(sec)}<div class="section-data-note">This table is ${sectionUsesDashboardFilter(sec)?'filtered by the top-row dashboard filters and section filters.':'showing all data except section filters.'}</div><div class="custom-results-table-toolbar table-toolbar"><div><label>Rank campaigns by</label><select onchange="updateCustomResultsTableSetting('${sectionId}','rankMetric',this.value)"><option value="" ${!rankMetric?'selected':''}>— None —</option>${enabledMetrics().map(m=>`<option value="${m.key}" ${m.key===rankMetric?'selected':''}>${esc(m.label)}</option>`).join('')}</select></div><div><label>Order</label><select onchange="updateCustomResultsTableSetting('${sectionId}','rankOrder',this.value)"><option value="desc" ${order==='desc'?'selected':''}>Highest first</option><option value="asc" ${order==='asc'?'selected':''}>Lowest first</option></select></div><div><label>Show</label><select onchange="updateCustomResultsTableSetting('${sectionId}','rankLimit',this.value)"><option value="all" ${limit==='all'?'selected':''}>All campaigns</option><option value="5" ${limit==='5'?'selected':''}>Top 5</option><option value="10" ${limit==='10'?'selected':''}>Top 10</option><option value="20" ${limit==='20'?'selected':''}>Top 20</option></select></div></div><div class="tablewrap"><table id="${tableId}">${thead}<tbody>${tbody}</tbody></table></div>`;
+  const tbody=rankedRows.length?rankedRows.map((r,ri)=>{
+    const campaignId=`${tableId}_campaign_${ri}`;
+    const adsets=r._adsets||[],directAds=r._directAds||[],hasChildren=adsets.length>0||directAds.length>0;
+    const campaignRow=`<tr class="campaign-row-main${hasChildren?' expandable':''}" id="${campaignId}" ${hasChildren?`onclick="toggleCampaignAccordion('${campaignId}')"`:''}>${cols.map(c=>{const val=isManual?manualCellHtml(sectionId,'campaign',r,c.key):(c.key==='name'?`<span class="level-pill">Campaign</span>${getCellValue(r,c.key)}`:getCellValue(r,c.key));return`<td class="${isNumCol(c.key)?'num':''}">${val}</td>`}).join('')}</tr>`;
+    const adsetRows=adsets.map((a,ai)=>{
+      const adsetId=`${campaignId}_adset_${ai}`;
+      const ads=a._ads||[];
+      const adsetRow=`<tr class="adset-row-main${ads.length?' expandable':''}" id="${adsetId}" data-parent="${campaignId}" style="display:none" ${ads.length?`onclick="event.stopPropagation();toggleAdsetAccordion('${adsetId}')"`:''}>${cols.map(c=>{let val;if(isManual)val=manualCellHtml(sectionId,'adset',a,c.key);else if(c.key==='name')val=`<span class="level-pill adset">Ad Set</span>${esc(a.name||'Unnamed ad set')}`;else if(c.key==='artist')val='↳';else if(c.key==='type')val='Ad Set';else if(c.key==='week'||c.key==='period')val='';else val=getCellValue(a,c.key);return`<td class="${isNumCol(c.key)?'num':''}">${val}</td>`}).join('')}</tr>`;
+      const adRows=ads.map(ad=>`<tr class="ad-row" data-parent="${adsetId}" style="display:none">${cols.map(c=>{let val;if(isManual)val=manualCellHtml(sectionId,'ad',ad,c.key);else if(c.key==='name')val=`<span class="level-pill ad">Ad</span>${esc(ad.name||'Unnamed ad')}`;else if(c.key==='artist')val='↳ ↳';else if(c.key==='type')val='Ad';else if(c.key==='week'||c.key==='period')val='';else val=getCellValue(ad,c.key);return`<td class="${isNumCol(c.key)?'num':''}">${val}</td>`}).join('')}</tr>`).join('');
+      return adsetRow+adRows;
+    }).join('');
+    const directAdRows=directAds.map(ad=>`<tr class="ad-row" data-parent="${campaignId}" style="display:none">${cols.map(c=>{let val;if(isManual)val=manualCellHtml(sectionId,'ad',ad,c.key);else if(c.key==='name')val=`<span class="level-pill ad">Ad</span>${esc(ad.name||'Unnamed ad')}`;else if(c.key==='artist')val='↳';else if(c.key==='type')val='Ad';else if(c.key==='week'||c.key==='period')val='';else val=getCellValue(ad,c.key);return`<td class="${isNumCol(c.key)?'num':''}">${val}</td>`}).join('')}</tr>`).join('');
+    return campaignRow+adsetRows+directAdRows;
+  }).join(''):`<tr class="empty-manual-row"><td colspan="${cols.length}">${isManual?'No rows yet. Use “+ Campaign” to start entering data.':'No campaigns match this section.'}</td></tr>`;
+  const manualActions=isManual?`<div class="manual-table-actions"><span class="table-source-pill">Empty editable table</span><button onclick="addManualTableCampaign('${sectionId}')">＋ Campaign</button><button onclick="addManualTableAdset('${sectionId}')">＋ Ad Set</button><button onclick="addManualTableAd('${sectionId}')">＋ Ad</button></div>`:`<div class="manual-table-actions"><span class="table-source-pill dashboard">Dashboard campaign data</span></div>`;
+  return `${sectionFilterSummary(sec)}<div class="section-data-note">${isManual?'This is an editable table stored in the shared dashboard. Add campaign, ad set and ad rows directly here.':'This table mirrors the main synced campaign results and uses the same custom columns from Table Columns.'}</div>${manualActions}<div class="custom-results-table-toolbar table-toolbar"><div><label>Rank campaigns by</label><select onchange="updateCustomResultsTableSetting('${sectionId}','rankMetric',this.value)"><option value="" ${!rankMetric?'selected':''}>— None —</option>${enabledMetrics().map(m=>`<option value="${m.key}" ${m.key===rankMetric?'selected':''}>${esc(m.label)}</option>`).join('')}</select></div><div><label>Order</label><select onchange="updateCustomResultsTableSetting('${sectionId}','rankOrder',this.value)"><option value="desc" ${order==='desc'?'selected':''}>Highest first</option><option value="asc" ${order==='asc'?'selected':''}>Lowest first</option></select></div><div><label>Show</label><select onchange="updateCustomResultsTableSetting('${sectionId}','rankLimit',this.value)"><option value="all" ${limit==='all'?'selected':''}>All campaigns</option><option value="5" ${limit==='5'?'selected':''}>Top 5</option><option value="10" ${limit==='10'?'selected':''}>Top 10</option><option value="20" ${limit==='20'?'selected':''}>Top 20</option></select></div></div><div class="tablewrap"><table id="${tableId}">${thead}<tbody>${tbody}</tbody></table></div>`;
 }
 function renderCustomSections(rows){
   document.querySelectorAll('.custom-section-mount').forEach(el=>el.remove());
