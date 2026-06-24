@@ -1,0 +1,10 @@
+{
+  "rules": {
+    "dashboards": {
+      "$dashboardId": {
+        ".read": true,
+        ".write": true
+      }
+    }
+  }
+}
