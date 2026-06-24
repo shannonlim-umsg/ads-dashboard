@@ -49,6 +49,9 @@ tr.campaign-row-main,tr.adset-row-main{cursor:pointer}tr.campaign-row-main td:fi
 .col-settings-grid,.metric-settings-grid{display:grid;gap:8px}.col-settings-row,.metric-settings-row{display:grid;grid-template-columns:auto 1fr 1fr auto auto;gap:8px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:10px;background:#f8fafc}.metric-settings-row{grid-template-columns:1.2fr 1.1fr .8fr .8fr auto}.col-settings-row input[type=checkbox],.metric-settings-row input[type=checkbox]{width:auto;cursor:pointer;width:16px;height:16px}.col-drag-handle{cursor:grab;color:var(--muted);font-weight:900;user-select:none;padding:0 4px}.col-type-badge{font-size:10px;padding:2px 8px;border-radius:20px;background:#eef4ff;color:#3538cd;font-weight:700;white-space:nowrap}.week-list{display:grid;gap:10px}.week-item{display:flex;justify-content:space-between;gap:12px;align-items:center;border:1px solid var(--line);border-radius:14px;padding:12px}.week-item.current{border-color:var(--accent);background:#eef4ff}.week-actions{display:flex;gap:6px}.section-card{position:relative}.section-card.dragging-section{opacity:.45;border-style:dashed}.section-card.drop-section{outline:3px solid rgba(49,71,255,.22)}.section-tools{display:flex;gap:8px;align-items:center}.section-handle{cursor:grab;user-select:none;color:var(--muted);font-weight:900;letter-spacing:.08em;border:1px solid var(--line);background:#fff;border-radius:9px;padding:4px 8px;font-size:12px}.layout-note{color:var(--muted);font-size:13px;margin:-4px 0 14px}
 [contenteditable=true]{outline:none;cursor:text;border-radius:6px;padding:1px 3px;transition:background .15s}[contenteditable=true]:hover{background:rgba(49,71,255,.07)}[contenteditable=true]:focus{background:rgba(49,71,255,.1);box-shadow:0 0 0 2px rgba(49,71,255,.25)}
 .tabs{display:flex;gap:4px;margin-bottom:14px;border-bottom:1px solid var(--line)}.tab{padding:9px 16px;border-radius:10px 10px 0 0;font-size:13px;font-weight:700;cursor:pointer;border:1px solid transparent;border-bottom:none;background:transparent;color:var(--muted);margin-bottom:-1px;box-shadow:none}.tab.active{background:#fff;border-color:var(--line);color:var(--ink)}.tab-panel{display:none}.tab-panel.active{display:block}.add-section-btn{width:100%;padding:14px;border:2px dashed var(--line);background:transparent;color:var(--muted);border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;margin-top:12px;box-shadow:none}.add-section-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(49,71,255,.04)}.section-type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}.section-type-btn{border:2px solid var(--line);border-radius:14px;padding:18px 14px;text-align:center;cursor:pointer;transition:all .15s;background:#fff;box-shadow:none}.section-type-btn:hover,.section-type-btn.sel{border-color:var(--accent);background:#eef4ff;color:var(--accent)}.section-type-icon{font-size:28px;display:block;margin-bottom:8px}.section-type-label{font-size:13px;font-weight:800}.section-type-desc{font-size:11px;color:var(--muted);margin-top:4px}.custom-stat-card{background:#f8fafc;border:1px solid var(--line);border-radius:14px;padding:18px}.custom-stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-top:12px}.remove-section-btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:3px 10px;font-size:12px;cursor:pointer;opacity:.6;box-shadow:none}.remove-section-btn:hover{opacity:1;border-color:var(--danger);color:var(--danger)}
+
+.live-sync-note{font-size:12px;color:var(--muted);margin-top:7px;line-height:1.4}
+
 @media(max-width:1050px){.filters{grid-template-columns:repeat(2,1fr)}.kpis{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.row-top,.row-metrics,.week-meta{grid-template-columns:1fr 1fr}.table-toolbar{align-items:stretch}.table-toolbar>div{min-width:calc(50% - 10px)}}@media(max-width:620px){.wrap{padding:18px}.filters,.kpis,.row-top,.row-metrics,.week-meta{grid-template-columns:1fr}header{flex-direction:column}.kpi-value{font-size:25px}.table-toolbar>div{min-width:100%}}
 </style>
 </head>
@@ -63,7 +66,7 @@ tr.campaign-row-main,tr.adset-row-main{cursor:pointer}tr.campaign-row-main td:fi
   <div class="actions">
     <button onclick="openHistory()">📅 Weeks</button>
     <button class="primary" onclick="openEditor(false)">＋ Update this week</button>
-    <button onclick="loadRemoteData(false)">Refresh Live Data</button>
+    <button onclick="loadRemoteData(false)">Refresh Meta Data</button>
     <button onclick="openCardSettings()">⚙️ Cards</button>
     <button onclick="openMetricSettings()">📐 Metrics</button>
     <button onclick="openColSettings()">⬜ Table columns</button>
@@ -157,12 +160,18 @@ tr.campaign-row-main,tr.adset-row-main{cursor:pointer}tr.campaign-row-main td:fi
   <div class="modal-footer"><button onclick="closeAddSection()">Cancel</button><button class="primary" onclick="confirmAddSection()">Add section</button></div>
 </div></div>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+<script src="./firebase-config.js"></script>
 <script>
 const STORAGE_KEY='umg_meta_ads_dashboard_v1';
 const REMOTE_JSON='./dashboard-data.json';
 const SYNC_DEBUG_JSON='./sync-debug.json';
-let state={weeks:[],cards:null,metrics:null,columns:null,customSections:[],sectionOrder:null,meta:{title:'UMG Meta Ads Dashboard',subtitle:'Meta campaign, ad set, and ad results · Last 30 days · Editable dashboard · Safe update',footer:'Dashboard data is loaded from GitHub-synced dashboard-data.json so every visitor sees the same results. Browser storage is used only for display preferences.'}};
+let state={weeks:[],cards:null,metrics:null,columns:null,customSections:[],sectionOrder:null,sectionTitles:{},meta:{title:'UMG Meta Ads Dashboard',subtitle:'Meta campaign, ad set, and ad results · Last 30 days · Editable dashboard · Live shared edits',footer:'Dashboard data is loaded from GitHub-synced dashboard-data.json and all page edits are shared live through Firebase Realtime Database.'}};
 let charts={}, editingExisting=false, editingIndex=-1, selectedSectionType='stat';
+let liveDb=null, liveRef=null, liveReady=false, liveApplying=false, liveSaveTimer=null;
+const CLIENT_ID=localStorage.getItem(STORAGE_KEY+'_client_id')||('client_'+Math.random().toString(36).slice(2));
+localStorage.setItem(STORAGE_KEY+'_client_id',CLIENT_ID);
 if(typeof structuredClone==='undefined') window.structuredClone=o=>JSON.parse(JSON.stringify(o));
 
 const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
@@ -215,6 +224,9 @@ function hasRows(w){return (w?.campaigns?.length||0)+(w?.adsets?.length||0)+(w?.
 function normalizeState(){
   if(!state.metrics)state.metrics=structuredClone(DEFAULT_METRICS);
   if(!state.columns)state.columns=structuredClone(DEFAULT_COLS);
+  if(!state.customSections)state.customSections=[];
+  if(!state.sectionTitles)state.sectionTitles={};
+  if(!state.meta)state.meta={title:'UMG Meta Ads Dashboard',subtitle:'',footer:''};
   const defaults=defaultCards();
   if(!state.cards||!state.cards.length)state.cards=defaults;
   const missing=defaults.filter(d=>!state.cards.some(c=>c.id===d.id));
@@ -223,8 +235,105 @@ function normalizeState(){
   if(!state.sectionOrder)state.sectionOrder=['trend','platform','clickConv','spendRevenue','rank','table'];
   state.weeks=(state.weeks||[]).filter(hasRows);
 }
-function load(){try{const s=JSON.parse(localStorage.getItem(STORAGE_KEY));if(s){const {cards,metrics,columns,customSections,sectionOrder,meta}=s;state={...state,cards,metrics,columns,customSections,sectionOrder,meta}}}catch{}; normalizeState();}
-function save(){const {cards,metrics,columns,customSections,sectionOrder,meta}=state;localStorage.setItem(STORAGE_KEY,JSON.stringify({cards,metrics,columns,customSections,sectionOrder,meta}));setSaveStatus('Display preferences saved')}
+function exportSharedState(){
+  return {
+    weeks:state.weeks||[],
+    cards:state.cards||defaultCards(),
+    metrics:state.metrics||structuredClone(DEFAULT_METRICS),
+    columns:state.columns||structuredClone(DEFAULT_COLS),
+    customSections:state.customSections||[],
+    sectionOrder:state.sectionOrder||['trend','platform','clickConv','spendRevenue','rank','table'],
+    sectionTitles:state.sectionTitles||{},
+    meta:state.meta||{},
+    updatedAt:new Date().toISOString(),
+    updatedBy:CLIENT_ID
+  };
+}
+function persistLocalState(){localStorage.setItem(STORAGE_KEY,JSON.stringify(exportSharedState()))}
+function load(){
+  try{const s=JSON.parse(localStorage.getItem(STORAGE_KEY));if(s)state={...state,...s}}catch{};
+  normalizeState();
+}
+function captureEditableContent(){
+  const title=document.getElementById('dashTitle');
+  const subtitle=document.getElementById('dashSubtitle');
+  const footer=document.getElementById('dashFooter');
+  state.meta=state.meta||{};
+  if(title)state.meta.title=title.textContent.trim()||'UMG Meta Ads Dashboard';
+  if(subtitle)state.meta.subtitle=subtitle.textContent.trim();
+  if(footer)state.meta.footer=footer.textContent.trim();
+  state.sectionTitles=state.sectionTitles||{};
+  document.querySelectorAll('#sectionsGrid [data-section-id] > .section-title h2[contenteditable="true"]').forEach(h=>{
+    const id=h.closest('[data-section-id]')?.dataset.sectionId;
+    if(id)state.sectionTitles[id]=h.textContent.trim();
+  });
+  document.querySelectorAll('.custom-section-mount[data-custom-section-id]').forEach(el=>{
+    const id=el.dataset.customSectionId;
+    const sec=(state.customSections||[]).find(s=>s.id===id);
+    if(!sec)return;
+    const h=el.querySelector('.section-title h2[contenteditable="true"]');
+    if(h)sec.title=h.textContent.trim()||sec.title;
+    if(sec.type==='text'){
+      const t=el.querySelector('[data-custom-field="content"]');
+      if(t)sec.content=t.innerText.trim();
+    }
+    if(sec.type==='stat'){
+      sec.cards=[...el.querySelectorAll('[data-stat-index]')].map(card=>({
+        label:card.querySelector('[data-stat-field="label"]')?.innerText.trim()||'',
+        value:card.querySelector('[data-stat-field="value"]')?.innerText.trim()||'',
+        note:card.querySelector('[data-stat-field="note"]')?.innerText.trim()||''
+      })).filter(c=>c.label||c.value||c.note);
+    }
+  });
+}
+function save(){
+  if(!liveApplying)captureEditableContent();
+  normalizeState();
+  persistLocalState();
+  if(liveReady&&liveRef&&!liveApplying){scheduleSharedSave();setSaveStatus('Saving shared changes...')}
+  else setSaveStatus(liveApplying?'Live shared changes loaded':'Saved locally');
+}
+function scheduleSharedSave(){
+  clearTimeout(liveSaveTimer);
+  liveSaveTimer=setTimeout(saveSharedNow,450);
+}
+function saveSharedNow(){
+  if(!liveReady||!liveRef||liveApplying)return Promise.resolve();
+  const payload=exportSharedState();
+  return liveRef.set(payload).then(()=>setSaveStatus('Live shared changes saved')).catch(err=>{console.error(err);setSaveStatus('Live save failed')});
+}
+function firebaseConfigIsValid(){
+  const cfg=window.FIREBASE_CONFIG;
+  return !!(cfg&&cfg.apiKey&&cfg.databaseURL&&!String(cfg.apiKey).includes('PASTE_')&&!String(cfg.databaseURL).includes('PASTE_'));
+}
+function initSharedSync(){
+  if(!firebaseConfigIsValid()){
+    setSaveStatus('Local mode: add Firebase config for live sharing');
+    return;
+  }
+  try{
+    if(!firebase.apps.length)firebase.initializeApp(window.FIREBASE_CONFIG);
+    liveDb=firebase.database();
+    const path=(window.DASHBOARD_LIVE_PATH||'dashboards/umg-meta-dashboard/state').replace(/^\/+|\/+$/g,'');
+    liveRef=liveDb.ref(path);
+    liveReady=true;
+    setSaveStatus('Connecting live shared dashboard...');
+    liveRef.on('value',snap=>{
+      const remote=snap.val();
+      if(remote&&typeof remote==='object'){
+        liveApplying=true;
+        state={...state,...remote};
+        normalizeState();
+        persistLocalState();
+        render();
+        liveApplying=false;
+        setSaveStatus('Live shared dashboard synced');
+      }else{
+        saveSharedNow();
+      }
+    },err=>{console.error(err);setSaveStatus('Live sync error')});
+  }catch(err){console.error(err);setSaveStatus('Live sync unavailable')}
+}
 function enabledMetrics(){return (state.metrics||DEFAULT_METRICS).filter(m=>m.enabled)}
 function editableMetrics(){return (state.metrics||DEFAULT_METRICS).filter(m=>m.enabled&&m.editable)}
 function metricByKey(k){return (state.metrics||DEFAULT_METRICS).find(m=>m.key===k)||{key:k,label:k,type:'number'}}
@@ -240,7 +349,15 @@ function setRemoteWeeks(weeks){
   if(!Array.isArray(weeks))return;
   weeks=weeks.filter(hasRows);
   if(!weeks.length)return;
-  state.weeks=weeks;
+  const existing=state.weeks||[];
+  const merged=[...existing];
+  weeks.forEach(w=>{
+    const key=w.id||w.label;
+    const idx=merged.findIndex(x=>(x.id||x.label)===key);
+    if(idx>=0)merged[idx]={...merged[idx],...w};
+    else merged.push(w);
+  });
+  state.weeks=merged;
 }
 async function loadSyncDebug(){
   try{
@@ -352,7 +469,36 @@ function renderSectionTypeConfig(){const el=document.getElementById('sectionType
 function addNewStatRow(){const d=document.createElement('div');d.className='stat-row';d.style.cssText='display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px';d.innerHTML=`<input placeholder="Label"><input placeholder="Value"><input placeholder="Note"><button onclick="this.closest('.stat-row').remove()">×</button>`;document.getElementById('newStatCards').appendChild(d)}
 function confirmAddSection(){const title=document.getElementById('newSecTitle')?.value.trim()||'Section';const id='cs_'+Date.now();let sec={id,type:selectedSectionType,title};if(selectedSectionType==='stat')sec.cards=[...document.querySelectorAll('#newStatCards .stat-row')].map(r=>{const i=r.querySelectorAll('input');return{label:i[0].value,value:i[1].value,note:i[2].value}}).filter(c=>c.label);else if(selectedSectionType==='text')sec.content=document.getElementById('newTextContent').value;else{sec.chartType=document.getElementById('newChartType').value;sec.metric=document.getElementById('newChartMetric').value;sec.groupBy=document.getElementById('newChartGroup').value}state.customSections.push(sec);save();closeAddSection();render()}
 function removeCustomSection(id){state.customSections=state.customSections.filter(s=>s.id!==id);save();render()}
-function renderCustomSections(rows){document.querySelectorAll('.custom-section-mount').forEach(el=>el.remove());const grid=document.getElementById('sectionsGrid');(state.customSections||[]).forEach(sec=>{const el=document.createElement('section');el.className='card wide section-card custom-section-mount';let inner='';if(sec.type==='stat')inner=`<div class="custom-stats-grid">${(sec.cards||[]).map(c=>`<div class="custom-stat-card"><div style="font-size:13px;font-weight:800;color:var(--muted);margin-bottom:8px" contenteditable="true">${esc(c.label)}</div><div style="font-size:26px;font-weight:900;letter-spacing:-.04em" contenteditable="true">${esc(c.value)}</div><div style="font-size:12px;color:var(--muted);margin-top:4px" contenteditable="true">${esc(c.note||'')}</div></div>`).join('')}</div>`;else if(sec.type==='text')inner=`<div contenteditable="true" style="font-size:15px;line-height:1.7;color:var(--muted);min-height:60px">${esc(sec.content||'Click to edit...')}</div>`;else inner=`<div style="height:280px"><canvas id="chart_${sec.id}"></canvas></div>`;el.innerHTML=`<div class="section-title"><h2 contenteditable="true">${esc(sec.title)}</h2><div class="section-tools"><button class="remove-section-btn" onclick="removeCustomSection('${sec.id}')">Remove</button></div></div>${inner}`;grid.appendChild(el);if(sec.type==='chart'){const groups=Object.entries(groupBy(rows,sec.groupBy||'name')).map(([label,rs])=>({label,value:sum(rs,sec.metric||'spend')})).slice(0,10);charts['custom_'+sec.id]=new Chart(document.getElementById('chart_'+sec.id),{type:sec.chartType||'bar',data:{labels:groups.map(g=>g.label),datasets:[{label:sec.metric,data:groups.map(g=>g.value)}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:sec.chartType==='doughnut'?{}:{y:{beginAtZero:true}}}})}})}
+function renderCustomSections(rows){
+  document.querySelectorAll('.custom-section-mount').forEach(el=>el.remove());
+  const grid=document.getElementById('sectionsGrid');
+  (state.customSections||[]).forEach(sec=>{
+    const el=document.createElement('section');
+    el.className='card wide section-card custom-section-mount';
+    el.dataset.customSectionId=sec.id;
+    let inner='';
+    if(sec.type==='stat'){
+      inner=`<div class="custom-stats-grid">${(sec.cards||[]).map((c,i)=>`<div class="custom-stat-card" data-stat-index="${i}"><div data-stat-field="label" style="font-size:13px;font-weight:800;color:var(--muted);margin-bottom:8px" contenteditable="true">${esc(c.label)}</div><div data-stat-field="value" style="font-size:26px;font-weight:900;letter-spacing:-.04em" contenteditable="true">${esc(c.value)}</div><div data-stat-field="note" style="font-size:12px;color:var(--muted);margin-top:4px" contenteditable="true">${esc(c.note||'')}</div></div>`).join('')}</div>`;
+    }else if(sec.type==='text'){
+      inner=`<div data-custom-field="content" contenteditable="true" style="font-size:15px;line-height:1.7;color:var(--muted);min-height:60px">${esc(sec.content||'Click to edit...')}</div>`;
+    }else{
+      inner=`<div style="height:280px"><canvas id="chart_${sec.id}"></canvas></div>`;
+    }
+    el.innerHTML=`<div class="section-title"><h2 contenteditable="true">${esc(sec.title)}</h2><div class="section-tools"><button class="remove-section-btn" onclick="removeCustomSection('${sec.id}')">Remove</button></div></div>${inner}`;
+    grid.appendChild(el);
+    if(sec.type==='chart'){
+      const groups=Object.entries(groupBy(rows,sec.groupBy||'name')).map(([label,rs])=>({label,value:sum(rs,sec.metric||'spend')})).slice(0,10);
+      charts['custom_'+sec.id]=new Chart(document.getElementById('chart_'+sec.id),{type:sec.chartType||'bar',data:{labels:groups.map(g=>g.label),datasets:[{label:sec.metric,data:groups.map(g=>g.value)}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:sec.chartType==='doughnut'?{}:{y:{beginAtZero:true}}}})
+    }
+  });
+}
+function applySectionTitles(){
+  const titles=state.sectionTitles||{};
+  document.querySelectorAll('#sectionsGrid [data-section-id] > .section-title h2[contenteditable="true"]').forEach(h=>{
+    const id=h.closest('[data-section-id]')?.dataset.sectionId;
+    if(id&&titles[id])h.textContent=titles[id];
+  });
+}
 function render(){
   document.getElementById('dashTitle').textContent=state.meta?.title||'UMG Meta Ads Dashboard';
   document.getElementById('dashSubtitle').textContent=state.meta?.subtitle||'';
@@ -362,14 +508,16 @@ function render(){
   document.getElementById('dash').style.display='block';
   refreshFilters();
   buildSectionsGrid();
+  applySectionTitles();
   const rows=has?selectedRows():[];
   renderKpis(rows);
   renderCharts(rows);
   renderTable(rows);
 }
-load();buildFilters();render();loadRemoteData(true);
+load();buildFilters();render();initSharedSync();loadRemoteData(true);
 ['editModal','cardSettingsModal','metricSettingsModal','historyModal','colSettingsModal','addSectionModal'].forEach(id=>document.getElementById(id)?.addEventListener('click',e=>{if(e.target.id===id)document.getElementById(id).classList.remove('open')}));
-['dashTitle','dashSubtitle','dashFooter'].forEach(id=>document.getElementById(id)?.addEventListener('blur',()=>{state.meta=state.meta||{};state.meta.title=document.getElementById('dashTitle').textContent;state.meta.subtitle=document.getElementById('dashSubtitle').textContent;state.meta.footer=document.getElementById('dashFooter').textContent;save()}));
+document.addEventListener('focusout',e=>{if(e.target&&e.target.matches&&e.target.matches('[contenteditable="true"]'))save()},true);
+window.addEventListener('beforeunload',()=>{captureEditableContent();persistLocalState();if(liveReady&&liveRef&&!liveApplying){try{liveRef.set(exportSharedState())}catch(e){}}});
 </script>
 </body>
 </html>
