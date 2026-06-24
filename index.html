@@ -50,40 +50,48 @@ tr.campaign-row-main,tr.adset-row-main{cursor:pointer}tr.campaign-row-main td:fi
 [contenteditable=true]{outline:none;cursor:text;border-radius:6px;padding:1px 3px;transition:background .15s}[contenteditable=true]:hover{background:rgba(49,71,255,.07)}[contenteditable=true]:focus{background:rgba(49,71,255,.1);box-shadow:0 0 0 2px rgba(49,71,255,.25)}
 .tabs{display:flex;gap:4px;margin-bottom:14px;border-bottom:1px solid var(--line)}.tab{padding:9px 16px;border-radius:10px 10px 0 0;font-size:13px;font-weight:700;cursor:pointer;border:1px solid transparent;border-bottom:none;background:transparent;color:var(--muted);margin-bottom:-1px;box-shadow:none}.tab.active{background:#fff;border-color:var(--line);color:var(--ink)}.tab-panel{display:none}.tab-panel.active{display:block}.add-section-btn{width:100%;padding:14px;border:2px dashed var(--line);background:transparent;color:var(--muted);border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;margin-top:12px;box-shadow:none}.add-section-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(49,71,255,.04)}.section-type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}.section-type-btn{border:2px solid var(--line);border-radius:14px;padding:18px 14px;text-align:center;cursor:pointer;transition:all .15s;background:#fff;box-shadow:none}.section-type-btn:hover,.section-type-btn.sel{border-color:var(--accent);background:#eef4ff;color:var(--accent)}.section-type-icon{font-size:28px;display:block;margin-bottom:8px}.section-type-label{font-size:13px;font-weight:800}.section-type-desc{font-size:11px;color:var(--muted);margin-top:4px}.custom-stat-card{background:#f8fafc;border:1px solid var(--line);border-radius:14px;padding:18px}.custom-stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-top:12px}.remove-section-btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:3px 10px;font-size:12px;cursor:pointer;opacity:.6;box-shadow:none}.remove-section-btn:hover{opacity:1;border-color:var(--danger);color:var(--danger)}
 
-/* Editable custom KPI cards */
-.kpi-label[contenteditable="true"],
-.kpi-value[contenteditable="true"],
-.kpi-note[contenteditable="true"] {
-  outline: none;
-  border-radius: 6px;
-  padding: 2px 4px;
+
+/* Editable/filterable custom sections */
+.section-edit-btn {
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 8px;
+  padding: 3px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  opacity: .75;
+  box-shadow: none;
 }
-.kpi-label[contenteditable="true"]:hover,
-.kpi-value[contenteditable="true"]:hover,
-.kpi-note[contenteditable="true"]:hover {
-  background: rgba(49, 71, 255, 0.07);
+.section-edit-btn:hover { opacity: 1; border-color: var(--accent); color: var(--accent); }
+.section-filter-pill {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #eef4ff;
+  color: #3538cd;
 }
-.kpi-label[contenteditable="true"]:focus,
-.kpi-value[contenteditable="true"]:focus,
-.kpi-note[contenteditable="true"]:focus {
-  background: rgba(49, 71, 255, 0.1);
-  box-shadow: 0 0 0 2px rgba(49, 71, 255, 0.25);
-}
-.section-type-grid { grid-template-columns: repeat(4, 1fr); }
-.custom-results-table-toolbar {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
+.section-filter-pill.off { background: #f2f4f7; color: var(--muted); }
+.section-editor-grid { display: grid; gap: 10px; }
+.section-editor-row {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr 1fr 1fr 1fr auto;
+  gap: 8px;
   align-items: end;
-  margin: 0 0 12px;
-  padding: 12px;
   background: #f8fafc;
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: 12px;
+  padding: 10px;
 }
-.custom-results-table-toolbar > div { min-width: 160px; }
-@media(max-width: 900px) { .section-type-grid { grid-template-columns: repeat(2, 1fr); } }
-@media(max-width: 620px) { .section-type-grid { grid-template-columns: 1fr; } }
+.section-editor-row input,
+.section-editor-row select { font-size: 12px; padding: 7px 9px; }
+.section-data-note { color: var(--muted); font-size: 12px; line-height: 1.45; margin: 6px 0 12px; }
+.custom-results-table-toolbar { display:flex; gap:10px; flex-wrap:wrap; align-items:end; margin:0 0 12px; padding:12px; background:#f8fafc; border:1px solid var(--line); border-radius:14px; }
+.custom-results-table-toolbar > div { min-width:160px; }
+.section-type-grid { grid-template-columns: repeat(4, 1fr); }
+@media(max-width:900px){ .section-editor-row { grid-template-columns:1fr 1fr; } .section-type-grid { grid-template-columns:repeat(2,1fr); } }
+@media(max-width:620px){ .section-editor-row, .section-type-grid { grid-template-columns:1fr; } }
 
 .live-sync-note{font-size:12px;color:var(--muted);margin-top:7px;line-height:1.4}
 
@@ -119,10 +127,7 @@ tr.campaign-row-main,tr.adset-row-main{cursor:pointer}tr.campaign-row-main td:fi
 <div id="dash">
   <section class="customize-bar">
     <div class="customize-note">Drag KPI cards to reorder · Click × to hide a card · Use Metrics / Columns to customize</div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button onclick="addEditableKpiCard()">＋ Add editable KPI card</button>
-      <button onclick="resetCardLayout()">Reset card layout</button>
-    </div>
+    <button onclick="resetCardLayout()">Reset card layout</button>
   </section>
   <section class="kpis" id="kpis"></section>
   <div class="layout-note">Drag ⋮⋮ handles to reorder sections.</div>
@@ -193,10 +198,25 @@ tr.campaign-row-main,tr.adset-row-main{cursor:pointer}tr.campaign-row-main td:fi
     <div class="section-type-btn sel" onclick="selectSectionType('stat',this)" id="stype-stat"><span class="section-type-icon">🔢</span><div class="section-type-label">Stat cards</div><div class="section-type-desc">Custom KPI cards with editable text</div></div>
     <div class="section-type-btn" onclick="selectSectionType('text',this)" id="stype-text"><span class="section-type-icon">📝</span><div class="section-type-label">Text block</div><div class="section-type-desc">Notes or summary</div></div>
     <div class="section-type-btn" onclick="selectSectionType('chart',this)" id="stype-chart"><span class="section-type-icon">📊</span><div class="section-type-label">Chart</div><div class="section-type-desc">Custom chart from data</div></div>
-    <div class="section-type-btn" onclick="selectSectionType('resultsTable',this)" id="stype-table"><span class="section-type-icon">📋</span><div class="section-type-label">Campaign table</div><div class="section-type-desc">Another nested Campaign / Ad Set / Ad table</div></div>
+    <div class="section-type-btn" onclick="selectSectionType('resultsTable',this)" id="stype-table"><span class="section-type-icon">📋</span><div class="section-type-label">Campaign table</div><div class="section-type-desc">Nested Campaign / Ad Set / Ad table</div></div>
   </div>
   <div id="sectionTypeConfig"></div>
   <div class="modal-footer"><button onclick="closeAddSection()">Cancel</button><button class="primary" onclick="confirmAddSection()">Add section</button></div>
+</div></div>
+
+<!-- ══ EDIT CUSTOM SECTION MODAL ══ -->
+<div class="modal-backdrop" id="editSectionModal"><div class="modal medium">
+  <div class="modal-header"><span class="modal-title">Edit section</span><button class="x" onclick="closeEditSection()">×</button></div>
+  <input type="hidden" id="editSectionId"/>
+  <div class="section-editor-grid">
+    <div><label>Section title</label><input id="editSectionTitle" placeholder="Section title"/></div>
+    <label style="display:flex;gap:8px;align-items:center;text-transform:none;font-size:13px;margin:0">
+      <input id="editSectionFilterWithDashboard" type="checkbox" style="width:auto"> Use top-row dashboard filters, including Artist
+    </label>
+    <div class="section-data-note">When enabled, this section updates based on the main dashboard filters at the top of the page. Selecting an Artist will also filter charts, metric stat cards, and campaign tables inside this section.</div>
+    <div id="editSectionConfig"></div>
+  </div>
+  <div class="modal-footer"><button onclick="closeEditSection()">Cancel</button><button class="primary" onclick="saveEditSection()">Save section</button></div>
 </div></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
@@ -317,11 +337,15 @@ function captureEditableContent(){
       if(t)sec.content=t.innerText.trim();
     }
     if(sec.type==='stat'){
-      sec.cards=[...el.querySelectorAll('[data-stat-index]')].map(card=>({
-        label:card.querySelector('[data-stat-field="label"]')?.innerText.trim()||'',
-        value:card.querySelector('[data-stat-field="value"]')?.innerText.trim()||'',
-        note:card.querySelector('[data-stat-field="note"]')?.innerText.trim()||''
-      })).filter(c=>c.label||c.value||c.note);
+      sec.cards=[...el.querySelectorAll('[data-stat-index]')].map((card,idx)=>{
+        const prior=(sec.cards||[])[idx]||{};
+        return {
+          ...prior,
+          label:card.querySelector('[data-stat-field="label"]')?.innerText.trim()||prior.label||'',
+          value:prior.source==='metric' ? (prior.value||'') : (card.querySelector('[data-stat-field="value"]')?.innerText.trim()||prior.value||''),
+          note:card.querySelector('[data-stat-field="note"]')?.innerText.trim()||prior.note||''
+        };
+      }).filter(c=>c.label||c.value||c.note||c.metric);
     }
   });
 }
@@ -458,59 +482,7 @@ function deltaHtml(c,p){if(p===undefined||p===null)return'';const d=c-p;if(d===0
 
 function buildFilters(){const sec=document.getElementById('filtersSection');sec.innerHTML=`<div class="filter"><label>Week</label><select id="weekFilter"></select></div><div class="filter"><label>Artist</label><select id="artistFilter"></select></div><div class="filter"><label>Platform</label><select id="platformFilter"></select></div><div class="filter"><label>Campaign Type</label><select id="typeFilter"></select></div><div class="filter"><label>Campaign</label><select id="campaignFilter"></select></div><div class="filter"><label>Rank chart by</label><select id="metricFilter"></select></div>`;['weekFilter','artistFilter','platformFilter','typeFilter','campaignFilter','metricFilter'].forEach(id=>document.getElementById(id).addEventListener('change',render))}
 function refreshFilters(){const weeks=state.weeks||[],rows=allRows();function fill(id,vals,all){const sel=document.getElementById(id);const cur=sel.value||'All';sel.innerHTML=`<option value="All">${all}</option>`+vals.map(v=>`<option value="${esc(v.value??v)}">${esc(v.label??v)}</option>`).join('');if([...sel.options].some(o=>o.value===cur))sel.value=cur}fill('weekFilter',weeks.map((w,i)=>({value:String(i),label:`${w.label} · ${w.period||''}`})),'All weeks');fill('artistFilter',uniq(rows.map(r=>r.artist)).map(v=>({value:v,label:v})),'All artists');fill('platformFilter',uniq(rows.map(r=>r.platform)).map(v=>({value:v,label:v})),'All platforms');fill('typeFilter',uniq(rows.map(r=>r.type)).map(v=>({value:v,label:v})),'All types');fill('campaignFilter',uniq(rows.map(r=>r.name)).map(v=>({value:v,label:v})),'All campaigns');fill('metricFilter',enabledMetrics().map(m=>({value:m.key,label:m.label})),'Spend');if(getFilterVal('metricFilter')==='All')document.getElementById('metricFilter').value='spend'}
-function renderKpis(rows){
-  const t = totalize(rows);
-  const p = totalize(prevRows(rows));
-  const vmap = {};
-
-  enabledMetrics().forEach(m => {
-    const cur = calcMetric(m.key, t);
-    const prev = calcMetric(m.key, p);
-    const showDelta = ['spend','revenue','clicks_all','link_clicks','purchases','conversions'].includes(m.key);
-    vmap[m.key] = { value: fmtMetric(m.key, cur), delta: showDelta ? deltaHtml(cur, prev) : '' };
-  });
-
-  vmap.rows = { value: num(rows.length), delta: '' };
-
-  let cards = (state.cards || defaultCards()).filter(c => c.visible);
-  if (!cards.length) {
-    state.cards = defaultCards();
-    cards = state.cards;
-  }
-
-  document.getElementById('kpis').innerHTML = cards.map(c => {
-    const isCustom = c.custom || c.staticValue !== undefined;
-    const v = isCustom ? { value: c.staticValue || '0', delta: '' } : (vmap[c.id] || { value: '—', delta: '' });
-
-    return `
-      <div class="card draggable" draggable="true" data-card-id="${c.id}">
-        <div class="card-tools">
-          <div class="kpi-label" contenteditable="true" spellcheck="false" onblur="updateCardField('${c.id}','label',this.innerText)">${esc(c.label)}</div>
-          <div class="card-actions">
-            <button class="icon-btn" onclick="hideCard('${c.id}')">×</button>
-            <span class="drag-handle">⋮⋮</span>
-          </div>
-        </div>
-        <div class="kpi-value" ${isCustom ? 'contenteditable="true" spellcheck="false"' : ''} ${isCustom ? `onblur="updateCardField('${c.id}','staticValue',this.innerText)"` : ''}>${v.value}</div>
-        ${v.delta}
-        <div class="kpi-note" contenteditable="true" spellcheck="false" onblur="updateCardField('${c.id}','note',this.innerText)">${esc(c.note || '')}</div>
-      </div>
-    `;
-  }).join('');
-
-  enableCardDrag();
-}
-function addEditableKpiCard(){
-  const id = 'custom_card_' + Date.now();
-  state.cards = state.cards || [];
-  state.cards.push({ id, label: 'New card', note: 'Click to edit', staticValue: '0', visible: true, custom: true });
-  save();
-  render();
-}
-function updateCardField(id, field, value){
-  state.cards = (state.cards || []).map(card => card.id === id ? { ...card, [field]: String(value || '').trim() } : card);
-  save();
-}
+function renderKpis(rows){const t=totalize(rows),p=totalize(prevRows(rows));const vmap={};enabledMetrics().forEach(m=>{const cur=calcMetric(m.key,t),prev=calcMetric(m.key,p);const sd=['spend','revenue','clicks_all','link_clicks','purchases','conversions'].includes(m.key);vmap[m.key]={value:fmtMetric(m.key,cur),delta:sd?deltaHtml(cur,prev):''}});vmap.rows={value:num(rows.length),delta:''};let cards=(state.cards||defaultCards()).filter(c=>c.visible);if(!cards.length){state.cards=defaultCards();cards=state.cards}document.getElementById('kpis').innerHTML=cards.map(c=>{const v=c.staticValue?{value:c.staticValue,delta:''}:(vmap[c.id]||{value:'—',delta:''});return`<div class="card draggable" draggable="true" data-card-id="${c.id}"><div class="card-tools"><div class="kpi-label">${esc(c.label)}</div><div class="card-actions"><button class="icon-btn" onclick="hideCard('${c.id}')">×</button><span class="drag-handle">⋮⋮</span></div></div><div class="kpi-value">${v.value}</div>${v.delta}<div class="kpi-note">${esc(c.note||'')}</div></div>`}).join('');enableCardDrag()}
 function enableCardDrag(){const wrap=document.getElementById('kpis');let dragged=null;wrap.querySelectorAll('.card.draggable').forEach(card=>{card.addEventListener('dragstart',e=>{dragged=card;card.classList.add('dragging')});card.addEventListener('dragend',()=>{card.classList.remove('dragging');persistCardOrder()});card.addEventListener('dragover',e=>{e.preventDefault()});card.addEventListener('drop',e=>{e.preventDefault();if(!dragged||dragged===card)return;const cards=[...wrap.querySelectorAll('.card.draggable')];const f=cards.indexOf(dragged),t=cards.indexOf(card);if(f<t)card.after(dragged);else card.before(dragged);persistCardOrder()})})}
 function persistCardOrder(){const order=[...document.querySelectorAll('#kpis .card.draggable')].map(el=>el.dataset.cardId);state.cards.sort((a,b)=>{const ai=order.indexOf(a.id),bi=order.indexOf(b.id);if(ai===-1&&bi===-1)return 0;if(ai===-1)return 1;if(bi===-1)return-1;return ai-bi});save()}
 function hideCard(id){state.cards=state.cards.map(c=>c.id===id?{...c,visible:false}:c);save();render()}
@@ -558,122 +530,184 @@ function saveEditor(){const campaigns=[...document.querySelectorAll('#editorRows
 function openHistory(){const sel=getFilterVal('weekFilter');document.getElementById('historyList').innerHTML=(state.weeks||[]).length?state.weeks.map((w,i)=>`<div class="week-item ${String(i)===sel?'current':''}"><div><b>${esc(w.label)}</b><div class="hint">${esc(w.period||'')} · ${(w.campaigns||[]).length} campaigns · ${(w.adsets||[]).length} ad sets · ${(w.ads||[]).length} ads</div></div><div class="week-actions"><button onclick="viewWeek(${i})">View</button><button onclick="editWeek(${i})">Edit</button><button class="danger" onclick="deleteWeek(${i})">Delete</button></div></div>`).join(''):'<div class="hint">No saved weeks yet.</div>';document.getElementById('historyModal').classList.add('open')}
 function closeHistory(){document.getElementById('historyModal').classList.remove('open')}function viewWeek(i){document.getElementById('weekFilter').value=String(i);closeHistory();render()}function editWeek(i){document.getElementById('weekFilter').value=String(i);closeHistory();openEditor(true)}function deleteWeek(i){if(!confirm('Delete this week?'))return;state.weeks.splice(i,1);save();closeHistory();render()}
 function downloadCSV(){const hdrs=['Level','Week','Period','Artist','Campaign','Ad Set','Ad','Platform','Type',...enabledMetrics().map(m=>m.label),'Status'];const csv=[hdrs.join(',')].concat(allRows().flatMap(r=>{const main=['Campaign',r.week,r.period,r.artist,r.name,'','',r.platform,r.type,...enabledMetrics().map(m=>calcMetric(m.key,r)),r.status].map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',');const adsetRows=(r._adsets||[]).flatMap(a=>{const line=['Ad Set',r.week,r.period,'',r.name,a.name,'',a.platform,'Ad Set',...enabledMetrics().map(m=>calcMetric(m.key,a)),a.status].map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',');const adLines=(a._ads||[]).map(ad=>['Ad',r.week,r.period,'',r.name,a.name,ad.name,ad.platform,'Ad',...enabledMetrics().map(m=>calcMetric(m.key,ad)),ad.status].map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(','));return[line,...adLines]});const directAds=(r._directAds||[]).map(ad=>['Ad',r.week,r.period,'',r.name,'',ad.name,ad.platform,'Ad',...enabledMetrics().map(m=>calcMetric(m.key,ad)),ad.status].map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(','));return[main,...adsetRows,...directAds]})).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='meta_ads_dashboard_data.csv';a.click();URL.revokeObjectURL(a.href)}
-function openAddSection(){selectedSectionType='stat';document.querySelectorAll('.section-type-btn').forEach(b=>b.classList.remove('sel'));document.getElementById('stype-stat').classList.add('sel');renderSectionTypeConfig();document.getElementById('addSectionModal').classList.add('open')}function closeAddSection(){document.getElementById('addSectionModal').classList.remove('open')}function selectSectionType(type,btn){selectedSectionType=type;document.querySelectorAll('.section-type-btn').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');renderSectionTypeConfig()}
+function sectionUsesDashboardFilter(sec){
+  return sec.filterWithDashboard !== false;
+}
+function rowsForCustomSection(sec){
+  return sectionUsesDashboardFilter(sec) ? selectedRows() : allRows();
+}
+function metricOptions(selected){
+  return enabledMetrics().map(m=>`<option value="${m.key}" ${m.key===selected?'selected':''}>${esc(m.label)}</option>`).join('');
+}
+function statRowEditorHtml(card={}, targetClass='stat-row'){
+  const source=card.source || (card.metric ? 'metric' : 'manual');
+  const metric=card.metric || 'spend';
+  return `<div class="${targetClass} section-editor-row">
+    <div><div class="mini">Label</div><input class="stat-label" value="${esc(card.label||'')}" placeholder="Label"/></div>
+    <div><div class="mini">Value</div><input class="stat-value" value="${esc(card.value||'')}" placeholder="Manual value" ${source==='metric'?'disabled':''}/></div>
+    <div><div class="mini">Source</div><select class="stat-source" onchange="toggleStatSource(this)"><option value="manual" ${source==='manual'?'selected':''}>Manual</option><option value="metric" ${source==='metric'?'selected':''}>Metric from data</option></select></div>
+    <div><div class="mini">Metric</div><select class="stat-metric" ${source==='manual'?'disabled':''}>${metricOptions(metric)}</select></div>
+    <div><div class="mini">Note</div><input class="stat-note" value="${esc(card.note||'')}" placeholder="Note"/></div>
+    <button class="danger" onclick="this.closest('.${targetClass}').remove()">×</button>
+  </div>`;
+}
+function toggleStatSource(select){
+  const row=select.closest('.section-editor-row');
+  const isMetric=select.value==='metric';
+  row.querySelector('.stat-value').disabled=isMetric;
+  row.querySelector('.stat-metric').disabled=!isMetric;
+}
+function readStatRows(containerId){
+  return [...document.querySelectorAll(`#${containerId} .section-editor-row`)].map(row=>{
+    const source=row.querySelector('.stat-source')?.value||'manual';
+    const metric=row.querySelector('.stat-metric')?.value||'spend';
+    const label=row.querySelector('.stat-label')?.value.trim();
+    return {label:label || (source==='metric'?metricByKey(metric).label:''), value:row.querySelector('.stat-value')?.value.trim()||'', source, metric, note:row.querySelector('.stat-note')?.value.trim()||''};
+  }).filter(card=>card.label||card.value||card.metric);
+}
+function openAddSection(){
+  selectedSectionType='stat';
+  document.querySelectorAll('.section-type-btn').forEach(b=>b.classList.remove('sel'));
+  document.getElementById('stype-stat').classList.add('sel');
+  renderSectionTypeConfig();
+  document.getElementById('addSectionModal').classList.add('open');
+}
+function closeAddSection(){document.getElementById('addSectionModal').classList.remove('open')}
+function selectSectionType(type,btn){
+  selectedSectionType=type;
+  document.querySelectorAll('.section-type-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  renderSectionTypeConfig();
+}
 function renderSectionTypeConfig(){
-  const el = document.getElementById('sectionTypeConfig');
-
-  if (selectedSectionType === 'stat') {
-    el.innerHTML = `<div><label>Section title</label><input id="newSecTitle" value="Custom Stats"/></div><div id="newStatCards" style="display:grid;gap:8px;margin-top:8px"><div class="stat-row" style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px"><input placeholder="Label"><input placeholder="Value"><input placeholder="Note"><button onclick="this.closest('.stat-row').remove()">×</button></div></div><button onclick="addNewStatRow()" style="margin-top:8px">＋ Add card</button>`;
-  }
-  else if (selectedSectionType === 'text') {
-    el.innerHTML = `<div><label>Section title</label><input id="newSecTitle" value="Notes"/></div><div style="margin-top:8px"><label>Content</label><textarea id="newTextContent"></textarea></div>`;
-  }
-  else if (selectedSectionType === 'chart') {
-    el.innerHTML = `<div><label>Section title</label><input id="newSecTitle" value="Custom Chart"/></div><div style="margin-top:8px"><label>Chart type</label><select id="newChartType"><option value="bar">Bar</option><option value="line">Line</option><option value="doughnut">Doughnut</option></select></div><div><label>Metric</label><select id="newChartMetric">${enabledMetrics().map(m => `<option value="${m.key}">${esc(m.label)}</option>`).join('')}</select></div><div><label>Group by</label><select id="newChartGroup"><option value="name">Campaign</option><option value="platform">Platform</option><option value="type">Type</option><option value="artist">Artist</option></select></div>`;
-  }
-  else if (selectedSectionType === 'resultsTable') {
-    el.innerHTML = `<div><label>Section title</label><input id="newSecTitle" value="Campaign Results Table"/></div><div style="margin-top:8px"><label>Rank campaigns by</label><select id="newTableRankMetric">${enabledMetrics().map(m => `<option value="${m.key}">${esc(m.label)}</option>`).join('')}</select></div><div><label>Order</label><select id="newTableRankOrder"><option value="desc">Highest first</option><option value="asc">Lowest first</option></select></div><div><label>Show</label><select id="newTableRankLimit"><option value="all">All campaigns</option><option value="5">Top 5</option><option value="10">Top 10</option><option value="20">Top 20</option></select></div>`;
+  const el=document.getElementById('sectionTypeConfig');
+  const sharedFilterToggle=`<label style="display:flex;gap:8px;align-items:center;text-transform:none;font-size:13px;margin:6px 0 12px"><input id="newSectionFilterWithDashboard" type="checkbox" checked style="width:auto"> Use top-row dashboard filters, including Artist</label>`;
+  if(selectedSectionType==='stat'){
+    el.innerHTML=`<div class="section-editor-grid"><div><label>Section title</label><input id="newSecTitle" value="Custom Stats"/></div>${sharedFilterToggle}<div class="section-data-note">Use “Metric from data” if you want stat cards to change when the Artist filter changes.</div><div id="newStatCards" class="section-editor-grid">${statRowEditorHtml({label:'Spend',source:'metric',metric:'spend',note:'Filtered by top row'})}</div><button onclick="addNewStatRow('newStatCards')" style="margin-top:4px">＋ Add stat card</button></div>`;
+  }else if(selectedSectionType==='text'){
+    el.innerHTML=`<div class="section-editor-grid"><div><label>Section title</label><input id="newSecTitle" value="Notes"/></div>${sharedFilterToggle}<div><label>Content</label><textarea id="newTextContent" placeholder="Add notes or commentary..."></textarea></div></div>`;
+  }else if(selectedSectionType==='chart'){
+    el.innerHTML=`<div class="section-editor-grid"><div><label>Section title</label><input id="newSecTitle" value="Custom Chart"/></div>${sharedFilterToggle}<div><label>Chart type</label><select id="newChartType"><option value="bar">Bar</option><option value="line">Line</option><option value="doughnut">Doughnut</option></select></div><div><label>Metric</label><select id="newChartMetric">${metricOptions('spend')}</select></div><div><label>Group by</label><select id="newChartGroup"><option value="name">Campaign</option><option value="platform">Platform</option><option value="type">Campaign Type</option><option value="artist">Artist</option></select></div></div>`;
+  }else if(selectedSectionType==='resultsTable'){
+    el.innerHTML=`<div class="section-editor-grid"><div><label>Section title</label><input id="newSecTitle" value="Campaign Results Table"/></div>${sharedFilterToggle}<div><label>Rank campaigns by</label><select id="newTableRankMetric">${metricOptions('spend')}</select></div><div><label>Order</label><select id="newTableRankOrder"><option value="desc">Highest first</option><option value="asc">Lowest first</option></select></div><div><label>Show</label><select id="newTableRankLimit"><option value="all">All campaigns</option><option value="5">Top 5</option><option value="10">Top 10</option><option value="20">Top 20</option></select></div></div>`;
   }
 }
-function addNewStatRow(){const d=document.createElement('div');d.className='stat-row';d.style.cssText='display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px';d.innerHTML=`<input placeholder="Label"><input placeholder="Value"><input placeholder="Note"><button onclick="this.closest('.stat-row').remove()">×</button>`;document.getElementById('newStatCards').appendChild(d)}
+function addNewStatRow(containerId='newStatCards'){
+  const container=document.getElementById(containerId);if(!container)return;
+  const div=document.createElement('div');div.innerHTML=statRowEditorHtml({},'stat-row');container.appendChild(div.firstElementChild);
+}
 function confirmAddSection(){
-  const title = document.getElementById('newSecTitle')?.value.trim() || 'Section';
-  const id = 'cs_' + Date.now();
-  let sec = { id, type: selectedSectionType, title };
-
-  if (selectedSectionType === 'stat') {
-    sec.cards = [...document.querySelectorAll('#newStatCards .stat-row')]
-      .map(row => { const inputs = row.querySelectorAll('input'); return { label: inputs[0].value, value: inputs[1].value, note: inputs[2].value }; })
-      .filter(card => card.label || card.value || card.note);
-  }
-  else if (selectedSectionType === 'text') {
-    sec.content = document.getElementById('newTextContent').value;
-  }
-  else if (selectedSectionType === 'chart') {
-    sec.chartType = document.getElementById('newChartType').value;
-    sec.metric = document.getElementById('newChartMetric').value;
-    sec.groupBy = document.getElementById('newChartGroup').value;
-  }
-  else if (selectedSectionType === 'resultsTable') {
-    sec.rankMetric = document.getElementById('newTableRankMetric').value || 'spend';
-    sec.rankOrder = document.getElementById('newTableRankOrder').value || 'desc';
-    sec.rankLimit = document.getElementById('newTableRankLimit').value || 'all';
-  }
-
-  state.customSections = state.customSections || [];
-  state.customSections.push(sec);
-  save();
-  closeAddSection();
-  render();
+  const title=document.getElementById('newSecTitle')?.value.trim()||'Section';
+  const id='cs_'+Date.now();
+  let sec={id,type:selectedSectionType,title,filterWithDashboard:document.getElementById('newSectionFilterWithDashboard')?.checked!==false};
+  if(selectedSectionType==='stat')sec.cards=readStatRows('newStatCards');
+  else if(selectedSectionType==='text')sec.content=document.getElementById('newTextContent')?.value.trim()||'';
+  else if(selectedSectionType==='chart'){sec.chartType=document.getElementById('newChartType').value;sec.metric=document.getElementById('newChartMetric').value;sec.groupBy=document.getElementById('newChartGroup').value;}
+  else if(selectedSectionType==='resultsTable'){sec.rankMetric=document.getElementById('newTableRankMetric').value||'spend';sec.rankOrder=document.getElementById('newTableRankOrder').value||'desc';sec.rankLimit=document.getElementById('newTableRankLimit').value||'all';}
+  state.customSections=state.customSections||[];state.customSections.push(sec);save();closeAddSection();render();
 }
-function removeCustomSection(id){state.customSections=state.customSections.filter(s=>s.id!==id);save();render()}
-function updateCustomResultsTableSetting(sectionId, key, value){
-  state.customSections = (state.customSections || []).map(sec => sec.id === sectionId ? { ...sec, [key]: value } : sec);
-  save();
-  render();
+function removeCustomSection(id){if(!confirm('Remove this section?'))return;state.customSections=(state.customSections||[]).filter(s=>s.id!==id);save();render();}
+function openEditSection(id){
+  const sec=(state.customSections||[]).find(s=>s.id===id);if(!sec)return;
+  document.getElementById('editSectionId').value=id;
+  document.getElementById('editSectionTitle').value=sec.title||'';
+  document.getElementById('editSectionFilterWithDashboard').checked=sec.filterWithDashboard!==false;
+  renderEditSectionConfig(sec);
+  document.getElementById('editSectionModal').classList.add('open');
 }
-function buildNestedResultsTableHTML(sectionId, rows, sec){
-  const rankMetric = sec.rankMetric || 'spend';
-  const order = sec.rankOrder || 'desc';
-  const limit = sec.rankLimit || 'all';
-  let rankedRows = [...rows].sort((a, b) => {
-    const av = getMetricRaw(a, rankMetric);
-    const bv = getMetricRaw(b, rankMetric);
-    return order === 'asc' ? av - bv : bv - av;
-  });
-  if (limit !== 'all') rankedRows = rankedRows.slice(0, Number(limit));
-  const cols = visibleCols();
-  const tableId = 'custom_results_table_' + sectionId;
-  const thead = `<thead><tr>${cols.map(c => `<th class="${isNumCol(c.key) ? 'num' : ''}"><div class="th-inner">${esc(c.label)}</div></th>`).join('')}</tr></thead>`;
-  const tbody = rankedRows.map((r, ri) => {
-    const campaignId = `${tableId}_campaign_${ri}`;
-    const adsets = r._adsets || [];
-    const directAds = r._directAds || [];
-    const hasChildren = adsets.length > 0 || directAds.length > 0;
-    const campaignRow = `<tr class="campaign-row-main${hasChildren ? ' expandable' : ''}" id="${campaignId}" ${hasChildren ? `onclick="toggleCampaignAccordion('${campaignId}')"` : ''}>${cols.map(c => { const val = c.key === 'name' ? `<span class="level-pill">Campaign</span>${getCellValue(r, c.key)}` : getCellValue(r, c.key); return `<td class="${isNumCol(c.key) ? 'num' : ''}">${val}</td>`; }).join('')}</tr>`;
-    const adsetRows = adsets.map((a, ai) => {
-      const adsetId = `${campaignId}_adset_${ai}`;
-      const ads = a._ads || [];
-      const adsetRow = `<tr class="adset-row-main${ads.length ? ' expandable' : ''}" id="${adsetId}" data-parent="${campaignId}" style="display:none" ${ads.length ? `onclick="event.stopPropagation();toggleAdsetAccordion('${adsetId}')"` : ''}>${cols.map(c => { let val; if (c.key === 'name') val = `<span class="level-pill adset">Ad Set</span>${esc(a.name || 'Unnamed ad set')}`; else if (c.key === 'artist') val = '↳'; else if (c.key === 'type') val = 'Ad Set'; else if (c.key === 'week' || c.key === 'period') val = ''; else val = getCellValue(a, c.key); return `<td class="${isNumCol(c.key) ? 'num' : ''}">${val}</td>`; }).join('')}</tr>`;
-      const adRows = ads.map(ad => `<tr class="ad-row" data-parent="${adsetId}" data-campaign-parent="${campaignId}" style="display:none">${cols.map(c => { let val; if (c.key === 'name') val = `<span class="level-pill ad">Ad</span>${esc(ad.name || 'Unnamed ad')}`; else if (c.key === 'artist') val = '↳ ↳'; else if (c.key === 'type') val = 'Ad'; else if (c.key === 'week' || c.key === 'period') val = ''; else val = getCellValue(ad, c.key); return `<td class="${isNumCol(c.key) ? 'num' : ''}">${val}</td>`; }).join('')}</tr>`).join('');
-      return adsetRow + adRows;
+function closeEditSection(){document.getElementById('editSectionModal').classList.remove('open')}
+function renderEditSectionConfig(sec){
+  const el=document.getElementById('editSectionConfig');
+  if(sec.type==='stat'){
+    el.innerHTML=`<div class="section-editor-grid"><div class="section-data-note">Manual cards stay fixed. Metric cards update according to the top-row filters, including Artist.</div><div id="editStatCards" class="section-editor-grid">${(sec.cards||[]).map(card=>statRowEditorHtml(card)).join('')}</div><button onclick="addNewStatRow('editStatCards')" style="margin-top:4px">＋ Add stat card</button></div>`;
+  }else if(sec.type==='text'){
+    el.innerHTML=`<div><label>Content</label><textarea id="editTextContent">${esc(sec.content||'')}</textarea></div>`;
+  }else if(sec.type==='chart'){
+    el.innerHTML=`<div class="section-editor-grid"><div><label>Chart type</label><select id="editChartType"><option value="bar" ${sec.chartType==='bar'?'selected':''}>Bar</option><option value="line" ${sec.chartType==='line'?'selected':''}>Line</option><option value="doughnut" ${sec.chartType==='doughnut'?'selected':''}>Doughnut</option></select></div><div><label>Metric</label><select id="editChartMetric">${metricOptions(sec.metric||'spend')}</select></div><div><label>Group by</label><select id="editChartGroup"><option value="name" ${sec.groupBy==='name'?'selected':''}>Campaign</option><option value="platform" ${sec.groupBy==='platform'?'selected':''}>Platform</option><option value="type" ${sec.groupBy==='type'?'selected':''}>Campaign Type</option><option value="artist" ${sec.groupBy==='artist'?'selected':''}>Artist</option></select></div></div>`;
+  }else if(sec.type==='resultsTable'){
+    el.innerHTML=`<div class="section-editor-grid"><div><label>Rank campaigns by</label><select id="editTableRankMetric">${metricOptions(sec.rankMetric||'spend')}</select></div><div><label>Order</label><select id="editTableRankOrder"><option value="desc" ${sec.rankOrder!=='asc'?'selected':''}>Highest first</option><option value="asc" ${sec.rankOrder==='asc'?'selected':''}>Lowest first</option></select></div><div><label>Show</label><select id="editTableRankLimit"><option value="all" ${sec.rankLimit==='all'?'selected':''}>All campaigns</option><option value="5" ${sec.rankLimit==='5'?'selected':''}>Top 5</option><option value="10" ${sec.rankLimit==='10'?'selected':''}>Top 10</option><option value="20" ${sec.rankLimit==='20'?'selected':''}>Top 20</option></select></div></div>`;
+  }
+}
+function saveEditSection(){
+  const id=document.getElementById('editSectionId').value;
+  const original=(state.customSections||[]).find(sec=>sec.id===id);if(!original)return;
+  let next={...original,title:document.getElementById('editSectionTitle').value.trim()||original.title,filterWithDashboard:document.getElementById('editSectionFilterWithDashboard').checked};
+  if(original.type==='stat')next.cards=readStatRows('editStatCards');
+  else if(original.type==='text')next.content=document.getElementById('editTextContent')?.value||'';
+  else if(original.type==='chart'){next.chartType=document.getElementById('editChartType').value;next.metric=document.getElementById('editChartMetric').value;next.groupBy=document.getElementById('editChartGroup').value;}
+  else if(original.type==='resultsTable'){next.rankMetric=document.getElementById('editTableRankMetric').value||'spend';next.rankOrder=document.getElementById('editTableRankOrder').value||'desc';next.rankLimit=document.getElementById('editTableRankLimit').value||'all';}
+  state.customSections=(state.customSections||[]).map(sec=>sec.id===id?next:sec);save();closeEditSection();render();
+}
+function saveCustomSectionField(id,field,value){
+  state.customSections=(state.customSections||[]).map(sec=>sec.id===id?{...sec,[field]:String(value||'').trim()}:sec);save();
+}
+function saveCustomStatField(sectionId,index,field,value){
+  state.customSections=(state.customSections||[]).map(sec=>{
+    if(sec.id!==sectionId)return sec;
+    const cards=[...(sec.cards||[])];cards[index]={...(cards[index]||{}),[field]:String(value||'').trim()};return {...sec,cards};
+  });save();
+}
+function updateCustomResultsTableSetting(sectionId,key,value){
+  state.customSections=(state.customSections||[]).map(sec=>sec.id===sectionId?{...sec,[key]:value}:sec);save();render();
+}
+function computeStatCardValue(card,rows){
+  if(card.source==='metric'){
+    const metric=card.metric||'spend';
+    const t=totalize(rows);
+    return fmtMetric(metric,calcMetric(metric,t));
+  }
+  return card.value||'0';
+}
+function buildNestedResultsTableHTML(sectionId,rows,sec){
+  const rankMetric=sec.rankMetric||'spend', order=sec.rankOrder||'desc', limit=sec.rankLimit||'all';
+  let rankedRows=[...rows].sort((a,b)=>{const av=getMetricRaw(a,rankMetric),bv=getMetricRaw(b,rankMetric);return order==='asc'?av-bv:bv-av});
+  if(limit!=='all')rankedRows=rankedRows.slice(0,Number(limit));
+  const cols=visibleCols();
+  const tableId='custom_results_table_'+sectionId;
+  const thead=`<thead><tr>${cols.map(c=>`<th class="${isNumCol(c.key)?'num':''}"><div class="th-inner">${esc(c.label)}</div></th>`).join('')}</tr></thead>`;
+  const tbody=rankedRows.map((r,ri)=>{
+    const campaignId=`${tableId}_campaign_${ri}`;
+    const adsets=r._adsets||[], directAds=r._directAds||[], hasChildren=adsets.length>0||directAds.length>0;
+    const campaignRow=`<tr class="campaign-row-main${hasChildren?' expandable':''}" id="${campaignId}" ${hasChildren?`onclick="toggleCampaignAccordion('${campaignId}')"`:''}>${cols.map(c=>{const val=c.key==='name'?`<span class="level-pill">Campaign</span>${getCellValue(r,c.key)}`:getCellValue(r,c.key);return`<td class="${isNumCol(c.key)?'num':''}">${val}</td>`}).join('')}</tr>`;
+    const adsetRows=adsets.map((a,ai)=>{
+      const adsetId=`${campaignId}_adset_${ai}`;const ads=a._ads||[];
+      const adsetRow=`<tr class="adset-row-main${ads.length?' expandable':''}" id="${adsetId}" data-parent="${campaignId}" style="display:none" ${ads.length?`onclick="event.stopPropagation();toggleAdsetAccordion('${adsetId}')"`:''}>${cols.map(c=>{let val;if(c.key==='name')val=`<span class="level-pill adset">Ad Set</span>${esc(a.name||'Unnamed ad set')}`;else if(c.key==='artist')val='↳';else if(c.key==='type')val='Ad Set';else if(c.key==='week'||c.key==='period')val='';else val=getCellValue(a,c.key);return`<td class="${isNumCol(c.key)?'num':''}">${val}</td>`}).join('')}</tr>`;
+      const adRows=ads.map(ad=>`<tr class="ad-row" data-parent="${adsetId}" style="display:none">${cols.map(c=>{let val;if(c.key==='name')val=`<span class="level-pill ad">Ad</span>${esc(ad.name||'Unnamed ad')}`;else if(c.key==='artist')val='↳ ↳';else if(c.key==='type')val='Ad';else if(c.key==='week'||c.key==='period')val='';else val=getCellValue(ad,c.key);return`<td class="${isNumCol(c.key)?'num':''}">${val}</td>`}).join('')}</tr>`).join('');
+      return adsetRow+adRows;
     }).join('');
-    const directAdRows = directAds.map(ad => `<tr class="ad-row" data-parent="${campaignId}" style="display:none">${cols.map(c => { let val; if (c.key === 'name') val = `<span class="level-pill ad">Ad</span>${esc(ad.name || 'Unnamed ad')}`; else if (c.key === 'artist') val = '↳'; else if (c.key === 'type') val = 'Ad'; else if (c.key === 'week' || c.key === 'period') val = ''; else val = getCellValue(ad, c.key); return `<td class="${isNumCol(c.key) ? 'num' : ''}">${val}</td>`; }).join('')}</tr>`).join('');
-    return campaignRow + adsetRows + directAdRows;
+    const directAdRows=directAds.map(ad=>`<tr class="ad-row" data-parent="${campaignId}" style="display:none">${cols.map(c=>{let val;if(c.key==='name')val=`<span class="level-pill ad">Ad</span>${esc(ad.name||'Unnamed ad')}`;else if(c.key==='artist')val='↳';else if(c.key==='type')val='Ad';else if(c.key==='week'||c.key==='period')val='';else val=getCellValue(ad,c.key);return`<td class="${isNumCol(c.key)?'num':''}">${val}</td>`}).join('')}</tr>`).join('');
+    return campaignRow+adsetRows+directAdRows;
   }).join('');
-  return `<div class="custom-results-table-toolbar"><div><label>Rank campaigns by</label><select onchange="updateCustomResultsTableSetting('${sectionId}','rankMetric',this.value)">${enabledMetrics().map(m => `<option value="${m.key}" ${m.key === rankMetric ? 'selected' : ''}>${esc(m.label)}</option>`).join('')}</select></div><div><label>Order</label><select onchange="updateCustomResultsTableSetting('${sectionId}','rankOrder',this.value)"><option value="desc" ${order === 'desc' ? 'selected' : ''}>Highest first</option><option value="asc" ${order === 'asc' ? 'selected' : ''}>Lowest first</option></select></div><div><label>Show</label><select onchange="updateCustomResultsTableSetting('${sectionId}','rankLimit',this.value)"><option value="all" ${limit === 'all' ? 'selected' : ''}>All campaigns</option><option value="5" ${limit === '5' ? 'selected' : ''}>Top 5</option><option value="10" ${limit === '10' ? 'selected' : ''}>Top 10</option><option value="20" ${limit === '20' ? 'selected' : ''}>Top 20</option></select></div></div><div class="tablewrap"><table id="${tableId}">${thead}<tbody>${tbody}</tbody></table></div>`;
+  return `<div class="section-data-note">This table is ${sectionUsesDashboardFilter(sec)?'filtered by the top-row dashboard filters, including Artist.':'showing all dashboard data.'}</div><div class="custom-results-table-toolbar table-toolbar"><div><label>Rank campaigns by</label><select onchange="updateCustomResultsTableSetting('${sectionId}','rankMetric',this.value)">${enabledMetrics().map(m=>`<option value="${m.key}" ${m.key===rankMetric?'selected':''}>${esc(m.label)}</option>`).join('')}</select></div><div><label>Order</label><select onchange="updateCustomResultsTableSetting('${sectionId}','rankOrder',this.value)"><option value="desc" ${order==='desc'?'selected':''}>Highest first</option><option value="asc" ${order==='asc'?'selected':''}>Lowest first</option></select></div><div><label>Show</label><select onchange="updateCustomResultsTableSetting('${sectionId}','rankLimit',this.value)"><option value="all" ${limit==='all'?'selected':''}>All campaigns</option><option value="5" ${limit==='5'?'selected':''}>Top 5</option><option value="10" ${limit==='10'?'selected':''}>Top 10</option><option value="20" ${limit==='20'?'selected':''}>Top 20</option></select></div></div><div class="tablewrap"><table id="${tableId}">${thead}<tbody>${tbody}</tbody></table></div>`;
 }
 function renderCustomSections(rows){
-  document.querySelectorAll('.custom-section-mount').forEach(el => el.remove());
-  const grid = document.getElementById('sectionsGrid');
-  (state.customSections || []).forEach(sec => {
-    const el = document.createElement('section');
-    el.className = 'card wide section-card custom-section-mount';
-    el.dataset.customSectionId = sec.id;
-    let inner = '';
-
-    if (sec.type === 'stat') {
-      inner = `<div class="custom-stats-grid">${(sec.cards || []).map((c, i) => `<div class="custom-stat-card" data-stat-index="${i}"><div data-stat-field="label" style="font-size:13px;font-weight:800;color:var(--muted);margin-bottom:8px" contenteditable="true">${esc(c.label)}</div><div data-stat-field="value" style="font-size:26px;font-weight:900;letter-spacing:-.04em" contenteditable="true">${esc(c.value)}</div><div data-stat-field="note" style="font-size:12px;color:var(--muted);margin-top:4px" contenteditable="true">${esc(c.note || '')}</div></div>`).join('')}</div>`;
+  document.querySelectorAll('.custom-section-mount').forEach(el=>el.remove());
+  Object.keys(charts).filter(key=>key.startsWith('custom_')).forEach(key=>destroy(key));
+  const grid=document.getElementById('sectionsGrid');if(!grid)return;
+  (state.customSections||[]).forEach(sec=>{
+    const el=document.createElement('section');el.className='card wide section-card custom-section-mount';el.dataset.customSectionId=sec.id;
+    const sectionRows=rowsForCustomSection(sec);
+    const filterBadge=sectionUsesDashboardFilter(sec)?'<span class="section-filter-pill">Uses top filters</span>':'<span class="section-filter-pill off">All data</span>';
+    let inner='';
+    if(sec.type==='stat'){
+      inner=`<div class="custom-stats-grid">${(sec.cards||[]).map((card,i)=>{const isMetric=card.source==='metric';const displayValue=computeStatCardValue(card,sectionRows);return`<div class="custom-stat-card" data-stat-index="${i}"><div data-stat-field="label" style="font-size:13px;font-weight:800;color:var(--muted);margin-bottom:8px" contenteditable="true" onblur="saveCustomStatField('${sec.id}',${i},'label',this.innerText)">${esc(card.label)}</div><div data-stat-field="value" style="font-size:26px;font-weight:900;letter-spacing:-.04em" ${isMetric?'':'contenteditable="true"'} ${isMetric?'':`onblur="saveCustomStatField('${sec.id}',${i},'value',this.innerText)"`}>${esc(displayValue)}</div><div data-stat-field="note" style="font-size:12px;color:var(--muted);margin-top:4px" contenteditable="true" onblur="saveCustomStatField('${sec.id}',${i},'note',this.innerText)">${esc(card.note||'')}</div></div>`}).join('')}</div>`;
+    }else if(sec.type==='text'){
+      inner=`<div data-custom-field="content" contenteditable="true" style="font-size:15px;line-height:1.7;color:var(--muted);min-height:60px" onblur="saveCustomSectionField('${sec.id}','content',this.innerText)">${esc(sec.content||'Click to edit...')}</div>`;
+    }else if(sec.type==='chart'){
+      inner=`<div class="section-data-note">This chart is ${sectionUsesDashboardFilter(sec)?'filtered by the top-row dashboard filters, including Artist.':'showing all dashboard data.'}</div><div style="height:280px"><canvas id="chart_${sec.id}"></canvas></div>`;
+    }else if(sec.type==='resultsTable'){
+      inner=buildNestedResultsTableHTML(sec.id,sectionRows,sec);
     }
-    else if (sec.type === 'text') {
-      inner = `<div data-custom-field="content" contenteditable="true" style="font-size:15px;line-height:1.7;color:var(--muted);min-height:60px">${esc(sec.content || 'Click to edit...')}</div>`;
-    }
-    else if (sec.type === 'chart') {
-      inner = `<div style="height:280px"><canvas id="chart_${sec.id}"></canvas></div>`;
-    }
-    else if (sec.type === 'resultsTable') {
-      inner = buildNestedResultsTableHTML(sec.id, rows, sec);
-    }
-
-    el.innerHTML = `<div class="section-title"><h2 contenteditable="true">${esc(sec.title)}</h2><div class="section-tools"><button class="remove-section-btn" onclick="removeCustomSection('${sec.id}')">Remove</button></div></div>${inner}`;
+    el.innerHTML=`<div class="section-title"><h2 contenteditable="true" onblur="saveCustomSectionField('${sec.id}','title',this.innerText)">${esc(sec.title)}</h2><div class="section-tools">${filterBadge}<button class="section-edit-btn" onclick="openEditSection('${sec.id}')">Edit</button><button class="remove-section-btn" onclick="removeCustomSection('${sec.id}')">Remove</button></div></div>${inner}`;
     grid.appendChild(el);
-
-    if (sec.type === 'chart') {
-      const groups = Object.entries(groupBy(rows, sec.groupBy || 'name')).map(([label, rs]) => ({ label, value: sum(rs, sec.metric || 'spend') })).slice(0, 10);
-      charts['custom_' + sec.id] = new Chart(document.getElementById('chart_' + sec.id), { type: sec.chartType || 'bar', data: { labels: groups.map(g => g.label), datasets: [{ label: sec.metric, data: groups.map(g => g.value) }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, scales: sec.chartType === 'doughnut' ? {} : { y: { beginAtZero: true } } } });
+    if(sec.type==='chart'){
+      const groups=Object.entries(groupBy(sectionRows,sec.groupBy||'name')).map(([label,rs])=>({label,value:sum(rs,sec.metric||'spend')})).slice(0,10);
+      const canvas=document.getElementById('chart_'+sec.id);if(!canvas)return;
+      charts['custom_'+sec.id]=new Chart(canvas,{type:sec.chartType||'bar',data:{labels:groups.map(g=>g.label),datasets:[{label:metricByKey(sec.metric||'spend').label,data:groups.map(g=>g.value)}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:sec.chartType==='doughnut'?{}:{y:{beginAtZero:true}}}})
     }
   });
 }
+
 function applySectionTitles(){
   const titles=state.sectionTitles||{};
   document.querySelectorAll('#sectionsGrid [data-section-id] > .section-title h2[contenteditable="true"]').forEach(h=>{
@@ -697,7 +731,7 @@ function render(){
   renderTable(rows);
 }
 load();buildFilters();render();initSharedSync();loadRemoteData(true);
-['editModal','cardSettingsModal','metricSettingsModal','historyModal','colSettingsModal','addSectionModal'].forEach(id=>document.getElementById(id)?.addEventListener('click',e=>{if(e.target.id===id)document.getElementById(id).classList.remove('open')}));
+['editModal','cardSettingsModal','metricSettingsModal','historyModal','colSettingsModal','addSectionModal','editSectionModal'].forEach(id=>document.getElementById(id)?.addEventListener('click',e=>{if(e.target.id===id)document.getElementById(id).classList.remove('open')}));
 document.addEventListener('focusout',e=>{if(e.target&&e.target.matches&&e.target.matches('[contenteditable="true"]'))save()},true);
 window.addEventListener('beforeunload',()=>{captureEditableContent();persistLocalState();if(liveReady&&liveRef&&!liveApplying){try{liveRef.set(exportSharedState())}catch(e){}}});
 </script>
