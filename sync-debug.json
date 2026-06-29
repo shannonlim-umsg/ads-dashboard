@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-28T05:10:06.384Z",
+  "generatedAt": "2026-06-29T05:21:27.445Z",
   "datePreset": "last_30d",
   "meta": {
     "enabled": true,
@@ -7,20 +7,20 @@
     "adAccountIdPresent": true,
     "graphVersion": "v24.0",
     "levels": {
-      "adset": {
-        "status": "error",
-        "fieldMode": "core",
-        "message": "{\n  \"message\": \"Error validating access token: Session has expired on Tuesday, 23-Jun-26 10:00:00 PDT. The current time is Saturday, 27-Jun-26 22:10:06 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AIPcdeBib3MlmZwJ8BBrsUw\"\n}"
-      },
       "ad": {
         "status": "error",
         "fieldMode": "core",
-        "message": "{\n  \"message\": \"Error validating access token: Session has expired on Tuesday, 23-Jun-26 10:00:00 PDT. The current time is Saturday, 27-Jun-26 22:10:06 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"ABoVlxh834Q6umE43ahZXj8\"\n}"
+        "message": "{\n  \"message\": \"Error validating access token: Session has expired on Tuesday, 23-Jun-26 10:00:00 PDT. The current time is Sunday, 28-Jun-26 22:21:27 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AasqQyv1hCTLYKlFCFRf3w6\"\n}"
+      },
+      "adset": {
+        "status": "error",
+        "fieldMode": "core",
+        "message": "{\n  \"message\": \"Error validating access token: Session has expired on Tuesday, 23-Jun-26 10:00:00 PDT. The current time is Sunday, 28-Jun-26 22:21:27 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"A811lsROm1xrgWvPktWrZ7b\"\n}"
       },
       "campaign": {
         "status": "error",
         "fieldMode": "core",
-        "message": "{\n  \"message\": \"Error validating access token: Session has expired on Tuesday, 23-Jun-26 10:00:00 PDT. The current time is Saturday, 27-Jun-26 22:10:06 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AHpahx93iUwLOoJjM0zmfKV\"\n}"
+        "message": "{\n  \"message\": \"Error validating access token: Session has expired on Tuesday, 23-Jun-26 10:00:00 PDT. The current time is Sunday, 28-Jun-26 22:21:27 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"A2CrK6xfsh90id1031P5BlV\"\n}"
       }
     }
   },
