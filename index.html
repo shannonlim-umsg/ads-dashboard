@@ -406,6 +406,64 @@ tr.campaign-row-main,tr.adset-row-main{cursor:pointer}tr.campaign-row-main td:fi
 
 
 
+
+/* ========================================================================== 
+   PERSISTENT META ARCHIVE + IMPORTED ROW EDITING
+   Purpose:
+   - Keep user overrides separate from raw Meta API values.
+   - Make imported Campaign / Ad Set / Ad cells editable without mutating the
+     archived API rows that are refreshed from GitHub.
+   - Clearly identify legacy rolling snapshots retained for reference.
+   ========================================================================== */
+.main-table-edit-input,
+.main-table-edit-select {
+  width: 100%;
+  min-width: 110px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 7px 9px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  font-size: 12px;
+}
+.main-table-edit-input:focus,
+.main-table-edit-select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(49,71,255,.10);
+}
+.main-table-name-edit {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 250px;
+}
+.main-table-edit-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.main-table-reset-btn {
+  padding: 5px 8px;
+  border-radius: 8px;
+  font-size: 10px;
+  box-shadow: none;
+  white-space: nowrap;
+}
+.archive-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  background: #fff7ed;
+  color: #c2410c;
+  border: 1px solid #fed7aa;
+  margin-left: 5px;
+}
+
 /* ========================================================================== 
    CRM CAMPAIGN TABLE (FLAT, EDITABLE, FILTERABLE)
    Purpose:
@@ -644,7 +702,7 @@ tr.campaign-row-main,tr.adset-row-main{cursor:pointer}tr.campaign-row-main td:fi
   <button class="add-section-btn" onclick="openAddSection()">＋ Add new section</button>
 </div>
 
-<div class="footer" id="dashFooter" contenteditable="true" spellcheck="false">Dashboard data is loaded from GitHub-synced dashboard-data.json so every visitor sees the same results. Browser storage is used only for display preferences.</div>
+<div class="footer" id="dashFooter" contenteditable="true" spellcheck="false">Meta results are stored as a permanent weekly archive. User edits are saved as shared overrides, so refreshing Meta data updates API values without replacing columns, text, cards, sections, or edited fields.</div>
 </div>
 
 <div class="modal-backdrop" id="editModal"><div class="modal">
@@ -736,9 +794,9 @@ tr.campaign-row-main,tr.adset-row-main{cursor:pointer}tr.campaign-row-main td:fi
 const STORAGE_KEY='umg_meta_ads_dashboard_v1';
 const REMOTE_JSON='./dashboard-data.json';
 const SYNC_DEBUG_JSON='./sync-debug.json';
-let state={weeks:[],cards:null,metrics:null,columns:null,customSections:[],sectionOrder:null,sectionTitles:{},mainTableSettings:{rankMetric:'spend',rankOrder:'desc',rankLimit:'all'},meta:{title:'UMG Meta Ads Dashboard',subtitle:'Meta campaign, ad set, and ad results · Live shared edits across browsers',footer:'Dashboard data is loaded from GitHub-synced dashboard-data.json and all page edits are shared live through Firebase Realtime Database.'}};
+let state={weeks:[],cards:null,metrics:null,columns:null,customSections:[],sectionOrder:null,sectionTitles:{},entityOverrides:{},recordOverrides:{},dataSync:{archiveVersion:2,lastRemoteGeneratedAt:null},mainTableSettings:{rankMetric:'spend',rankOrder:'desc',rankLimit:'all',editMode:false},meta:{title:'UMG Meta Ads Dashboard',subtitle:'Meta campaign, ad set, and ad results · Live shared edits across browsers',footer:'Dashboard data is loaded from GitHub-synced dashboard-data.json and all page edits are shared live through Firebase Realtime Database.'}};
 let charts={}, editingExisting=false, editingIndex=-1, selectedSectionType='stat';
-let liveDb=null, liveRef=null, liveReady=false, liveApplying=false, liveSaveTimer=null;
+let liveDb=null, liveRef=null, liveReady=false, liveApplying=false, liveSaveTimer=null, liveInitialLoadComplete=false;
 const CLIENT_ID=localStorage.getItem(STORAGE_KEY+'_client_id')||('client_'+Math.random().toString(36).slice(2));
 localStorage.setItem(STORAGE_KEY+'_client_id',CLIENT_ID);
 if(typeof structuredClone==='undefined') window.structuredClone=o=>JSON.parse(JSON.stringify(o));
@@ -795,6 +853,9 @@ function normalizeState(){
   if(!state.columns)state.columns=structuredClone(DEFAULT_COLS);
   if(!state.customSections)state.customSections=[];
   if(!state.sectionTitles)state.sectionTitles={};
+  if(!state.entityOverrides)state.entityOverrides={};
+  if(!state.recordOverrides)state.recordOverrides={};
+  if(!state.dataSync)state.dataSync={archiveVersion:2,lastRemoteGeneratedAt:null};
   if(!state.meta)state.meta={title:'UMG Meta Ads Dashboard',subtitle:'',footer:''};
   const defaults=defaultCards();
   if(!state.cards||!state.cards.length)state.cards=defaults;
@@ -802,7 +863,8 @@ function normalizeState(){
   if(missing.length)state.cards=[...state.cards,...missing];
   if(!state.cards.some(c=>c.visible))state.cards=defaults;
   if(!state.sectionOrder)state.sectionOrder=['trend','platform','clickConv','spendRevenue','rank','table'];
-  if(!state.mainTableSettings)state.mainTableSettings={rankMetric:'spend',rankOrder:'desc',rankLimit:'all'};
+  if(!state.mainTableSettings)state.mainTableSettings={rankMetric:'spend',rankOrder:'desc',rankLimit:'all',editMode:false};
+  if(typeof state.mainTableSettings.editMode!=='boolean')state.mainTableSettings.editMode=false;
   state.weeks=(state.weeks||[]).filter(hasRows);
 }
 function exportSharedState(){
@@ -814,7 +876,10 @@ function exportSharedState(){
     customSections:state.customSections||[],
     sectionOrder:state.sectionOrder||['trend','platform','clickConv','spendRevenue','rank','table'],
     sectionTitles:state.sectionTitles||{},
-    mainTableSettings:state.mainTableSettings||{rankMetric:'spend',rankOrder:'desc',rankLimit:'all'},
+    entityOverrides:state.entityOverrides||{},
+    recordOverrides:state.recordOverrides||{},
+    dataSync:state.dataSync||{archiveVersion:2,lastRemoteGeneratedAt:null},
+    mainTableSettings:state.mainTableSettings||{rankMetric:'spend',rankOrder:'desc',rankLimit:'all',editMode:false},
     meta:state.meta||{},
     updatedAt:new Date().toISOString(),
     updatedBy:CLIENT_ID
@@ -885,32 +950,54 @@ function firebaseConfigIsValid(){
   return !!(cfg&&cfg.apiKey&&cfg.databaseURL&&!String(cfg.apiKey).includes('PASTE_')&&!String(cfg.databaseURL).includes('PASTE_'));
 }
 function initSharedSync(){
-  if(!firebaseConfigIsValid()){
-    setSaveStatus('Local mode: add Firebase config for live sharing');
-    return;
-  }
-  try{
-    if(!firebase.apps.length)firebase.initializeApp(getFirebaseConfig());
-    liveDb=firebase.database();
-    const path=(window.DASHBOARD_LIVE_PATH||'dashboards/umg-meta-dashboard/state').replace(/^\/+|\/+$/g,'');
-    liveRef=liveDb.ref(path);
-    liveReady=true;
-    setSaveStatus('Connecting live shared dashboard...');
-    liveRef.on('value',snap=>{
-      const remote=snap.val();
-      if(remote&&typeof remote==='object'){
-        liveApplying=true;
-        state={...state,...remote};
-        normalizeState();
-        persistLocalState();
-        render();
-        liveApplying=false;
-        setSaveStatus('Live shared dashboard synced');
-      }else{
-        saveSharedNow();
-      }
-    },err=>{console.error(err);setSaveStatus('Live sync error')});
-  }catch(err){console.error(err);setSaveStatus('Live sync unavailable')}
+  return new Promise(resolve=>{
+    let initialResolved=false;
+    const finishInitialLoad=()=>{
+      if(initialResolved)return;
+      initialResolved=true;
+      liveInitialLoadComplete=true;
+      resolve();
+    };
+
+    if(!firebaseConfigIsValid()){
+      setSaveStatus('Local mode: add Firebase config for live sharing');
+      finishInitialLoad();
+      return;
+    }
+
+    try{
+      if(!firebase.apps.length)firebase.initializeApp(getFirebaseConfig());
+      liveDb=firebase.database();
+      const path=(window.DASHBOARD_LIVE_PATH||'dashboards/umg-meta-dashboard/state').replace(/^\/+|\/+$/g,'');
+      liveRef=liveDb.ref(path);
+      liveReady=true;
+      setSaveStatus('Connecting live shared dashboard...');
+
+      liveRef.on('value',snap=>{
+        const remote=snap.val();
+        if(remote&&typeof remote==='object'){
+          liveApplying=true;
+          state={...state,...remote};
+          normalizeState();
+          persistLocalState();
+          render();
+          liveApplying=false;
+          setSaveStatus('Live shared dashboard synced');
+          finishInitialLoad();
+        }else{
+          saveSharedNow().finally(finishInitialLoad);
+        }
+      },err=>{
+        console.error(err);
+        setSaveStatus('Live sync error');
+        finishInitialLoad();
+      });
+    }catch(err){
+      console.error(err);
+      setSaveStatus('Live sync unavailable');
+      finishInitialLoad();
+    }
+  });
 }
 function enabledMetrics(){return (state.metrics||DEFAULT_METRICS).filter(m=>m.enabled)}
 function editableMetrics(){return (state.metrics||DEFAULT_METRICS).filter(m=>m.enabled&&m.editable)}
@@ -941,19 +1028,254 @@ function getMetricRaw(row,key){
   return calcMetric(key,row);
 }
 
+
+/* --------------------------------------------------------------------------
+   META ROW OVERRIDE LAYER
+   Raw API values remain replaceable, while user edits are stored separately.
+   Entity overrides apply to every archived period for the same Meta object.
+   Record overrides apply only to one archived week / period.
+   -------------------------------------------------------------------------- */
+const META_NUMERIC_FIELDS=new Set([
+  'spend','impressions','reach','clicks_all','ctr_all','cpc_all','cpm',
+  'link_clicks','ctr_link','cpc_link','purchases','purchase_roas','views',
+  'conversions','revenue','roas','ctr','cpc','cpa'
+]);
+const ENTITY_OVERRIDE_FIELDS=new Set(['artist','name','platform','type','status']);
+
+function isMetaWeek(week){
+  return !!week && (week.source==='Meta Marketing API' || String(week.id||'').startsWith('meta_'));
+}
+function metaEntityId(level,row){
+  if(level==='campaign')return String(row.metaCampaignId||row.id||row.name||'unknown');
+  if(level==='adset')return String(row.metaAdsetId||row.id||`${row.metaCampaignId||row.campaign||''}:${row.name||'unknown'}`);
+  return String(row.metaAdId||row.id||`${row.metaAdsetId||row.adset||''}:${row.name||'unknown'}`);
+}
+function entityOverrideKey(level,row){return `${level}:${metaEntityId(level,row)}`}
+function recordOverrideKey(week,level,row){return `${week.id||week.label||'period'}|${entityOverrideKey(level,row)}`}
+function fieldUsesEntityOverride(key){
+  const col=columnByKey(key);
+  return ENTITY_OVERRIDE_FIELDS.has(key) || (!META_NUMERIC_FIELDS.has(key) && !['week','period'].includes(key)) || col.base===false;
+}
+function typedOverrideValue(key,value){
+  const col=columnByKey(key);
+  return (META_NUMERIC_FIELDS.has(key)||['number','currency','percent','ratio'].includes(col.type)) ? Number(value||0) : String(value??'');
+}
+function applyRowOverrides(level,row,week){
+  const entityKey=entityOverrideKey(level,row);
+  const recordKey=recordOverrideKey(week,level,row);
+  return {
+    ...row,
+    ...(state.entityOverrides?.[entityKey]||{}),
+    ...(state.recordOverrides?.[recordKey]||{}),
+    _level:level,
+    _entityKey:entityKey,
+    _recordKey:recordKey,
+    _weekId:week.id||week.label||'',
+    _snapshotType:week.snapshotType||'',
+    _archivedLegacy:week.archivedLegacy===true || week.snapshotType==='legacy_rolling'
+  };
+}
+function updateMainTableOverride(entityKey,recordKey,key,value){
+  const target=fieldUsesEntityOverride(key)?'entityOverrides':'recordOverrides';
+  state[target]=state[target]||{};
+  state[target][fieldUsesEntityOverride(key)?entityKey:recordKey]={
+    ...(state[target][fieldUsesEntityOverride(key)?entityKey:recordKey]||{}),
+    [key]:typedOverrideValue(key,value),
+    _updatedAt:new Date().toISOString(),
+    _updatedBy:CLIENT_ID
+  };
+  save();
+  render();
+}
+function clearMainTableOverrides(entityKey,recordKey){
+  if(state.entityOverrides)delete state.entityOverrides[entityKey];
+  if(state.recordOverrides)delete state.recordOverrides[recordKey];
+  save();
+  render();
+}
+function mainTableCellHtml(row,level,col){
+  const settings=getMainTableSettings();
+  if(!settings.editMode){
+    if(col.key==='name'){
+      const pill=level==='campaign'?'Campaign':level==='adset'?'Ad Set':'Ad';
+      const cls=level==='campaign'?'':level==='adset'?' adset':' ad';
+      return `<span class="level-pill${cls}">${pill}</span>${getCellValue(row,col.key)}`;
+    }
+    if(col.key==='artist'&&level!=='campaign')return level==='adset'?'↳':'↳ ↳';
+    if(col.key==='type'&&level!=='campaign')return level==='adset'?'Ad Set':'Ad';
+    if((col.key==='week'||col.key==='period')&&level!=='campaign')return '';
+    return getCellValue(row,col.key);
+  }
+
+  if(col.key==='week'||col.key==='period')return esc(row[col.key]||'');
+  const entityKey=encodeURIComponent(row._entityKey||'').replace(/'/g,'%27');
+  const recordKey=encodeURIComponent(row._recordKey||'').replace(/'/g,'%27');
+  const columnKey=encodeURIComponent(col.key||'').replace(/'/g,'%27');
+  const current=row[col.key]??'';
+  const onChange=`updateMainTableOverride(decodeURIComponent('${entityKey}'),decodeURIComponent('${recordKey}'),decodeURIComponent('${columnKey}'),this.value)`;
+
+  if(col.key==='status'){
+    return `<select class="main-table-edit-select" onclick="event.stopPropagation()" onchange="${onChange}"><option value="active" ${current!=='paused'?'selected':''}>active</option><option value="paused" ${current==='paused'?'selected':''}>paused</option></select>`;
+  }
+
+  const numeric=isNumCol(col.key)||['number','currency','percent','ratio'].includes(col.type);
+  const input=`<input class="main-table-edit-input" ${numeric?'type="number" step="0.01"':'type="text"'} value="${esc(current)}" onclick="event.stopPropagation()" onchange="${onChange}">`;
+  if(col.key==='name'){
+    const pill=level==='campaign'?'Campaign':level==='adset'?'Ad Set':'Ad';
+    const cls=level==='campaign'?'':level==='adset'?' adset':' ad';
+    return `<div class="main-table-name-edit"><span class="level-pill${cls}">${pill}</span>${input}<button class="main-table-reset-btn" onclick="event.stopPropagation();clearMainTableOverrides(decodeURIComponent('${entityKey}'),decodeURIComponent('${recordKey}'))">Reset</button></div>`;
+  }
+  return input;
+}
+function toggleMainTableEditMode(){
+  state.mainTableSettings={...getMainTableSettings(),editMode:!getMainTableSettings().editMode};
+  save();
+  render();
+}
+
+function rowListForLevel(week,level){return level==='campaign'?(week.campaigns||[]):level==='adset'?(week.adsets||[]):(week.ads||[])}
+function migrateExistingEditsBeforeMerge(incomingWeeks){
+  const entityFields=['artist','name','platform','type','status'];
+  const knownKeys=new Set([
+    ...META_NUMERIC_FIELDS,
+    'id','metaCampaignId','metaAdsetId','metaAdId','campaign','adset',
+    'source','syncedAt','userAdded','date_start','date_stop'
+  ]);
+
+  // First migrate identity/text/custom-field edits by Meta object ID across
+  // every stored period. This is what carries an edited "Imported Artist"
+  // value from a legacy rolling snapshot into the new permanent archive.
+  const incomingEntities={
+    campaign:new Map(),
+    adset:new Map(),
+    ad:new Map()
+  };
+
+  (incomingWeeks||[]).forEach(week=>{
+    ['campaign','adset','ad'].forEach(level=>{
+      rowListForLevel(week,level).forEach(row=>{
+        const key=entityOverrideKey(level,row);
+        if(!incomingEntities[level].has(key))incomingEntities[level].set(key,row);
+      });
+    });
+  });
+
+  (state.weeks||[]).forEach(existingWeek=>{
+    ['campaign','adset','ad'].forEach(level=>{
+      rowListForLevel(existingWeek,level).forEach(existingRow=>{
+        const entityKey=entityOverrideKey(level,existingRow);
+        const incomingRow=incomingEntities[level].get(entityKey);
+        if(!incomingRow)return;
+
+        entityFields.forEach(key=>{
+          if(!Object.prototype.hasOwnProperty.call(existingRow,key))return;
+          if(String(existingRow[key]??'')!==String(incomingRow[key]??'')){
+            state.entityOverrides[entityKey]={
+              ...(state.entityOverrides[entityKey]||{}),
+              [key]:existingRow[key]
+            };
+          }
+        });
+
+        // Any custom column attached to the Meta object is treated as a
+        // durable entity-level edit and is never replaced by an API refresh.
+        Object.keys(existingRow).forEach(key=>{
+          if(key.startsWith('_')||knownKeys.has(key)||entityFields.includes(key))return;
+          if(!Object.prototype.hasOwnProperty.call(existingRow,key))return;
+          if(String(existingRow[key]??'')!==String(incomingRow[key]??'')){
+            state.entityOverrides[entityKey]={
+              ...(state.entityOverrides[entityKey]||{}),
+              [key]:existingRow[key]
+            };
+          }
+        });
+      });
+    });
+  });
+
+  // Numeric edits are period-specific. They are migrated automatically only
+  // when the stored and incoming rows share the same raw API baseline. New
+  // edits made after this upgrade are always written directly to overrides.
+  const incomingById=new Map((incomingWeeks||[]).map(week=>[week.id||week.label,week]));
+  (state.weeks||[]).forEach(existingWeek=>{
+    const incomingWeek=incomingById.get(existingWeek.id||existingWeek.label);
+    if(!incomingWeek)return;
+    const sameBaseline=!!existingWeek.syncedAt && existingWeek.syncedAt===incomingWeek.syncedAt;
+    if(!sameBaseline)return;
+
+    ['campaign','adset','ad'].forEach(level=>{
+      const incomingMap=new Map(
+        rowListForLevel(incomingWeek,level).map(row=>[entityOverrideKey(level,row),row])
+      );
+      rowListForLevel(existingWeek,level).forEach(existingRow=>{
+        const entityKey=entityOverrideKey(level,existingRow);
+        const incomingRow=incomingMap.get(entityKey);
+        if(!incomingRow)return;
+        const recordKey=recordOverrideKey(existingWeek,level,existingRow);
+
+        META_NUMERIC_FIELDS.forEach(key=>{
+          if(!Object.prototype.hasOwnProperty.call(existingRow,key))return;
+          if(Number(existingRow[key])!==Number(incomingRow[key]||0)){
+            state.recordOverrides[recordKey]={
+              ...(state.recordOverrides[recordKey]||{}),
+              [key]:Number(existingRow[key]||0)
+            };
+          }
+        });
+      });
+    });
+  });
+}
+function mergeApiRows(existingRows,incomingRows,level){
+  const apiKeys=new Set((incomingRows||[]).map(row=>entityOverrideKey(level,row)));
+  const userRows=(existingRows||[]).filter(row=>row.userAdded===true || (!row.metaCampaignId && level==='campaign') || (!row.metaAdsetId && level==='adset') || (!row.metaAdId && level==='ad'));
+  return [...(incomingRows||[]),...userRows.filter(row=>!apiKeys.has(entityOverrideKey(level,row)))];
+}
+async function persistRemoteDataOnly(){
+  persistLocalState();
+  if(!liveReady||!liveRef){setSaveStatus('Meta archive updated locally');return;}
+  const patch={
+    weeks:state.weeks||[],
+    entityOverrides:state.entityOverrides||{},
+    recordOverrides:state.recordOverrides||{},
+    dataSync:state.dataSync||{},
+    updatedAt:new Date().toISOString(),
+    updatedBy:CLIENT_ID
+  };
+  try{
+    await liveRef.update(patch);
+    setSaveStatus('Meta archive refreshed; dashboard edits retained');
+  }catch(error){
+    console.error(error);
+    setSaveStatus('Meta data loaded locally; shared update failed');
+  }
+}
+
 function setRemoteWeeks(weeks){
   if(!Array.isArray(weeks))return;
   weeks=weeks.filter(hasRows);
   if(!weeks.length)return;
+
+  migrateExistingEditsBeforeMerge(weeks);
+
   const existing=state.weeks||[];
   const merged=[...existing];
-  weeks.forEach(w=>{
-    const key=w.id||w.label;
-    const idx=merged.findIndex(x=>(x.id||x.label)===key);
-    if(idx>=0)merged[idx]={...merged[idx],...w};
-    else merged.push(w);
+  weeks.forEach(incoming=>{
+    const key=incoming.id||incoming.label;
+    const index=merged.findIndex(item=>(item.id||item.label)===key);
+    if(index>=0){
+      const current=merged[index];
+      merged[index]={
+        ...current,
+        ...incoming,
+        campaigns:mergeApiRows(current.campaigns,incoming.campaigns,'campaign'),
+        adsets:mergeApiRows(current.adsets,incoming.adsets,'adset'),
+        ads:mergeApiRows(current.ads,incoming.ads,'ad')
+      };
+    }else merged.push(incoming);
   });
-  state.weeks=merged;
+
+  state.weeks=merged.sort((a,b)=>String(a.dateFrom||a.id||'').localeCompare(String(b.dateFrom||b.id||'')));
 }
 async function loadSyncDebug(){
   try{
@@ -971,18 +1293,30 @@ function syncErrorMessage(debug){
 }
 async function loadRemoteData(auto=true){
   try{
+    // Save any unblurred page edits before reading the API archive. This uses
+    // the existing Firebase state and avoids losing layout/text/section edits.
+    captureEditableContent();
+    persistLocalState();
+    if(liveReady&&liveRef&&!liveApplying&&liveInitialLoadComplete)await saveSharedNow();
+
     const res=await fetch(REMOTE_JSON+'?ts='+Date.now());
     if(!res.ok)throw new Error('dashboard-data.json not found');
     const data=await res.json();
     if(!Array.isArray(data.weeks))throw new Error('No weeks array in dashboard-data.json');
     const usableWeeks=data.weeks.filter(hasRows);
     if(!usableWeeks.length)throw new Error('dashboard-data.json has no synced weeks with rows');
+
     setRemoteWeeks(usableWeeks);
+    state.dataSync={
+      ...(state.dataSync||{}),
+      archiveVersion:data.archiveVersion||2,
+      lastRemoteGeneratedAt:data.generatedAt||new Date().toISOString(),
+      lastRefreshAt:new Date().toISOString()
+    };
     normalizeState();
-    save();
     render();
-    setSaveStatus('Live GitHub data loaded');
-    if(!auto)alert('Live GitHub-synced Meta data loaded.');
+    await persistRemoteDataOnly();
+    if(!auto)alert('Meta archive refreshed. Existing edits, columns, cards and sections were retained.');
   }catch(e){
     console.warn(e);
     const debug=await loadSyncDebug();
@@ -994,19 +1328,46 @@ async function loadRemoteData(auto=true){
 
 function allRows(){
   let rows=[];
-  (state.weeks||[]).forEach((w,wi)=>{
-    const adsets=w.adsets||[], ads=w.ads||[];
-    (w.campaigns||[]).forEach(c=>{
-      const nestedAdsets=adsets.filter(a=>(a.metaCampaignId&&c.metaCampaignId&&a.metaCampaignId===c.metaCampaignId)||(!a.metaCampaignId&&a.campaign===c.name)).map(a=>({...a,_ads:ads.filter(ad=>(ad.metaAdsetId&&a.metaAdsetId&&ad.metaAdsetId===a.metaAdsetId)||(!ad.metaAdsetId&&ad.adset===a.name&&ad.campaign===c.name))}));
-      const nestedAdIds=new Set();nestedAdsets.forEach(a=>(a._ads||[]).forEach(ad=>{if(ad.metaAdId)nestedAdIds.add(ad.metaAdId)}));
-      const directAds=ads.filter(ad=>((ad.metaCampaignId&&c.metaCampaignId&&ad.metaCampaignId===c.metaCampaignId)||(!ad.metaCampaignId&&ad.campaign===c.name))&&!(ad.metaAdId&&nestedAdIds.has(ad.metaAdId)));
-      rows.push({...c,week:w.label,period:w.period,weekIndex:wi,_adsets:nestedAdsets,_directAds:directAds});
+  (state.weeks||[]).forEach((week,weekIndex)=>{
+    const rawAdsets=week.adsets||[];
+    const rawAds=week.ads||[];
+    (week.campaigns||[]).forEach(rawCampaign=>{
+      const campaign=applyRowOverrides('campaign',rawCampaign,week);
+      const nestedAdsets=rawAdsets
+        .filter(rawAdset=>(rawAdset.metaCampaignId&&rawCampaign.metaCampaignId&&rawAdset.metaCampaignId===rawCampaign.metaCampaignId)||(!rawAdset.metaCampaignId&&rawAdset.campaign===rawCampaign.name))
+        .map(rawAdset=>{
+          const adset=applyRowOverrides('adset',rawAdset,week);
+          return {
+            ...adset,
+            campaign:campaign.name,
+            _ads:rawAds
+              .filter(rawAd=>(rawAd.metaAdsetId&&rawAdset.metaAdsetId&&rawAd.metaAdsetId===rawAdset.metaAdsetId)||(!rawAd.metaAdsetId&&rawAd.adset===rawAdset.name&&rawAd.campaign===rawCampaign.name))
+              .map(rawAd=>({...applyRowOverrides('ad',rawAd,week),campaign:campaign.name,adset:adset.name}))
+          };
+        });
+      const nestedAdIds=new Set();
+      nestedAdsets.forEach(adset=>(adset._ads||[]).forEach(ad=>nestedAdIds.add(ad._entityKey)));
+      const directAds=rawAds
+        .filter(rawAd=>((rawAd.metaCampaignId&&rawCampaign.metaCampaignId&&rawAd.metaCampaignId===rawCampaign.metaCampaignId)||(!rawAd.metaCampaignId&&rawAd.campaign===rawCampaign.name))&&!nestedAdIds.has(entityOverrideKey('ad',rawAd)))
+        .map(rawAd=>({...applyRowOverrides('ad',rawAd,week),campaign:campaign.name}));
+      rows.push({...campaign,week:week.label,period:week.period,weekIndex,_adsets:nestedAdsets,_directAds:directAds});
     });
   });
   return rows;
 }
 function getFilterVal(id){const el=document.getElementById(id);return el?el.value:'All'}
-function selectedRows(){const week=getFilterVal('weekFilter'),artist=getFilterVal('artistFilter'),platform=getFilterVal('platformFilter'),type=getFilterVal('typeFilter'),campaign=getFilterVal('campaignFilter');return allRows().filter(r=>(week==='All'||String(r.weekIndex)===week)&&(artist==='All'||r.artist===artist)&&(platform==='All'||r.platform===platform)&&(type==='All'||r.type===type)&&(campaign==='All'||r.name===campaign))}
+function selectedRows(){
+  const week=getFilterVal('weekFilter'),artist=getFilterVal('artistFilter'),platform=getFilterVal('platformFilter'),type=getFilterVal('typeFilter'),campaign=getFilterVal('campaignFilter');
+  const hasWeeklyArchive=(state.weeks||[]).some(item=>item.snapshotType==='weekly'||String(item.id||'').startsWith('meta_week_'));
+  return allRows().filter(row=>
+    (week!=='All'||!hasWeeklyArchive||!row._archivedLegacy) &&
+    (week==='All'||String(row.weekIndex)===week) &&
+    (artist==='All'||row.artist===artist) &&
+    (platform==='All'||row.platform===platform) &&
+    (type==='All'||row.type===type) &&
+    (campaign==='All'||row.name===campaign)
+  );
+}
 function prevRows(rows){const wv=uniq(rows.map(r=>String(r.weekIndex)));if(!wv.length)return[];const cw=getFilterVal('weekFilter');const pi=(cw==='All'?Math.max(...wv.map(Number))-1:Number(cw)-1);const artist=getFilterVal('artistFilter'),platform=getFilterVal('platformFilter'),type=getFilterVal('typeFilter'),campaign=getFilterVal('campaignFilter');return allRows().filter(r=>r.weekIndex===pi&&(artist==='All'||r.artist===artist)&&(platform==='All'||r.platform===platform)&&(type==='All'||r.type===type)&&(campaign==='All'||r.name===campaign))}
 function deltaHtml(c,p){if(p===undefined||p===null)return'';const d=c-p;if(d===0)return'<div class="delta flat">→ flat</div>';const pc=p?Math.abs(d/p*100).toFixed(0)+'%':'';return`<div class="delta ${d>0?'up':'down'}">${d>0?'↑':'↓'} ${pc} vs last week</div>`}
 
@@ -1027,7 +1388,7 @@ function refreshFilters(){
     if([...select.options].some(option=>option.value===current))select.value=current;
   }
 
-  fill('weekFilter',weeks.map((week,index)=>({value:String(index),label:`${week.label} · ${week.period||''}`})),'All weeks');
+  fill('weekFilter',weeks.map((week,index)=>({value:String(index),label:`${week.archivedLegacy||week.snapshotType==='legacy_rolling'?'Legacy · ':''}${week.label} · ${week.period||''}`})),'All weeks');
   fill('artistFilter',uniq(filterRows.map(row=>row.artist)).map(value=>({value,label:value})),'All artists');
   fill('platformFilter',uniq(filterRows.map(row=>row.platform)).map(value=>({value,label:value})),'All platforms');
   fill('typeFilter',uniq(filterRows.map(row=>row.type)).map(value=>({value,label:value})),'All types');
@@ -1036,7 +1397,7 @@ function refreshFilters(){
   if(getFilterVal('metricFilter')==='All')document.getElementById('metricFilter').value='spend';
 }
 function getMainTableSettings(){
-  const defaults={rankMetric:'spend',rankOrder:'desc',rankLimit:'all'};
+  const defaults={rankMetric:'spend',rankOrder:'desc',rankLimit:'all',editMode:false};
   return {...defaults,...(state.mainTableSettings||{})};
 }
 
@@ -1163,7 +1524,7 @@ function persistCardOrder(){const order=[...document.querySelectorAll('#kpis .ca
 function hideCard(id){state.cards=state.cards.map(c=>c.id===id?{...c,visible:false}:c);save();render()}
 function resetCardLayout(){state.cards=defaultCards();save();closeCardSettings();render()}
 
-function buildSectionsGrid(){const grid=document.getElementById('sectionsGrid');const BUILT_IN={trend:`<section class="card section-card draggable-section" draggable="true" data-section-id="trend"><div class="section-title"><h2 contenteditable="true">Performance trend</h2><div class="section-tools"><span class="hint">Spend, revenue, clicks, purchases by week</span><span class="section-handle">⋮⋮</span></div></div><div class="chartbox"><canvas id="trendChart"></canvas></div></section>`,platform:`<section class="card section-card draggable-section" draggable="true" data-section-id="platform"><div class="section-title"><h2 contenteditable="true">Platform mix</h2><div class="section-tools"><span class="hint">Spend share</span><span class="section-handle">⋮⋮</span></div></div><div class="chartbox"><canvas id="platformChart"></canvas></div></section>`,clickConv:`<section class="card section-card draggable-section" draggable="true" data-section-id="clickConv"><div class="section-title"><h2 contenteditable="true">Clicks & purchases</h2><div class="section-tools"><span class="hint">By campaign</span><span class="section-handle">⋮⋮</span></div></div><div class="shortchart"><canvas id="clickConvChart"></canvas></div></section>`,spendRevenue:`<section class="card section-card draggable-section" draggable="true" data-section-id="spendRevenue"><div class="section-title"><h2 contenteditable="true">Spend vs revenue</h2><div class="section-tools"><span class="hint">By campaign</span><span class="section-handle">⋮⋮</span></div></div><div class="shortchart"><canvas id="spendRevenueChart"></canvas></div></section>`,rank:`<section class="card wide section-card draggable-section" draggable="true" data-section-id="rank"><div class="section-title"><h2 contenteditable="true">Campaign ranking</h2><div class="section-tools"><span class="hint" id="rankHint">Top campaigns</span><span class="section-handle">⋮⋮</span></div></div><div class="chartbox"><canvas id="rankChart"></canvas></div></section>`,table:`<section class="card wide section-card draggable-section" draggable="true" data-section-id="table"><div class="section-title"><h2 contenteditable="true">Campaign results table</h2><div class="section-tools"><span class="hint" id="rowCount"></span><button onclick="openColSettings()" style="font-size:12px;padding:5px 10px;box-shadow:none">⬜ Columns</button><span class="section-handle">⋮⋮</span></div></div><div class="table-toolbar"><div><label>Rank campaigns by</label><select id="tableRankMetric"></select></div><div><label>Order</label><select id="tableRankOrder"><option value="desc">Highest first</option><option value="asc">Lowest first</option></select></div><div><label>Show</label><select id="tableRankLimit"><option value="all">All campaigns</option><option value="5">Top 5</option><option value="10">Top 10</option><option value="20">Top 20</option></select></div></div><div class="tablewrap"><table id="resultsTableInner"></table></div></section>`};grid.innerHTML=(state.sectionOrder||['trend','platform','clickConv','spendRevenue','rank','table']).filter(id=>BUILT_IN[id]).map(id=>BUILT_IN[id]).join('');enableSectionDrag()}
+function buildSectionsGrid(){const grid=document.getElementById('sectionsGrid');const BUILT_IN={trend:`<section class="card section-card draggable-section" draggable="true" data-section-id="trend"><div class="section-title"><h2 contenteditable="true">Performance trend</h2><div class="section-tools"><span class="hint">Spend, revenue, clicks, purchases by week</span><span class="section-handle">⋮⋮</span></div></div><div class="chartbox"><canvas id="trendChart"></canvas></div></section>`,platform:`<section class="card section-card draggable-section" draggable="true" data-section-id="platform"><div class="section-title"><h2 contenteditable="true">Platform mix</h2><div class="section-tools"><span class="hint">Spend share</span><span class="section-handle">⋮⋮</span></div></div><div class="chartbox"><canvas id="platformChart"></canvas></div></section>`,clickConv:`<section class="card section-card draggable-section" draggable="true" data-section-id="clickConv"><div class="section-title"><h2 contenteditable="true">Clicks & purchases</h2><div class="section-tools"><span class="hint">By campaign</span><span class="section-handle">⋮⋮</span></div></div><div class="shortchart"><canvas id="clickConvChart"></canvas></div></section>`,spendRevenue:`<section class="card section-card draggable-section" draggable="true" data-section-id="spendRevenue"><div class="section-title"><h2 contenteditable="true">Spend vs revenue</h2><div class="section-tools"><span class="hint">By campaign</span><span class="section-handle">⋮⋮</span></div></div><div class="shortchart"><canvas id="spendRevenueChart"></canvas></div></section>`,rank:`<section class="card wide section-card draggable-section" draggable="true" data-section-id="rank"><div class="section-title"><h2 contenteditable="true">Campaign ranking</h2><div class="section-tools"><span class="hint" id="rankHint">Top campaigns</span><span class="section-handle">⋮⋮</span></div></div><div class="chartbox"><canvas id="rankChart"></canvas></div></section>`,table:`<section class="card wide section-card draggable-section" draggable="true" data-section-id="table"><div class="section-title"><h2 contenteditable="true">Campaign results table</h2><div class="section-tools"><span class="hint" id="rowCount"></span><button onclick="openColSettings()" style="font-size:12px;padding:5px 10px;box-shadow:none">⬜ Columns</button><span class="section-handle">⋮⋮</span></div></div><div class="table-toolbar"><div><label>Rank campaigns by</label><select id="tableRankMetric"></select></div><div><label>Order</label><select id="tableRankOrder"><option value="desc">Highest first</option><option value="asc">Lowest first</option></select></div><div><label>Show</label><select id="tableRankLimit"><option value="all">All campaigns</option><option value="5">Top 5</option><option value="10">Top 10</option><option value="20">Top 20</option></select></div><div><label>Imported data edits</label><button id="mainTableEditToggle" type="button" onclick="toggleMainTableEditMode()">Edit values</button></div></div><div class="tablewrap"><table id="resultsTableInner"></table></div></section>`};grid.innerHTML=(state.sectionOrder||['trend','platform','clickConv','spendRevenue','rank','table']).filter(id=>BUILT_IN[id]).map(id=>BUILT_IN[id]).join('');enableSectionDrag()}
 function enableSectionDrag(){const grid=document.getElementById('sectionsGrid');let dragged=null;grid.querySelectorAll('.draggable-section').forEach(s=>{s.addEventListener('dragstart',e=>{dragged=s;s.classList.add('dragging-section')});s.addEventListener('dragend',()=>{s.classList.remove('dragging-section');state.sectionOrder=[...grid.querySelectorAll('[data-section-id]')].map(el=>el.dataset.sectionId);save()});s.addEventListener('dragover',e=>e.preventDefault());s.addEventListener('drop',e=>{e.preventDefault();if(!dragged||dragged===s)return;const secs=[...grid.querySelectorAll('.draggable-section')];const f=secs.indexOf(dragged),t=secs.indexOf(s);if(f<t)s.after(dragged);else s.before(dragged);state.sectionOrder=[...grid.querySelectorAll('[data-section-id]')].map(el=>el.dataset.sectionId);save()})})}
 function groupBy(rows,key){const m={};rows.forEach(r=>{const k=r[key]||'?';(m[k]??=[]).push(r)});return m}
 function destroy(id){if(charts[id]){charts[id].destroy();charts[id]=null}}
@@ -1183,6 +1544,8 @@ function refreshTableRankControls(){
   limitSelect.value=['all','5','10','20'].includes(String(settings.rankLimit))
     ? String(settings.rankLimit)
     : 'all';
+  const editButton=document.getElementById('mainTableEditToggle');
+  if(editButton)editButton.textContent=settings.editMode?'Done editing':'Edit values';
 
   metricSelect.onchange=handleMainTableSettingsChange;
   orderSelect.onchange=handleMainTableSettingsChange;
@@ -1191,6 +1554,7 @@ function refreshTableRankControls(){
 
 function handleMainTableSettingsChange(){
   state.mainTableSettings={
+    ...getMainTableSettings(),
     rankMetric:document.getElementById('tableRankMetric')?.value||'spend',
     rankOrder:document.getElementById('tableRankOrder')?.value||'desc',
     rankLimit:document.getElementById('tableRankLimit')?.value||'all'
@@ -1223,9 +1587,7 @@ function renderTable(rows){
 
     const campaignRow=`<tr class="campaign-row-main${hasChildren?' expandable':''}" id="${campaignId}" ${hasChildren?`onclick="toggleCampaignAccordion('${campaignId}')"`:''}>`+
       cols.map(col=>{
-        const value=col.key==='name'
-          ? `<span class="level-pill">Campaign</span>${getCellValue(row,col.key)}`
-          : getCellValue(row,col.key);
+        const value=mainTableCellHtml(row,'campaign',col);
         return `<td class="${isNumCol(col.key)?'num':''}">${value}</td>`;
       }).join('')+'</tr>';
 
@@ -1234,23 +1596,13 @@ function renderTable(rows){
       const ads=adset._ads||[];
       const adsetRow=`<tr class="adset-row-main${ads.length?' expandable':''}" id="${adsetId}" data-parent="${campaignId}" style="display:none" ${ads.length?`onclick="event.stopPropagation();toggleAdsetAccordion('${adsetId}')"`:''}>`+
         cols.map(col=>{
-          let value;
-          if(col.key==='name')value=`<span class="level-pill adset">Ad Set</span>${esc(adset.name||'Unnamed ad set')}`;
-          else if(col.key==='artist')value='↳';
-          else if(col.key==='type')value='Ad Set';
-          else if(col.key==='week'||col.key==='period')value='';
-          else value=getCellValue(adset,col.key);
+          const value=mainTableCellHtml(adset,'adset',col);
           return `<td class="${isNumCol(col.key)?'num':''}">${value}</td>`;
         }).join('')+'</tr>';
 
       const adRows=ads.map(ad=>`<tr class="ad-row" data-parent="${adsetId}" data-campaign-parent="${campaignId}" style="display:none">`+
         cols.map(col=>{
-          let value;
-          if(col.key==='name')value=`<span class="level-pill ad">Ad</span>${esc(ad.name||'Unnamed ad')}`;
-          else if(col.key==='artist')value='↳ ↳';
-          else if(col.key==='type')value='Ad';
-          else if(col.key==='week'||col.key==='period')value='';
-          else value=getCellValue(ad,col.key);
+          const value=mainTableCellHtml(ad,'ad',col);
           return `<td class="${isNumCol(col.key)?'num':''}">${value}</td>`;
         }).join('')+'</tr>').join('');
 
@@ -1259,12 +1611,7 @@ function renderTable(rows){
 
     const directAdRows=directAds.map(ad=>`<tr class="ad-row" data-parent="${campaignId}" style="display:none">`+
       cols.map(col=>{
-        let value;
-        if(col.key==='name')value=`<span class="level-pill ad">Ad</span>${esc(ad.name||'Unnamed ad')}`;
-        else if(col.key==='artist')value='↳';
-        else if(col.key==='type')value='Ad';
-        else if(col.key==='week'||col.key==='period')value='';
-        else value=getCellValue(ad,col.key);
+        const value=mainTableCellHtml(ad,'ad',col);
         return `<td class="${isNumCol(col.key)?'num':''}">${value}</td>`;
       }).join('')+'</tr>').join('');
 
@@ -1304,7 +1651,59 @@ function getCampaignNames(){return[...document.querySelectorAll('#editorRows .ca
 function getAdsetNames(){return[...document.querySelectorAll('#adsetEditorRows .adset-row-editor .as-name')].map(i=>i.value.trim()).filter(Boolean)}
 function addAdsetRow(data={}){const d={campaign:'',name:'Ad Set 1',platform:'Meta',status:'active',...data};const campNames=getCampaignNames();const div=document.createElement('div');div.className='adset-row-editor';div.innerHTML=`<div><div class="mini">Campaign</div><select class="as-campaign">${[...new Set([d.campaign,...campNames].filter(Boolean))].map(n=>`<option ${n===d.campaign?'selected':''}>${esc(n)}</option>`).join('')}</select></div><div><div class="mini">Ad set name</div><input class="as-name" value="${esc(d.name)}"/></div><div><div class="mini">Platform</div><select class="as-platform">${opt(['Meta'],d.platform)}</select></div>${editableMetrics().map(m=>`<div><div class="mini">${esc(m.label)}</div><input class="as-metric" data-key="${esc(m.key)}" type="number" step="${m.type==='currency'||m.type==='percent'||m.type==='ratio'?'0.01':'1'}" value="${d[m.key]||0}"/></div>`).join('')}<div><button class="danger" onclick="this.closest('.adset-row-editor').remove()">×</button></div>`;document.getElementById('adsetEditorRows').appendChild(div)}
 function addAdRow(data={}){const d={campaign:'',adset:'',name:'Ad 1',platform:'Meta',status:'active',...data};const campNames=getCampaignNames(),adsetNames=getAdsetNames();const div=document.createElement('div');div.className='ad-row-editor';div.innerHTML=`<div><div class="mini">Campaign</div><select class="ad-campaign">${[...new Set([d.campaign,...campNames].filter(Boolean))].map(n=>`<option ${n===d.campaign?'selected':''}>${esc(n)}</option>`).join('')}</select></div><div><div class="mini">Ad set</div><select class="ad-adset">${[...new Set([d.adset,...adsetNames].filter(Boolean))].map(n=>`<option ${n===d.adset?'selected':''}>${esc(n)}</option>`).join('')}</select></div><div><div class="mini">Ad name</div><input class="ad-name" value="${esc(d.name)}"/></div>${editableMetrics().map(m=>`<div><div class="mini">${esc(m.label)}</div><input class="ad-metric" data-key="${esc(m.key)}" type="number" step="${m.type==='currency'||m.type==='percent'||m.type==='ratio'?'0.01':'1'}" value="${d[m.key]||0}"/></div>`).join('')}<div><button class="danger" onclick="this.closest('.ad-row-editor').remove()">×</button></div>`;document.getElementById('adEditorRows').appendChild(div)}
-function saveEditor(){const campaigns=[...document.querySelectorAll('#editorRows .campaign-block')].map(block=>{const c={artist:block.querySelector('.artist').value.trim()||'Unassigned',name:block.querySelector('.name').value.trim()||'Unnamed',platform:'Meta',type:block.querySelector('.type').value,status:block.querySelector('.toggle .paused.sel')?'paused':'active'};block.querySelectorAll('.metric-input').forEach(inp=>c[inp.dataset.metric]=+inp.value||0);return c});const adsets=[...document.querySelectorAll('#adsetEditorRows .adset-row-editor')].map(row=>{const a={campaign:row.querySelector('.as-campaign').value,name:row.querySelector('.as-name').value.trim()||'Ad Set',platform:'Meta',status:'active'};row.querySelectorAll('.as-metric').forEach(inp=>a[inp.dataset.key]=+inp.value||0);return a});const ads=[...document.querySelectorAll('#adEditorRows .ad-row-editor')].map(row=>{const a={campaign:row.querySelector('.ad-campaign').value,adset:row.querySelector('.ad-adset').value,name:row.querySelector('.ad-name').value.trim()||'Ad',platform:'Meta',status:'active'};row.querySelectorAll('.ad-metric').forEach(inp=>a[inp.dataset.key]=+inp.value||0);return a});const w={id:editingExisting&&state.weeks[editingIndex]?.id?state.weeks[editingIndex].id:'manual_'+Date.now(),label:document.getElementById('weekLabel').value.trim()||'Unnamed week',period:document.getElementById('weekPeriod').value.trim(),dateFrom:document.getElementById('dateFrom').value,dateTo:document.getElementById('dateTo').value,campaigns,adsets,ads,savedAt:new Date().toISOString()};if(editingExisting&&editingIndex>=0)state.weeks[editingIndex]=w;else state.weeks.push(w);save();closeEditor();render()}
+function saveEditor(){
+  const campaigns=[...document.querySelectorAll('#editorRows .campaign-block')].map(block=>{
+    const row={artist:block.querySelector('.artist').value.trim()||'Unassigned',name:block.querySelector('.name').value.trim()||'Unnamed',platform:'Meta',type:block.querySelector('.type').value,status:block.querySelector('.toggle .paused.sel')?'paused':'active'};
+    block.querySelectorAll('.metric-input').forEach(input=>row[input.dataset.metric]=+input.value||0);
+    return row;
+  });
+  const adsets=[...document.querySelectorAll('#adsetEditorRows .adset-row-editor')].map(element=>{
+    const row={campaign:element.querySelector('.as-campaign').value,name:element.querySelector('.as-name').value.trim()||'Ad Set',platform:'Meta',status:'active'};
+    element.querySelectorAll('.as-metric').forEach(input=>row[input.dataset.key]=+input.value||0);
+    return row;
+  });
+  const ads=[...document.querySelectorAll('#adEditorRows .ad-row-editor')].map(element=>{
+    const row={campaign:element.querySelector('.ad-campaign').value,adset:element.querySelector('.ad-adset').value,name:element.querySelector('.ad-name').value.trim()||'Ad',platform:'Meta',status:'active'};
+    element.querySelectorAll('.ad-metric').forEach(input=>row[input.dataset.key]=+input.value||0);
+    return row;
+  });
+
+  const original=editingExisting?state.weeks[editingIndex]:null;
+  if(original&&isMetaWeek(original)){
+    const storeDiffs=(level,originalRows,editedRows)=>{
+      editedRows.forEach((edited,index)=>{
+        const raw=originalRows[index];
+        if(!raw){
+          const extra={...edited,id:`user_${level}_${Date.now()}_${index}`,userAdded:true};
+          originalRows.push(extra);
+          return;
+        }
+        const entityKey=entityOverrideKey(level,raw);
+        const recordKey=recordOverrideKey(original,level,raw);
+        Object.entries(edited).forEach(([key,value])=>{
+          if(String(raw[key]??'')===String(value??''))return;
+          const target=fieldUsesEntityOverride(key)?'entityOverrides':'recordOverrides';
+          const overrideKey=target==='entityOverrides'?entityKey:recordKey;
+          state[target][overrideKey]={...(state[target][overrideKey]||{}),[key]:typedOverrideValue(key,value),_updatedAt:new Date().toISOString(),_updatedBy:CLIENT_ID};
+        });
+      });
+    };
+    storeDiffs('campaign',original.campaigns||[],campaigns);
+    storeDiffs('adset',original.adsets||[],adsets);
+    storeDiffs('ad',original.ads||[],ads);
+    save();
+    closeEditor();
+    render();
+    return;
+  }
+
+  const week={id:editingExisting&&original?.id?original.id:'manual_'+Date.now(),label:document.getElementById('weekLabel').value.trim()||'Unnamed week',period:document.getElementById('weekPeriod').value.trim(),dateFrom:document.getElementById('dateFrom').value,dateTo:document.getElementById('dateTo').value,campaigns,adsets,ads,savedAt:new Date().toISOString()};
+  if(editingExisting&&editingIndex>=0)state.weeks[editingIndex]=week;
+  else state.weeks.push(week);
+  save();
+  closeEditor();
+  render();
+}
 function openHistory(){const sel=getFilterVal('weekFilter');document.getElementById('historyList').innerHTML=(state.weeks||[]).length?state.weeks.map((w,i)=>`<div class="week-item ${String(i)===sel?'current':''}"><div><b>${esc(w.label)}</b><div class="hint">${esc(w.period||'')} · ${(w.campaigns||[]).length} campaigns · ${(w.adsets||[]).length} ad sets · ${(w.ads||[]).length} ads</div></div><div class="week-actions"><button onclick="viewWeek(${i})">View</button><button onclick="editWeek(${i})">Edit</button><button class="danger" onclick="deleteWeek(${i})">Delete</button></div></div>`).join(''):'<div class="hint">No saved weeks yet.</div>';document.getElementById('historyModal').classList.add('open')}
 function closeHistory(){document.getElementById('historyModal').classList.remove('open')}function viewWeek(i){document.getElementById('weekFilter').value=String(i);closeHistory();render()}function editWeek(i){document.getElementById('weekFilter').value=String(i);closeHistory();openEditor(true)}function deleteWeek(i){if(!confirm('Delete this week?'))return;state.weeks.splice(i,1);save();closeHistory();render()}
 function downloadCSV(){const hdrs=['Level','Week','Period','Artist','Campaign','Ad Set','Ad','Platform','Type',...enabledMetrics().map(m=>m.label),'Status'];const csv=[hdrs.join(',')].concat(allRows().flatMap(r=>{const main=['Campaign',r.week,r.period,r.artist,r.name,'','',r.platform,r.type,...enabledMetrics().map(m=>calcMetric(m.key,r)),r.status].map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',');const adsetRows=(r._adsets||[]).flatMap(a=>{const line=['Ad Set',r.week,r.period,'',r.name,a.name,'',a.platform,'Ad Set',...enabledMetrics().map(m=>calcMetric(m.key,a)),a.status].map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',');const adLines=(a._ads||[]).map(ad=>['Ad',r.week,r.period,'',r.name,a.name,ad.name,ad.platform,'Ad',...enabledMetrics().map(m=>calcMetric(m.key,ad)),ad.status].map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(','));return[line,...adLines]});const directAds=(r._directAds||[]).map(ad=>['Ad',r.week,r.period,'',r.name,'',ad.name,ad.platform,'Ad',...enabledMetrics().map(m=>calcMetric(m.key,ad)),ad.status].map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(','));return[main,...adsetRows,...directAds]})).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='meta_ads_dashboard_data.csv';a.click();URL.revokeObjectURL(a.href)}
@@ -2406,7 +2805,16 @@ function render(){
   renderCharts(rows);
   renderTable(rows);
 }
-load();buildFilters();render();initSharedSync();loadRemoteData(true);
+async function bootDashboard(){
+  load();
+  buildFilters();
+  render();
+  // Read the shared Firebase state first so a browser's stale local copy can
+  // never overwrite another visitor's columns, sections, text, or overrides.
+  await initSharedSync();
+  await loadRemoteData(true);
+}
+bootDashboard();
 ['editModal','cardSettingsModal','metricSettingsModal','historyModal','colSettingsModal','addSectionModal','editSectionModal'].forEach(id=>document.getElementById(id)?.addEventListener('click',e=>{if(e.target.id===id)document.getElementById(id).classList.remove('open')}));
 document.addEventListener('focusout',e=>{if(e.target&&e.target.matches&&e.target.matches('[contenteditable="true"]'))save()},true);
 window.addEventListener('beforeunload',()=>{captureEditableContent();persistLocalState();if(liveReady&&liveRef&&!liveApplying){try{liveRef.set(exportSharedState())}catch(e){}}});

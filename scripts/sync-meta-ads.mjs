@@ -1,21 +1,30 @@
 import fs from "node:fs";
 
+/* ========================================================================== 
+   META ADS WEEKLY ARCHIVE SYNC
+   Purpose:
+   - Fetch Campaign, Ad Set, and Ad insights in weekly reporting periods.
+   - Refresh only recent weeks while preserving every older archived week.
+   - Retain legacy rolling snapshots for reference without replacing them.
+   - Never write zero/empty API results over previously stored data.
+   ========================================================================== */
+
 const token = process.env.META_ACCESS_TOKEN;
 const accountId = process.env.META_AD_ACCOUNT_ID;
 const graphVersion = process.env.META_GRAPH_VERSION || "v24.0";
-const datePreset = process.env.META_DATE_PRESET || "last_30d";
+
+/* Normal runs refresh the most recent 6 weeks. The first upgraded run can
+   backfill one year. Override these values with optional GitHub Secrets. */
+const syncWeeks = positiveInteger(process.env.META_SYNC_WEEKS, 6);
+const initialBackfillWeeks = positiveInteger(process.env.META_INITIAL_BACKFILL_WEEKS, 52);
+const forcedBackfillWeeks = optionalPositiveInteger(process.env.META_FORCE_BACKFILL_WEEKS);
+const chunkWeeks = Math.min(positiveInteger(process.env.META_CHUNK_WEEKS, 12), 12);
 
 if (!token || !accountId) {
   throw new Error("Missing META_ACCESS_TOKEN or META_AD_ACCOUNT_ID GitHub secret.");
 }
 
-const fullFields = [
-  "campaign_id",
-  "campaign_name",
-  "adset_id",
-  "adset_name",
-  "ad_id",
-  "ad_name",
+const metricFields = [
   "impressions",
   "reach",
   "clicks",
@@ -41,13 +50,7 @@ const fullFields = [
   "date_stop"
 ];
 
-const coreFields = [
-  "campaign_id",
-  "campaign_name",
-  "adset_id",
-  "adset_name",
-  "ad_id",
-  "ad_name",
+const coreMetricFields = [
   "impressions",
   "reach",
   "clicks",
@@ -59,19 +62,99 @@ const coreFields = [
   "date_stop"
 ];
 
+const identityFields = {
+  campaign: ["campaign_id", "campaign_name"],
+  adset: ["campaign_id", "campaign_name", "adset_id", "adset_name"],
+  ad: ["campaign_id", "campaign_name", "adset_id", "adset_name", "ad_id", "ad_name"]
+};
+
+const existing = readExistingJson("dashboard-data.json", {
+  generatedAt: null,
+  source: "Meta Marketing API",
+  archiveVersion: 2,
+  weeks: []
+});
+
+const existingWeeks = Array.isArray(existing.weeks) ? existing.weeks : [];
+const hasWeeklyArchive = existingWeeks.some(
+  week => week?.snapshotType === "weekly" || String(week?.id || "").startsWith("meta_week_")
+);
+const lookbackWeeks = forcedBackfillWeeks || (hasWeeklyArchive ? syncWeeks : initialBackfillWeeks);
+
+const today = startOfUtcDay(new Date());
+const archiveStart = addDays(startOfIsoWeek(today), -(lookbackWeeks - 1) * 7);
+const archiveEnd = today;
+const ranges = buildWeekAlignedChunks(archiveStart, archiveEnd, chunkWeeks);
+
 const debug = {
   generatedAt: new Date().toISOString(),
-  datePreset,
-  meta: {
-    enabled: true,
-    tokenPresent: !!token,
-    adAccountIdPresent: !!accountId,
-    graphVersion,
-    levels: {}
-  }
+  mode: "weekly_archive",
+  graphVersion,
+  accountIdPresent: !!accountId,
+  tokenPresent: !!token,
+  archive: {
+    existingWeeklyArchive: hasWeeklyArchive,
+    forcedBackfillWeeks: forcedBackfillWeeks || null,
+    requestedWeeks: lookbackWeeks,
+    normalRefreshWeeks: syncWeeks,
+    initialBackfillWeeks,
+    chunkWeeks,
+    since: formatDate(archiveStart),
+    until: formatDate(archiveEnd),
+    chunks: ranges.map(range => ({ since: range.since, until: range.until }))
+  },
+  meta: { levels: {} }
 };
 
 let hadFetchError = false;
+
+function positiveInteger(value, fallback) {
+  const number = Number.parseInt(String(value || ""), 10);
+  return Number.isFinite(number) && number > 0 ? number : fallback;
+}
+
+function optionalPositiveInteger(value) {
+  const number = Number.parseInt(String(value || ""), 10);
+  return Number.isFinite(number) && number > 0 ? number : null;
+}
+
+function startOfUtcDay(date) {
+  return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+}
+
+function startOfIsoWeek(date) {
+  const value = startOfUtcDay(date);
+  const day = value.getUTCDay() || 7;
+  value.setUTCDate(value.getUTCDate() - day + 1);
+  return value;
+}
+
+function addDays(date, days) {
+  const value = new Date(date);
+  value.setUTCDate(value.getUTCDate() + days);
+  return value;
+}
+
+function formatDate(date) {
+  return date.toISOString().slice(0, 10);
+}
+
+function buildWeekAlignedChunks(start, end, weeksPerChunk) {
+  const chunks = [];
+  let cursor = startOfIsoWeek(start);
+
+  while (cursor <= end) {
+    const chunkEnd = new Date(Math.min(
+      addDays(cursor, weeksPerChunk * 7 - 1).getTime(),
+      end.getTime()
+    ));
+
+    chunks.push({ since: formatDate(cursor), until: formatDate(chunkEnd) });
+    cursor = addDays(chunkEnd, 1);
+  }
+
+  return chunks;
+}
 
 async function fetchAllPages(url) {
   const all = [];
@@ -92,94 +175,121 @@ async function fetchAllPages(url) {
   return all;
 }
 
-async function fetchInsights(level, fieldMode = "full") {
-  const fields = fieldMode === "full" ? fullFields : coreFields;
-  const url =
+function buildInsightsUrl(level, range, fieldMode) {
+  const metrics = fieldMode === "full" ? metricFields : coreMetricFields;
+  const fields = [...identityFields[level], ...metrics];
+  const timeRange = JSON.stringify({ since: range.since, until: range.until });
+
+  return (
     `https://graph.facebook.com/${graphVersion}/act_${accountId}/insights` +
     `?fields=${encodeURIComponent(fields.join(","))}` +
     `&level=${encodeURIComponent(level)}` +
-    `&date_preset=${encodeURIComponent(datePreset)}` +
+    `&time_range=${encodeURIComponent(timeRange)}` +
+    `&time_increment=7` +
     `&limit=500` +
-    `&access_token=${encodeURIComponent(token)}`;
+    `&access_token=${encodeURIComponent(token)}`
+  );
+}
 
+async function fetchRange(level, range, fieldMode = "full") {
   try {
-    const rows = await fetchAllPages(url);
-    debug.meta.levels[level] = { status: "ok", fieldMode, rows: rows.length };
-    return rows;
+    const rows = await fetchAllPages(buildInsightsUrl(level, range, fieldMode));
+    return { rows, fieldMode };
   } catch (error) {
     if (fieldMode === "full") {
-      debug.meta.levels[level] = { status: "retrying_core_fields", fieldMode, message: error.message };
-      return fetchInsights(level, "core");
+      return fetchRange(level, range, "core");
     }
-    hadFetchError = true;
-    debug.meta.levels[level] = { status: "error", fieldMode, message: error.message };
-    return [];
+    throw error;
   }
 }
 
-function arrValue(arr, actionTypes) {
-  if (!Array.isArray(arr)) return 0;
-  for (const type of actionTypes) {
-    const found = arr.find(x => x.action_type === type);
-    if (found) return Number(found.value || 0);
+async function fetchLevel(level) {
+  const rows = [];
+  const chunks = [];
+
+  for (const range of ranges) {
+    try {
+      const result = await fetchRange(level, range);
+      rows.push(...result.rows);
+      chunks.push({ ...range, status: "ok", fieldMode: result.fieldMode, rows: result.rows.length });
+    } catch (error) {
+      hadFetchError = true;
+      chunks.push({ ...range, status: "error", message: error.message });
+      debug.meta.levels[level] = { status: "error", rows: rows.length, chunks };
+      return [];
+    }
+  }
+
+  debug.meta.levels[level] = { status: "ok", rows: rows.length, chunks };
+  return rows;
+}
+
+function arrayValue(values, actionTypes) {
+  if (!Array.isArray(values)) return 0;
+  for (const actionType of actionTypes) {
+    const match = values.find(value => value.action_type === actionType);
+    if (match) return Number(match.value || 0);
   }
   return 0;
 }
 
-function firstValue(arr) {
-  if (!Array.isArray(arr) || !arr.length) return 0;
-  return Number(arr[0]?.value || 0);
+function firstValue(values) {
+  if (!Array.isArray(values) || !values.length) return 0;
+  return Number(values[0]?.value || 0);
 }
 
 function metricNumber(row, key) {
   return Number(row[key] || 0);
 }
 
-function getLinkClicks(row) {
+function linkClicks(row) {
   return metricNumber(row, "inline_link_clicks") ||
-    arrValue(row.actions, ["link_click", "onsite_conversion.messaging_first_reply"]) ||
+    arrayValue(row.actions, ["link_click", "onsite_conversion.messaging_first_reply"]) ||
     firstValue(row.outbound_clicks);
 }
 
-function getCtrAll(row) {
-  const v = metricNumber(row, "ctr");
-  if (v) return v / 100;
+function ctrAll(row) {
+  const supplied = metricNumber(row, "ctr");
+  if (supplied) return supplied / 100;
   const impressions = metricNumber(row, "impressions");
   return impressions ? metricNumber(row, "clicks") / impressions : 0;
 }
 
-function getCtrLink(row) {
-  const v = metricNumber(row, "inline_link_click_ctr");
-  if (v) return v / 100;
+function ctrLink(row) {
+  const supplied = metricNumber(row, "inline_link_click_ctr");
+  if (supplied) return supplied / 100;
 
-  const out = firstValue(row.outbound_clicks_ctr);
-  if (out) return out / 100;
+  const outbound = firstValue(row.outbound_clicks_ctr);
+  if (outbound) return outbound / 100;
 
-  const web = firstValue(row.website_ctr);
-  if (web) return web / 100;
+  const website = firstValue(row.website_ctr);
+  if (website) return website / 100;
 
   const impressions = metricNumber(row, "impressions");
-  return impressions ? getLinkClicks(row) / impressions : 0;
+  return impressions ? linkClicks(row) / impressions : 0;
 }
 
-function getCpcAll(row) {
-  return metricNumber(row, "cpc") || (metricNumber(row, "clicks") ? metricNumber(row, "spend") / metricNumber(row, "clicks") : 0);
+function cpcAll(row) {
+  return metricNumber(row, "cpc") ||
+    (metricNumber(row, "clicks") ? metricNumber(row, "spend") / metricNumber(row, "clicks") : 0);
 }
 
-function getCpcLink(row) {
+function cpcLink(row) {
   return metricNumber(row, "cost_per_inline_link_click") ||
-    arrValue(row.cost_per_action_type, ["link_click"]) ||
+    arrayValue(row.cost_per_action_type, ["link_click"]) ||
     firstValue(row.cost_per_outbound_click) ||
-    (getLinkClicks(row) ? metricNumber(row, "spend") / getLinkClicks(row) : 0);
+    (linkClicks(row) ? metricNumber(row, "spend") / linkClicks(row) : 0);
 }
 
-function getCpm(row) {
+function cpm(row) {
   return metricNumber(row, "cpm") ||
-    (metricNumber(row, "impressions") ? metricNumber(row, "spend") / metricNumber(row, "impressions") * 1000 : 0);
+    (metricNumber(row, "impressions")
+      ? (metricNumber(row, "spend") / metricNumber(row, "impressions")) * 1000
+      : 0);
 }
 
-function getPurchases(row) {
-  return arrValue(row.actions, [
+function purchases(row) {
+  return arrayValue(row.actions, [
     "purchase",
     "omni_purchase",
     "offsite_conversion.fb_pixel_purchase",
@@ -188,8 +298,8 @@ function getPurchases(row) {
   ]);
 }
 
-function getRevenue(row) {
-  return arrValue(row.action_values, [
+function revenue(row) {
+  return arrayValue(row.action_values, [
     "purchase",
     "omni_purchase",
     "offsite_conversion.fb_pixel_purchase",
@@ -198,41 +308,39 @@ function getRevenue(row) {
   ]);
 }
 
-function getPurchaseRoas(row) {
+function purchaseRoas(row) {
   return firstValue(row.purchase_roas) ||
     firstValue(row.website_purchase_roas) ||
     firstValue(row.mobile_app_purchase_roas) ||
-    (metricNumber(row, "spend") ? getRevenue(row) / metricNumber(row, "spend") : 0);
+    (metricNumber(row, "spend") ? revenue(row) / metricNumber(row, "spend") : 0);
 }
 
-function getViews(row) {
-  return firstValue(row.video_play_actions) || arrValue(row.actions, ["video_view"]);
+function views(row) {
+  return firstValue(row.video_play_actions) || arrayValue(row.actions, ["video_view"]);
 }
 
 function baseMetrics(row) {
   const spend = metricNumber(row, "spend");
-  const impressions = metricNumber(row, "impressions");
-  const clicks = metricNumber(row, "clicks");
-  const purchases = getPurchases(row);
-  const revenue = getRevenue(row);
+  const purchaseCount = purchases(row);
+  const purchaseValue = revenue(row);
 
   return {
-    impressions,
+    impressions: metricNumber(row, "impressions"),
     reach: metricNumber(row, "reach"),
-    clicks_all: clicks,
-    ctr_all: getCtrAll(row),
-    cpc_all: getCpcAll(row),
-    cpm: getCpm(row),
-    link_clicks: getLinkClicks(row),
-    ctr_link: getCtrLink(row),
-    cpc_link: getCpcLink(row),
-    purchases,
-    purchase_roas: getPurchaseRoas(row),
-    views: getViews(row),
-    conversions: purchases || arrValue(row.actions, ["lead", "complete_registration"]),
+    clicks_all: metricNumber(row, "clicks"),
+    ctr_all: ctrAll(row),
+    cpc_all: cpcAll(row),
+    cpm: cpm(row),
+    link_clicks: linkClicks(row),
+    ctr_link: ctrLink(row),
+    cpc_link: cpcLink(row),
+    purchases: purchaseCount,
+    purchase_roas: purchaseRoas(row),
+    views: views(row),
+    conversions: purchaseCount || arrayValue(row.actions, ["lead", "complete_registration"]),
     spend,
-    revenue,
-    roas: spend ? revenue / spend : 0
+    revenue: purchaseValue,
+    roas: spend ? purchaseValue / spend : 0
   };
 }
 
@@ -286,73 +394,120 @@ function readExistingJson(path, fallback) {
   }
 }
 
+function periodKey(row) {
+  if (!row.date_start) return null;
+  return `${row.date_start}|${row.date_stop || row.date_start}`;
+}
+
+function groupRowsByPeriod(rows) {
+  const grouped = new Map();
+  for (const row of rows) {
+    const key = periodKey(row);
+    if (!key) continue;
+    if (!grouped.has(key)) grouped.set(key, []);
+    grouped.get(key).push(row);
+  }
+  return grouped;
+}
+
 const [campaignRaw, adsetRaw, adRaw] = await Promise.all([
-  fetchInsights("campaign"),
-  fetchInsights("adset"),
-  fetchInsights("ad")
+  fetchLevel("campaign"),
+  fetchLevel("adset"),
+  fetchLevel("ad")
 ]);
 
-const campaigns = campaignRaw.map(mapCampaign);
-const adsets = adsetRaw.map(mapAdset);
-const ads = adRaw.map(mapAd);
-const totalRows = campaigns.length + adsets.length + ads.length;
+const campaignPeriods = groupRowsByPeriod(campaignRaw);
+const adsetPeriods = groupRowsByPeriod(adsetRaw);
+const adPeriods = groupRowsByPeriod(adRaw);
+const periodKeys = new Set([
+  ...campaignPeriods.keys(),
+  ...adsetPeriods.keys(),
+  ...adPeriods.keys()
+]);
 
-const today = new Date().toISOString().slice(0, 10);
-const week = {
-  id: `meta_${datePreset}_${today}`,
-  label: `Meta ${datePreset.replace("_", " ")} ${today}`,
-  period: campaignRaw[0]?.date_start && campaignRaw[0]?.date_stop
-    ? `${campaignRaw[0].date_start} to ${campaignRaw[0].date_stop}`
-    : datePreset,
-  dateFrom: campaignRaw[0]?.date_start || "",
-  dateTo: campaignRaw[0]?.date_stop || "",
-  campaigns,
-  adsets,
-  ads,
-  source: "Meta Marketing API",
-  syncedAt: new Date().toISOString()
-};
+const incomingWeeks = [...periodKeys]
+  .sort()
+  .map(key => {
+    const [dateFrom, dateTo] = key.split("|");
+    const campaigns = (campaignPeriods.get(key) || []).map(mapCampaign);
+    const adsets = (adsetPeriods.get(key) || []).map(mapAdset);
+    const ads = (adPeriods.get(key) || []).map(mapAd);
 
-const existing = readExistingJson("dashboard-data.json", {
-  generatedAt: null,
-  source: "Meta Marketing API",
-  datePreset,
-  weeks: []
+    return {
+      id: `meta_week_${dateFrom}`,
+      label: `Meta week ${dateFrom}`,
+      period: `${dateFrom} to ${dateTo}`,
+      dateFrom,
+      dateTo,
+      snapshotType: "weekly",
+      campaigns,
+      adsets,
+      ads,
+      source: "Meta Marketing API",
+      syncedAt: new Date().toISOString()
+    };
+  })
+  .filter(week => week.campaigns.length + week.adsets.length + week.ads.length > 0);
+
+const normalizedExistingWeeks = existingWeeks.map(week => {
+  if (
+    !week.snapshotType &&
+    (String(week.id || "").startsWith("meta_last_30d_") || String(week.label || "").includes("last 30d"))
+  ) {
+    return { ...week, snapshotType: "legacy_rolling", archivedLegacy: true };
+  }
+  return week;
 });
 
-const withoutSame = (existing.weeks || []).filter(w => (w.id || w.label) !== (week.id || week.label));
+const mergedById = new Map(normalizedExistingWeeks.map(week => [week.id || week.label, week]));
+for (const week of incomingWeeks) mergedById.set(week.id, week);
 
-const output = {
-  ...existing,
-  generatedAt: new Date().toISOString(),
-  source: "Meta Marketing API",
-  datePreset,
-  weeks: [...withoutSame, week]
-};
+const mergedWeeks = [...mergedById.values()].sort((a, b) =>
+  String(a.dateFrom || a.id || "").localeCompare(String(b.dateFrom || b.id || ""))
+);
+
+const totalRows = incomingWeeks.reduce(
+  (total, week) => total + week.campaigns.length + week.adsets.length + week.ads.length,
+  0
+);
 
 debug.summary = {
-  campaigns: campaigns.length,
-  adsets: adsets.length,
-  ads: ads.length,
-  totalRows
+  incomingWeeks: incomingWeeks.length,
+  campaigns: campaignRaw.length,
+  adsets: adsetRaw.length,
+  ads: adRaw.length,
+  totalRows,
+  preservedExistingWeeks: normalizedExistingWeeks.length,
+  finalArchiveWeeks: mergedWeeks.length
 };
 
 if (hadFetchError || totalRows === 0) {
   debug.summary.skippedDashboardDataUpdate = true;
   debug.summary.reason = hadFetchError
     ? "Meta API returned an error. Existing dashboard-data.json was left unchanged."
-    : "Meta API returned zero rows. Existing dashboard-data.json was left unchanged.";
+    : "Meta API returned zero usable weekly rows. Existing dashboard-data.json was left unchanged.";
+
   fs.writeFileSync("sync-debug.json", JSON.stringify(debug, null, 2));
-  console.log("Skipped dashboard-data.json update because Meta did not return usable rows.");
-  console.log(`Meta campaigns: ${campaigns.length}`);
-  console.log(`Meta ad sets: ${adsets.length}`);
-  console.log(`Meta ads: ${ads.length}`);
-  process.exit(0);
+  console.error(debug.summary.reason);
+  process.exitCode = 1;
+} else {
+  const output = {
+    ...existing,
+    generatedAt: new Date().toISOString(),
+    source: "Meta Marketing API",
+    archiveVersion: 2,
+    archiveGranularity: "weekly",
+    syncWeeks,
+    initialBackfillWeeks,
+    weeks: mergedWeeks
+  };
+
+  fs.writeFileSync("dashboard-data.json", JSON.stringify(output, null, 2));
+  fs.writeFileSync("sync-debug.json", JSON.stringify(debug, null, 2));
+
+  console.log(`Weekly archive periods updated: ${incomingWeeks.length}`);
+  console.log(`Meta campaign rows: ${campaignRaw.length}`);
+  console.log(`Meta ad set rows: ${adsetRaw.length}`);
+  console.log(`Meta ad rows: ${adRaw.length}`);
+  console.log(`Total archive periods retained: ${mergedWeeks.length}`);
 }
-
-fs.writeFileSync("dashboard-data.json", JSON.stringify(output, null, 2));
-fs.writeFileSync("sync-debug.json", JSON.stringify(debug, null, 2));
-
-console.log(`Meta campaigns: ${campaigns.length}`);
-console.log(`Meta ad sets: ${adsets.length}`);
-console.log(`Meta ads: ${ads.length}`);
