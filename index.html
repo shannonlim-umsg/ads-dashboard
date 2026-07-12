@@ -404,6 +404,207 @@ tr.campaign-row-main,tr.adset-row-main{cursor:pointer}tr.campaign-row-main td:fi
   }
 }
 
+
+
+/* ========================================================================== 
+   CRM CAMPAIGN TABLE (FLAT, EDITABLE, FILTERABLE)
+   Purpose:
+   - Provide a standalone CRM campaign table section.
+   - Keep rows editable and shared through the existing save()/Firebase flow.
+   - Support top-row Artist / Platform / Campaign filters while intentionally
+     keeping the CRM Type field independent from the top Campaign Type filter.
+   - Allow per-section column visibility, reordering, addition, and removal.
+   ========================================================================== */
+.crm-campaign-section {
+  padding: 22px;
+}
+
+.crm-campaign-section .section-title {
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.crm-campaign-note {
+  margin: 0 0 14px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.crm-campaign-toolbar {
+  display: grid;
+  grid-template-columns: minmax(180px, 260px) minmax(180px, 240px) 1fr auto auto;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 14px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #f8fafc;
+}
+
+.crm-campaign-toolbar-spacer {
+  min-width: 0;
+}
+
+.crm-campaign-table {
+  min-width: 980px;
+}
+
+.crm-campaign-table th,
+.crm-campaign-table td {
+  padding: 12px 10px;
+  vertical-align: middle;
+}
+
+.crm-campaign-table td {
+  background: #fff;
+}
+
+.crm-campaign-input {
+  width: 100%;
+  min-width: 130px;
+  padding: 9px 10px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+}
+
+.crm-campaign-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(49, 71, 255, .10);
+  outline: none;
+}
+
+.crm-campaign-delete {
+  padding: 7px 10px;
+  border-radius: 9px;
+  color: var(--danger);
+  white-space: nowrap;
+}
+
+.crm-campaign-summary td {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  background: #f8fafc;
+  border-top: 2px solid var(--line);
+  font-weight: 800;
+}
+
+.crm-campaign-summary-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.crm-campaign-summary-label small {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.crm-column-editor {
+  display: grid;
+  gap: 8px;
+}
+
+.crm-column-row {
+  display: grid;
+  grid-template-columns: auto minmax(160px, 1fr) minmax(130px, .7fr) auto auto;
+  gap: 8px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.crm-column-drag {
+  cursor: grab;
+  color: var(--muted);
+  font-weight: 900;
+  user-select: none;
+}
+
+.crm-column-row.dragging {
+  opacity: .45;
+}
+
+.crm-column-row input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+}
+
+.crm-column-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+/* Five section formats on desktop after adding the CRM table format. */
+.section-type-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+/* Tablet layout: compact toolbar and column editor. */
+@media (max-width: 1024px) {
+  .crm-campaign-toolbar {
+    grid-template-columns: repeat(2, minmax(180px, 1fr));
+  }
+
+  .crm-campaign-toolbar-spacer {
+    display: none;
+  }
+
+  .crm-campaign-toolbar .primary {
+    justify-self: start;
+  }
+
+  .section-type-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Mobile layout: stack controls while retaining horizontal table scrolling. */
+@media (max-width: 768px) {
+  .crm-campaign-section {
+    padding: 16px;
+  }
+
+  .crm-campaign-section .section-title {
+    flex-direction: column;
+  }
+
+  .crm-campaign-section .section-tools {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .crm-campaign-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .crm-campaign-toolbar button {
+    width: 100%;
+  }
+
+  .crm-column-row {
+    grid-template-columns: auto 1fr;
+  }
+
+  .crm-column-row > *:nth-child(n+3) {
+    grid-column: 2;
+  }
+
+  .section-type-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -507,6 +708,7 @@ tr.campaign-row-main,tr.adset-row-main{cursor:pointer}tr.campaign-row-main td:fi
     <div class="section-type-btn" onclick="selectSectionType('text',this)" id="stype-text"><span class="section-type-icon">📝</span><div class="section-type-label">Text block</div><div class="section-type-desc">Notes or summary</div></div>
     <div class="section-type-btn" onclick="selectSectionType('chart',this)" id="stype-chart"><span class="section-type-icon">📊</span><div class="section-type-label">Chart</div><div class="section-type-desc">Custom chart from data</div></div>
     <div class="section-type-btn" onclick="selectSectionType('resultsTable',this)" id="stype-table"><span class="section-type-icon">📋</span><div class="section-type-label">Campaign table</div><div class="section-type-desc">Nested Campaign / Ad Set / Ad table</div></div>
+    <div class="section-type-btn" onclick="selectSectionType('crmTable',this)" id="stype-crm-table"><span class="section-type-icon">🗂️</span><div class="section-type-label">CRM campaign table</div><div class="section-type-desc">Editable flat table with totals, Artist filtering, and custom columns</div></div>
   </div>
   <div id="sectionTypeConfig"></div>
   <div class="modal-footer"><button onclick="closeAddSection()">Cancel</button><button class="primary" onclick="confirmAddSection()">Add section</button></div>
@@ -1636,6 +1838,551 @@ function renderCustomSections(rows){
     }
   });
 }
+
+
+
+/* ========================================================================== 
+   CRM CAMPAIGN TABLE PATCH
+   Purpose:
+   - Adds a new custom section type named "CRM campaign table".
+   - Rows are fully editable and can be added/deleted at any time.
+   - Rows can follow the dashboard's top Artist, Platform, Campaign, and Week
+     filters. The CRM Type column deliberately ignores the top Campaign Type
+     filter, as requested.
+   - Each CRM section owns its column order and visibility, and can add custom
+     text/number columns without affecting the main results table.
+   - All changes use the existing save() function, so Firebase/local storage
+     behaviour remains unchanged.
+   ========================================================================== */
+
+const CRM_DEFAULT_COLUMNS = [
+  { key: 'campaign', label: 'Campaign', type: 'text', visible: true, defaultColumn: true },
+  { key: 'artist', label: 'Artist', type: 'text', visible: true, defaultColumn: true },
+  { key: 'platform', label: 'Platform', type: 'text', visible: true, defaultColumn: true },
+  { key: 'total_entries', label: 'Total Entries', type: 'number', visible: true, defaultColumn: true },
+  { key: 'presaves', label: 'Presaves', type: 'number', visible: true, defaultColumn: true },
+  { key: 'bonus_entries', label: 'Bonus Entries', type: 'number', visible: true, defaultColumn: true },
+  { key: 'type', label: 'Type', type: 'text', visible: true, defaultColumn: true }
+];
+
+/** Return a fresh copy so sections never share the same column objects. */
+function defaultCrmColumns() {
+  return structuredClone(CRM_DEFAULT_COLUMNS);
+}
+
+/** Ensure older/shared CRM sections have every required data property. */
+function ensureCrmTableData(section) {
+  section.crmRows = Array.isArray(section.crmRows) ? section.crmRows : [];
+  section.crmColumns = Array.isArray(section.crmColumns) && section.crmColumns.length
+    ? section.crmColumns
+    : defaultCrmColumns();
+  section.crmArtistFilter = section.crmArtistFilter || 'All';
+  section.crmArtistSort = section.crmArtistSort || 'natural';
+  return section;
+}
+
+/** Safely create a stable ID for new rows/columns. */
+function crmId(prefix) {
+  return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+}
+
+/** Render one column editor row used in both Add and Edit section modals. */
+function crmColumnEditorRowHtml(column) {
+  return `
+    <div class="crm-column-row" draggable="true" data-crm-column-key="${esc(column.key)}">
+      <span class="crm-column-drag" title="Drag to reorder">⠿</span>
+      <input class="crm-column-label" value="${esc(column.label)}" aria-label="Column label">
+      <select class="crm-column-type" aria-label="Column type">
+        <option value="text" ${column.type !== 'number' ? 'selected' : ''}>Text</option>
+        <option value="number" ${column.type === 'number' ? 'selected' : ''}>Number</option>
+      </select>
+      <label style="display:flex;align-items:center;gap:7px;text-transform:none;margin:0">
+        <input class="crm-column-visible" type="checkbox" ${column.visible !== false ? 'checked' : ''}>
+        Show
+      </label>
+      <button type="button" class="danger" onclick="this.closest('.crm-column-row').remove()">Remove</button>
+    </div>`;
+}
+
+/** Build the complete column editor for a new or existing CRM section. */
+function crmColumnEditorHtml(prefix, columns) {
+  const safeColumns = Array.isArray(columns) && columns.length ? columns : defaultCrmColumns();
+  return `
+    <div id="${prefix}CrmColumns" class="crm-column-editor">
+      ${safeColumns.map(crmColumnEditorRowHtml).join('')}
+    </div>
+    <div class="crm-column-actions">
+      <button type="button" onclick="addCrmColumnEditorRow('${prefix}')">＋ Add column</button>
+      <button type="button" onclick="resetCrmColumnEditor('${prefix}')">Reset default columns</button>
+    </div>`;
+}
+
+/** Enable drag-and-drop column reordering inside the section editor. */
+function enableCrmColumnDrag(containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  let dragged = null;
+  container.querySelectorAll('.crm-column-row').forEach(row => {
+    row.addEventListener('dragstart', event => {
+      dragged = row;
+      row.classList.add('dragging');
+      event.dataTransfer.effectAllowed = 'move';
+    });
+
+    row.addEventListener('dragend', () => {
+      row.classList.remove('dragging');
+      dragged = null;
+    });
+
+    row.addEventListener('dragover', event => {
+      event.preventDefault();
+      if (!dragged || dragged === row) return;
+      const box = row.getBoundingClientRect();
+      if (event.clientY < box.top + box.height / 2) container.insertBefore(dragged, row);
+      else row.after(dragged);
+    });
+  });
+}
+
+/** Append a new custom CRM column to the open section editor. */
+function addCrmColumnEditorRow(prefix) {
+  const container = document.getElementById(`${prefix}CrmColumns`);
+  if (!container) return;
+
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = crmColumnEditorRowHtml({
+    key: crmId('crm_custom'),
+    label: 'Custom Column',
+    type: 'text',
+    visible: true,
+    defaultColumn: false
+  });
+  container.appendChild(wrapper.firstElementChild);
+  enableCrmColumnDrag(`${prefix}CrmColumns`);
+}
+
+/** Restore the seven requested CRM columns in their default order. */
+function resetCrmColumnEditor(prefix) {
+  const container = document.getElementById(`${prefix}CrmColumns`);
+  if (!container) return;
+  container.innerHTML = defaultCrmColumns().map(crmColumnEditorRowHtml).join('');
+  enableCrmColumnDrag(`${prefix}CrmColumns`);
+}
+
+/** Read ordered CRM columns from the Add/Edit section modal. */
+function readCrmColumns(prefix) {
+  const container = document.getElementById(`${prefix}CrmColumns`);
+  if (!container) return defaultCrmColumns();
+
+  const columns = [...container.querySelectorAll('.crm-column-row')].map(row => ({
+    key: row.dataset.crmColumnKey,
+    label: row.querySelector('.crm-column-label')?.value.trim() || 'Column',
+    type: row.querySelector('.crm-column-type')?.value === 'number' ? 'number' : 'text',
+    visible: !!row.querySelector('.crm-column-visible')?.checked,
+    defaultColumn: CRM_DEFAULT_COLUMNS.some(column => column.key === row.dataset.crmColumnKey)
+  }));
+
+  return columns.length ? columns : defaultCrmColumns();
+}
+
+/** Get the visible, ordered columns; keep Campaign as a safe fallback. */
+function visibleCrmColumns(section) {
+  ensureCrmTableData(section);
+  const visible = section.crmColumns.filter(column => column.visible !== false);
+  return visible.length ? visible : [defaultCrmColumns()[0]];
+}
+
+/** Create a new editable CRM campaign row. */
+function addCrmCampaignRow(sectionId) {
+  const section = sectionById(sectionId);
+  if (!section) return;
+  ensureCrmTableData(section);
+
+  const weekIndex = getFilterVal('weekFilter');
+  const selectedWeek = weekIndex === 'All' ? '' : (state.weeks?.[Number(weekIndex)]?.label || '');
+  const selectedArtist = getFilterVal('artistFilter');
+  const selectedPlatform = getFilterVal('platformFilter');
+  const selectedCampaign = getFilterVal('campaignFilter');
+
+  const row = {
+    id: crmId('crm_campaign'),
+    week: selectedWeek,
+    campaign: selectedCampaign === 'All' ? 'New campaign' : selectedCampaign,
+    artist: selectedArtist === 'All' ? '' : selectedArtist,
+    platform: selectedPlatform === 'All' ? '' : selectedPlatform,
+    total_entries: 0,
+    presaves: 0,
+    bonus_entries: 0,
+    type: ''
+  };
+
+  section.crmColumns.forEach(column => {
+    if (!(column.key in row)) row[column.key] = column.type === 'number' ? 0 : '';
+  });
+
+  section.crmRows.push(row);
+  save();
+  render();
+}
+
+/** Delete one CRM row and refresh the responsive summary. */
+function deleteCrmCampaignRow(sectionId, rowId) {
+  const section = sectionById(sectionId);
+  if (!section) return;
+  ensureCrmTableData(section);
+  section.crmRows = section.crmRows.filter(row => row.id !== rowId);
+  save();
+  render();
+}
+
+/** Store an edited CRM cell using the column's declared text/number type. */
+function updateCrmCampaignCell(sectionId, rowId, key, value) {
+  const section = sectionById(sectionId);
+  if (!section) return;
+  ensureCrmTableData(section);
+
+  const row = section.crmRows.find(item => item.id === rowId);
+  if (!row) return;
+
+  const column = section.crmColumns.find(item => item.key === key) || { type: 'text' };
+  row[key] = column.type === 'number' ? Number(value || 0) : value;
+  save();
+  render();
+}
+
+/** Update the local Artist filter/sort settings shown in the CRM toolbar. */
+function updateCrmCampaignSetting(sectionId, key, value) {
+  const section = sectionById(sectionId);
+  if (!section) return;
+  ensureCrmTableData(section);
+  section[key] = value;
+  save();
+  render();
+}
+
+/**
+ * Apply the main dashboard filters to CRM data.
+ * Important: the top Campaign Type filter is intentionally NOT referenced,
+ * so the CRM Type column remains completely independent.
+ */
+function applyTopFiltersToCrmRows(rows, section) {
+  if (!sectionUsesDashboardFilter(section)) return [...rows];
+
+  const artist = getFilterVal('artistFilter');
+  const platform = getFilterVal('platformFilter');
+  const campaign = getFilterVal('campaignFilter');
+  const week = getFilterVal('weekFilter');
+  const selectedWeek = week === 'All' ? '' : (state.weeks?.[Number(week)]?.label || '');
+
+  return rows.filter(row => {
+    const weekMatches = week === 'All' || !row.week || row.week === selectedWeek;
+    return weekMatches &&
+      (artist === 'All' || row.artist === artist) &&
+      (platform === 'All' || row.platform === platform) &&
+      (campaign === 'All' || row.campaign === campaign);
+  });
+}
+
+/** Apply the CRM table's own Artist filter and Artist sort. */
+function displayedCrmCampaignRows(section) {
+  ensureCrmTableData(section);
+  let rows = applyTopFiltersToCrmRows(section.crmRows, section);
+
+  if (section.crmArtistFilter !== 'All') {
+    rows = rows.filter(row => row.artist === section.crmArtistFilter);
+  }
+
+  if (section.crmArtistSort === 'asc' || section.crmArtistSort === 'desc') {
+    const direction = section.crmArtistSort === 'asc' ? 1 : -1;
+    rows = [...rows].sort((a, b) =>
+      direction * String(a.artist || '').localeCompare(String(b.artist || ''), undefined, { sensitivity: 'base' })
+    );
+  }
+
+  return rows;
+}
+
+/** Render one editable table cell. */
+function crmCampaignCellHtml(sectionId, row, column) {
+  const inputType = column.type === 'number' ? 'number' : 'text';
+  const step = column.type === 'number' ? '1' : '';
+  const value = column.type === 'number' ? Number(row[column.key] || 0) : (row[column.key] || '');
+  return `<input
+    class="crm-campaign-input"
+    type="${inputType}"
+    ${step ? `step="${step}"` : ''}
+    value="${esc(value)}"
+    onchange="updateCrmCampaignCell('${sectionId}','${row.id}','${column.key}',this.value)"
+  >`;
+}
+
+/** Build a totals row that responds to the currently displayed CRM rows. */
+function crmCampaignSummaryHtml(rows, columns) {
+  const labelIndex = Math.max(0, columns.findIndex(column => column.key === 'campaign'));
+
+  return `<tfoot><tr class="crm-campaign-summary">
+    ${columns.map((column, index) => {
+      if (index === labelIndex) {
+        const total = column.type === 'number' ? sum(rows, column.key) : null;
+        return `<td>
+          <div class="crm-campaign-summary-label">
+            <span>Total (${rows.length} campaign${rows.length === 1 ? '' : 's'})</span>
+            ${total !== null ? `<small>${num(total)}</small>` : ''}
+          </div>
+        </td>`;
+      }
+
+      if (column.type === 'number') {
+        return `<td class="num">${num(sum(rows, column.key))}</td>`;
+      }
+
+      return '<td></td>';
+    }).join('')}
+    <td></td>
+  </tr></tfoot>`;
+}
+
+/** Render the complete CRM section, including local Artist controls. */
+function buildCrmCampaignTableHtml(section) {
+  ensureCrmTableData(section);
+  const columns = visibleCrmColumns(section);
+  const rows = displayedCrmCampaignRows(section);
+  const artists = uniq(section.crmRows.map(row => row.artist).filter(Boolean));
+
+  const artistOptions = [
+    `<option value="All" ${section.crmArtistFilter === 'All' ? 'selected' : ''}>All artists</option>`,
+    ...artists.map(artist => `<option value="${esc(artist)}" ${artist === section.crmArtistFilter ? 'selected' : ''}>${esc(artist)}</option>`)
+  ].join('');
+
+  const header = `<thead><tr>
+    ${columns.map(column => `<th class="${column.type === 'number' ? 'num' : ''}">${esc(column.label)}</th>`).join('')}
+    <th>Actions</th>
+  </tr></thead>`;
+
+  const body = rows.length
+    ? rows.map(row => `<tr>
+        ${columns.map(column => `<td class="${column.type === 'number' ? 'num' : ''}">${crmCampaignCellHtml(section.id, row, column)}</td>`).join('')}
+        <td><button class="crm-campaign-delete" onclick="deleteCrmCampaignRow('${section.id}','${row.id}')">Delete</button></td>
+      </tr>`).join('')
+    : `<tr><td colspan="${columns.length + 1}" class="empty-manual-row">No CRM campaigns match the active filters. Select “Add campaign” to create a row.</td></tr>`;
+
+  const topFilterMessage = sectionUsesDashboardFilter(section)
+    ? 'Uses the top Artist, Platform, Campaign, and Week filters. CRM Type stays independent from the top Campaign Type filter.'
+    : 'Top-row filtering is disabled for this section. CRM Type remains independent from Campaign Type.';
+
+  return `
+    <div class="crm-campaign-note">${topFilterMessage}</div>
+    <div class="crm-campaign-toolbar">
+      <div>
+        <label>Filter by Artist</label>
+        <select onchange="updateCrmCampaignSetting('${section.id}','crmArtistFilter',this.value)">${artistOptions}</select>
+      </div>
+      <div>
+        <label>Sort Artist</label>
+        <select onchange="updateCrmCampaignSetting('${section.id}','crmArtistSort',this.value)">
+          <option value="natural" ${section.crmArtistSort === 'natural' ? 'selected' : ''}>Natural order</option>
+          <option value="asc" ${section.crmArtistSort === 'asc' ? 'selected' : ''}>Artist A–Z</option>
+          <option value="desc" ${section.crmArtistSort === 'desc' ? 'selected' : ''}>Artist Z–A</option>
+        </select>
+      </div>
+      <div class="crm-campaign-toolbar-spacer"></div>
+      <button onclick="openEditSection('${section.id}')">Columns</button>
+      <button class="primary" onclick="addCrmCampaignRow('${section.id}')">＋ Add campaign</button>
+    </div>
+    <div class="tablewrap">
+      <table class="crm-campaign-table">
+        ${header}
+        <tbody>${body}</tbody>
+        ${crmCampaignSummaryHtml(rows, columns)}
+      </table>
+    </div>`;
+}
+
+/* --------------------------------------------------------------------------
+   Hook the CRM feature into the existing custom-section lifecycle.
+   The original functions remain responsible for every pre-existing section.
+   -------------------------------------------------------------------------- */
+const _crmOriginalNormalizeState = normalizeState;
+normalizeState = function normalizeStateWithCrm() {
+  _crmOriginalNormalizeState();
+  (state.customSections || []).forEach(section => {
+    if (section.type === 'crmTable') ensureCrmTableData(section);
+  });
+};
+
+const _crmOriginalRenderSectionTypeConfig = renderSectionTypeConfig;
+renderSectionTypeConfig = function renderSectionTypeConfigWithCrm() {
+  if (selectedSectionType !== 'crmTable') {
+    _crmOriginalRenderSectionTypeConfig();
+    return;
+  }
+
+  const element = document.getElementById('sectionTypeConfig');
+  element.innerHTML = `
+    <div class="section-editor-grid">
+      <div>
+        <label>Section title</label>
+        <input id="newSecTitle" value="CRM Campaign Table">
+      </div>
+      <label style="display:flex;gap:8px;align-items:center;text-transform:none;font-size:13px;margin:0">
+        <input id="newSectionFilterWithDashboard" type="checkbox" checked style="width:auto">
+        Use top-row dashboard filters
+      </label>
+      <div class="section-data-note">
+        Top Artist, Platform, Campaign, and Week filters can control this table. The CRM Type column is intentionally not linked to the top Campaign Type filter.
+      </div>
+      <div>
+        <label>Columns</label>
+        <div class="section-data-note">Drag to rearrange. Untick to hide. Remove a column or add a custom text/number column.</div>
+        ${crmColumnEditorHtml('new', defaultCrmColumns())}
+      </div>
+    </div>`;
+
+  requestAnimationFrame(() => enableCrmColumnDrag('newCrmColumns'));
+};
+
+const _crmOriginalConfirmAddSection = confirmAddSection;
+confirmAddSection = function confirmAddSectionWithCrm() {
+  if (selectedSectionType !== 'crmTable') {
+    _crmOriginalConfirmAddSection();
+    return;
+  }
+
+  const section = {
+    id: `cs_${Date.now()}`,
+    type: 'crmTable',
+    title: document.getElementById('newSecTitle')?.value.trim() || 'CRM Campaign Table',
+    filterWithDashboard: document.getElementById('newSectionFilterWithDashboard')?.checked !== false,
+    crmRows: [],
+    crmColumns: readCrmColumns('new'),
+    crmArtistFilter: 'All',
+    crmArtistSort: 'natural'
+  };
+
+  state.customSections = state.customSections || [];
+  state.customSections.push(section);
+  save();
+  closeAddSection();
+  render();
+};
+
+const _crmOriginalRenderEditSectionConfig = renderEditSectionConfig;
+renderEditSectionConfig = function renderEditSectionConfigWithCrm(section) {
+  if (section.type !== 'crmTable') {
+    _crmOriginalRenderEditSectionConfig(section);
+    return;
+  }
+
+  ensureCrmTableData(section);
+  document.getElementById('editSectionConfig').innerHTML = `
+    <div class="section-editor-grid">
+      <div class="section-data-note">
+        Reorder, show/hide, remove, or add columns. Existing row values remain stored even when a column is hidden.
+      </div>
+      ${crmColumnEditorHtml('edit', section.crmColumns)}
+    </div>`;
+
+  requestAnimationFrame(() => enableCrmColumnDrag('editCrmColumns'));
+};
+
+const _crmOriginalSaveEditSection = saveEditSection;
+saveEditSection = function saveEditSectionWithCrm() {
+  const id = document.getElementById('editSectionId').value;
+  const original = sectionById(id);
+
+  if (!original || original.type !== 'crmTable') {
+    _crmOriginalSaveEditSection();
+    return;
+  }
+
+  original.title = document.getElementById('editSectionTitle').value.trim() || original.title;
+  original.filterWithDashboard = document.getElementById('editSectionFilterWithDashboard').checked;
+  original.crmColumns = readCrmColumns('edit');
+  ensureCrmTableData(original);
+
+  save();
+  closeEditSection();
+  render();
+};
+
+/* Add CRM values to the top Artist/Platform/Campaign dropdowns only.
+   CRM Type is excluded so it never becomes a Campaign Type filter option. */
+const _crmOriginalRefreshFilters = refreshFilters;
+refreshFilters = function refreshFiltersWithCrm() {
+  const previous = {
+    artist: getFilterVal('artistFilter'),
+    platform: getFilterVal('platformFilter'),
+    campaign: getFilterVal('campaignFilter')
+  };
+
+  _crmOriginalRefreshFilters();
+
+  const crmRows = (state.customSections || [])
+    .filter(section => section.type === 'crmTable')
+    .flatMap(section => {
+      ensureCrmTableData(section);
+      return section.crmRows;
+    });
+
+  const appendMissingOptions = (selectId, values, preferredValue) => {
+    const select = document.getElementById(selectId);
+    if (!select) return;
+    const existing = new Set([...select.options].map(option => option.value));
+    uniq(values.filter(Boolean)).forEach(value => {
+      if (existing.has(value)) return;
+      const option = document.createElement('option');
+      option.value = value;
+      option.textContent = value;
+      select.appendChild(option);
+      existing.add(value);
+    });
+    if (preferredValue && existing.has(preferredValue)) select.value = preferredValue;
+  };
+
+  appendMissingOptions('artistFilter', crmRows.map(row => row.artist), previous.artist);
+  appendMissingOptions('platformFilter', crmRows.map(row => row.platform), previous.platform);
+  appendMissingOptions('campaignFilter', crmRows.map(row => row.campaign), previous.campaign);
+};
+
+/* Render all existing custom sections first, then append CRM sections. */
+const _crmOriginalRenderCustomSections = renderCustomSections;
+renderCustomSections = function renderCustomSectionsWithCrm(rows) {
+  const allSections = state.customSections || [];
+  const crmSections = allSections.filter(section => section.type === 'crmTable');
+
+  state.customSections = allSections.filter(section => section.type !== 'crmTable');
+  _crmOriginalRenderCustomSections(rows);
+  state.customSections = allSections;
+
+  const grid = document.getElementById('sectionsGrid');
+  if (!grid) return;
+
+  crmSections.forEach(section => {
+    ensureCrmTableData(section);
+    const element = document.createElement('section');
+    element.className = 'card wide section-card custom-section-mount crm-campaign-section';
+    element.dataset.customSectionId = section.id;
+
+    const filterBadge = sectionUsesDashboardFilter(section)
+      ? '<span class="section-filter-pill">Uses top filters</span>'
+      : '<span class="section-filter-pill off">All data</span>';
+
+    element.innerHTML = `
+      <div class="section-title">
+        <h2 contenteditable="true" onblur="saveCustomSectionField('${section.id}','title',this.innerText)">${esc(section.title)}</h2>
+        <div class="section-tools">
+          ${filterBadge}
+          <button class="section-edit-btn" onclick="openEditSection('${section.id}')">Edit</button>
+          <button class="remove-section-btn" onclick="removeCustomSection('${section.id}')">Remove</button>
+        </div>
+      </div>
+      ${buildCrmCampaignTableHtml(section)}`;
+
+    grid.appendChild(element);
+  });
+};
+
 
 function applySectionTitles(){
   const titles=state.sectionTitles||{};
