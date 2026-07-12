@@ -1,7 +1,16 @@
-name: Sync Meta Ads Data
+name: Sync Meta Ads Weekly Archive
 
 on:
   workflow_dispatch:
+    inputs:
+      backfill_weeks:
+        description: "Optional one-time historical backfill window (for example 104 or 260 weeks)"
+        required: false
+        type: string
+      refresh_weeks:
+        description: "Optional recent-week refresh window for this run (default 6)"
+        required: false
+        type: string
   schedule:
     - cron: "0 1 * * *"
 
@@ -13,24 +22,38 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out repo
+      - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Set up Node
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
-      - name: Pull Meta Ads Data
+      # The sync step is allowed to finish with an error so sync-debug.json can
+      # still be committed. A later step marks the workflow as failed.
+      - name: Pull Meta Ads data into permanent weekly archive
+        id: meta_sync
+        continue-on-error: true
         env:
           META_ACCESS_TOKEN: ${{ secrets.META_ACCESS_TOKEN }}
           META_AD_ACCOUNT_ID: ${{ secrets.META_AD_ACCOUNT_ID }}
           META_GRAPH_VERSION: ${{ secrets.META_GRAPH_VERSION }}
-          META_DATE_PRESET: ${{ secrets.META_DATE_PRESET }}
+          META_SYNC_WEEKS: ${{ github.event.inputs.refresh_weeks || secrets.META_SYNC_WEEKS }}
+          META_INITIAL_BACKFILL_WEEKS: ${{ secrets.META_INITIAL_BACKFILL_WEEKS }}
+          META_FORCE_BACKFILL_WEEKS: ${{ github.event.inputs.backfill_weeks }}
+          META_CHUNK_WEEKS: ${{ secrets.META_CHUNK_WEEKS }}
         run: node scripts/sync-meta-ads.mjs
 
-      - name: Commit updated dashboard data
+      - name: Commit archive and debug output
+        if: always()
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Update Meta Ads dashboard data"
+          commit_message: "Update permanent Meta Ads weekly archive"
           file_pattern: dashboard-data.json sync-debug.json
+
+      - name: Mark workflow failed when Meta sync failed
+        if: steps.meta_sync.outcome == 'failure'
+        run: |
+          echo "Meta sync failed. Review sync-debug.json for the API response."
+          exit 1
