@@ -411,9 +411,10 @@ tr.campaign-row-main,tr.adset-row-main{cursor:pointer}tr.campaign-row-main td:fi
 /* ========================================================================== 
    BEST / WORST CAMPAIGN PERFORMANCE SUMMARY
    Purpose:
-   - Show the highest and lowest CTR (link) campaign rows at a glance.
-   - Follow the exact campaign rows currently displayed in the main results
-     table after top filters, ranking, ordering, and table limits are applied.
+   - Rank the campaign rows currently displayed in the main results table by
+     any available campaign metric selected inside this summary section.
+   - Display the selected metric immediately after Type, followed by every
+     other available metric in alphabetical order.
    - Let users independently choose how many best and worst rows to display.
    - Participate in the existing drag-and-drop section layout.
    ========================================================================== */
@@ -423,7 +424,7 @@ tr.campaign-row-main,tr.adset-row-main{cursor:pointer}tr.campaign-row-main td:fi
 
 .performance-summary-toolbar {
   display: grid;
-  grid-template-columns: minmax(170px, 220px) minmax(170px, 220px) 1fr;
+  grid-template-columns: minmax(200px, 280px) minmax(170px, 220px) minmax(170px, 220px) 1fr;
   gap: 12px;
   align-items: end;
   margin-bottom: 14px;
@@ -433,7 +434,8 @@ tr.campaign-row-main,tr.adset-row-main{cursor:pointer}tr.campaign-row-main td:fi
   background: #f8fafc;
 }
 
-.performance-summary-toolbar input[type="number"] {
+.performance-summary-toolbar input[type="number"],
+.performance-summary-toolbar select {
   width: 100%;
   min-height: 42px;
 }
@@ -446,7 +448,8 @@ tr.campaign-row-main,tr.adset-row-main{cursor:pointer}tr.campaign-row-main td:fi
 }
 
 .performance-summary-table {
-  min-width: 980px;
+  width: max-content;
+  min-width: 100%;
 }
 
 .performance-summary-table th,
@@ -495,6 +498,16 @@ tr.campaign-row-main,tr.adset-row-main{cursor:pointer}tr.campaign-row-main td:fi
 .performance-summary-campaign {
   min-width: 250px;
   font-weight: 700;
+}
+
+.performance-summary-selected-metric {
+  background: #eef4ff !important;
+  color: #3538cd;
+  font-weight: 900;
+}
+
+.performance-summary-table th.performance-summary-selected-metric {
+  box-shadow: inset 0 -2px 0 var(--accent);
 }
 
 .performance-summary-empty td {
@@ -929,7 +942,7 @@ tr.campaign-row-main,tr.adset-row-main{cursor:pointer}tr.campaign-row-main td:fi
 const STORAGE_KEY='umg_meta_ads_dashboard_v1';
 const REMOTE_JSON='./dashboard-data.json';
 const SYNC_DEBUG_JSON='./sync-debug.json';
-let state={weeks:[],cards:null,metrics:null,columns:null,customSections:[],sectionOrder:null,sectionTitles:{},entityOverrides:{},recordOverrides:{},dataSync:{archiveVersion:2,lastRemoteGeneratedAt:null},performanceSummarySettings:{bestCount:1,worstCount:1},mainTableSettings:{rankMetric:'spend',rankOrder:'desc',rankLimit:'all',editMode:false},meta:{title:'UMG Meta Ads Dashboard',subtitle:'Meta campaign, ad set, and ad results · Live shared edits across browsers',footer:'Dashboard data is loaded from GitHub-synced dashboard-data.json and all page edits are shared live through Firebase Realtime Database.'}};
+let state={weeks:[],cards:null,metrics:null,columns:null,customSections:[],sectionOrder:null,sectionTitles:{},entityOverrides:{},recordOverrides:{},dataSync:{archiveVersion:2,lastRemoteGeneratedAt:null},performanceSummarySettings:{rankMetric:'ctr_link',bestCount:1,worstCount:1},mainTableSettings:{rankMetric:'spend',rankOrder:'desc',rankLimit:'all',editMode:false},meta:{title:'UMG Meta Ads Dashboard',subtitle:'Meta campaign, ad set, and ad results · Live shared edits across browsers',footer:'Dashboard data is loaded from GitHub-synced dashboard-data.json and all page edits are shared live through Firebase Realtime Database.'}};
 let charts={}, editingExisting=false, editingIndex=-1, selectedSectionType='stat';
 let liveDb=null, liveRef=null, liveReady=false, liveApplying=false, liveSaveTimer=null, liveInitialLoadComplete=false;
 const CLIENT_ID=localStorage.getItem(STORAGE_KEY+'_client_id')||('client_'+Math.random().toString(36).slice(2));
@@ -991,9 +1004,13 @@ function normalizeState(){
   if(!state.entityOverrides)state.entityOverrides={};
   if(!state.recordOverrides)state.recordOverrides={};
   if(!state.dataSync)state.dataSync={archiveVersion:2,lastRemoteGeneratedAt:null};
-  if(!state.performanceSummarySettings)state.performanceSummarySettings={bestCount:1,worstCount:1};
+  if(!state.performanceSummarySettings)state.performanceSummarySettings={rankMetric:'ctr_link',bestCount:1,worstCount:1};
+  const performanceMetricKeys=performanceSummaryMetricDefinitions().map(metric=>metric.key);
+  const performanceMetricFallback=performanceMetricKeys.includes('ctr_link') ? 'ctr_link' : (performanceMetricKeys[0]||'spend');
+  if(!performanceMetricKeys.includes(state.performanceSummarySettings.rankMetric))state.performanceSummarySettings.rankMetric=performanceMetricFallback;
   state.performanceSummarySettings.bestCount=Math.min(50,Math.max(1,Number(state.performanceSummarySettings.bestCount)||1));
   state.performanceSummarySettings.worstCount=Math.min(50,Math.max(1,Number(state.performanceSummarySettings.worstCount)||1));
+  if(state.sectionTitles?.performanceSummary==='Best & worst campaigns by CTR (link)')state.sectionTitles.performanceSummary='Best & Worst Campaigns';
   if(!state.meta)state.meta={title:'UMG Meta Ads Dashboard',subtitle:'',footer:''};
   const defaults=defaultCards();
   if(!state.cards||!state.cards.length)state.cards=defaults;
@@ -1023,7 +1040,7 @@ function exportSharedState(){
     entityOverrides:state.entityOverrides||{},
     recordOverrides:state.recordOverrides||{},
     dataSync:state.dataSync||{archiveVersion:2,lastRemoteGeneratedAt:null},
-    performanceSummarySettings:state.performanceSummarySettings||{bestCount:1,worstCount:1},
+    performanceSummarySettings:state.performanceSummarySettings||{rankMetric:'ctr_link',bestCount:1,worstCount:1},
     mainTableSettings:state.mainTableSettings||{rankMetric:'spend',rankOrder:'desc',rankLimit:'all',editMode:false},
     meta:state.meta||{},
     updatedAt:new Date().toISOString(),
@@ -1726,7 +1743,7 @@ function buildSectionsGrid(){
     performanceSummary:`
       <section class="card wide section-card draggable-section performance-summary-section" draggable="true" data-section-id="performanceSummary">
         <div class="section-title">
-          <h2 contenteditable="true">Best & worst campaigns by CTR (link)</h2>
+          <h2 contenteditable="true">Best & Worst Campaigns</h2>
           <div class="section-tools">
             <span class="hint">At-a-glance performance summary</span>
             <span class="section-handle">⋮⋮</span>
@@ -1734,6 +1751,11 @@ function buildSectionsGrid(){
         </div>
 
         <div class="performance-summary-toolbar">
+          <div>
+            <label for="performanceRankMetric">Rank campaigns by</label>
+            <select id="performanceRankMetric"
+              onchange="updatePerformanceSummarySetting('rankMetric',this.value)"></select>
+          </div>
           <div>
             <label for="performanceBestCount">Best campaigns to show</label>
             <input id="performanceBestCount" type="number" min="1" max="50" step="1"
@@ -1752,8 +1774,8 @@ function buildSectionsGrid(){
         <div class="tablewrap">
           <table id="performanceSummaryTable" class="performance-summary-table"></table>
         </div>
-        <div class="performance-summary-footnote">
-          Best and worst lists are calculated independently. A campaign row can appear in both lists when the visible data set is smaller than the combined requested counts.
+        <div class="performance-summary-footnote" id="performanceSummaryFootnote">
+          Best is the highest selected metric and Worst is the lowest selected metric. The two lists are calculated independently.
         </div>
       </section>`,
 
@@ -1798,58 +1820,129 @@ function enableSectionDrag(){const grid=document.getElementById('sectionsGrid');
 /* ========================================================================== 
    PERFORMANCE SUMMARY LOGIC
    Purpose:
-   - Reuse the exact campaign rows visible in the main table.
-   - Rank independently by CTR (link), highest for Best and lowest for Worst.
-   - Persist independent Best/Worst counts in Firebase shared state.
+   - Reuse the exact campaign rows visible in the main Campaign Results Table.
+   - Let the summary table choose its own ranking metric from every numeric
+     metric available to the main Campaign Results Table.
+   - Place the selected metric immediately after Type and place all remaining
+     metrics after it in alphabetical order.
+   - Persist the selected metric and independent Best/Worst counts in Firebase.
    ========================================================================== */
+
+/**
+ * Return every numeric metric available to the campaign table.
+ * This includes enabled dashboard metrics plus custom numeric/currency/
+ * percent/ratio columns added through the main Table Columns or Metrics tools.
+ */
+function performanceSummaryMetricDefinitions(){
+  const structuralKeys=new Set(['week','period','artist','name','platform','type','status']);
+  const numericTypes=new Set(['number','currency','percent','ratio']);
+  const metrics=new Map();
+
+  (state.metrics||DEFAULT_METRICS).forEach(metric=>{
+    if(metric?.key && metric.enabled!==false && numericTypes.has(metric.type||'number')){
+      metrics.set(metric.key,{
+        key:metric.key,
+        label:metric.label||metric.key,
+        type:metric.type||'number'
+      });
+    }
+  });
+
+  (state.columns||DEFAULT_COLS).forEach(column=>{
+    if(!column?.key || structuralKeys.has(column.key) || !numericTypes.has(column.type||'text'))return;
+    const prior=metrics.get(column.key)||{};
+    metrics.set(column.key,{
+      key:column.key,
+      label:column.label||prior.label||column.key,
+      type:column.type||prior.type||'number'
+    });
+  });
+
+  return [...metrics.values()].sort((a,b)=>
+    String(a.label||a.key).localeCompare(String(b.label||b.key),undefined,{sensitivity:'base'})
+  );
+}
+
+/** Keep the chosen metric first and alphabetise every other metric by label. */
+function orderedPerformanceSummaryMetrics(selectedKey){
+  const metrics=performanceSummaryMetricDefinitions();
+  const selected=metrics.find(metric=>metric.key===selectedKey) || metrics[0] || {key:'spend',label:'Spend',type:'currency'};
+  const others=metrics
+    .filter(metric=>metric.key!==selected.key)
+    .sort((a,b)=>String(a.label).localeCompare(String(b.label),undefined,{sensitivity:'base'}));
+  return [selected,...others];
+}
+
 function getPerformanceSummarySettings(){
-  const defaults={bestCount:1,worstCount:1};
+  const metrics=performanceSummaryMetricDefinitions();
+  const metricKeys=metrics.map(metric=>metric.key);
+  const fallback=metricKeys.includes('ctr_link') ? 'ctr_link' : (metricKeys[0]||'spend');
+  const defaults={rankMetric:fallback,bestCount:1,worstCount:1};
   const settings={...defaults,...(state.performanceSummarySettings||{})};
+
+  if(!metricKeys.includes(settings.rankMetric))settings.rankMetric=fallback;
   settings.bestCount=Math.min(50,Math.max(1,Number(settings.bestCount)||1));
   settings.worstCount=Math.min(50,Math.max(1,Number(settings.worstCount)||1));
   return settings;
 }
 
+/** Save a summary-table control and immediately redraw only this section. */
 function updatePerformanceSummarySetting(key,value){
-  if(!['bestCount','worstCount'].includes(key))return;
-  const next=Math.min(50,Math.max(1,Number(value)||1));
-  state.performanceSummarySettings={...getPerformanceSummarySettings(),[key]:next};
+  const current=getPerformanceSummarySettings();
+
+  if(key==='rankMetric'){
+    const metricKeys=performanceSummaryMetricDefinitions().map(metric=>metric.key);
+    if(!metricKeys.includes(value))return;
+    state.performanceSummarySettings={...current,rankMetric:value};
+  }else if(key==='bestCount'||key==='worstCount'){
+    const next=Math.min(50,Math.max(1,Number(value)||1));
+    state.performanceSummarySettings={...current,[key]:next};
+  }else{
+    return;
+  }
+
   save();
   renderPerformanceSummary(selectedRows());
 }
 
-function performanceSummaryCtrLink(row){
-  const value=Number(getMetricRaw(row,'ctr_link'));
+/** Return a safe numeric value for ranking and display. */
+function performanceSummaryMetricValue(row,key){
+  const value=Number(getMetricRaw(row,key));
   return Number.isFinite(value)?value:0;
 }
 
-function comparePerformanceRows(a,b,direction){
-  const ctrDifference=performanceSummaryCtrLink(a)-performanceSummaryCtrLink(b);
-  if(ctrDifference!==0)return direction==='asc'?ctrDifference:-ctrDifference;
+/** Format built-in and custom metrics according to their table-column type. */
+function formatPerformanceSummaryMetric(row,metric){
+  const value=performanceSummaryMetricValue(row,metric.key);
+  const type=metric.type||columnByKey(metric.key).type||'number';
+  if(type==='currency')return money(value,metric.key==='spend'||metric.key==='revenue'?0:2);
+  if(type==='percent')return pct(value);
+  if(type==='ratio')return ratio(value);
+  return num(value);
+}
 
-  const linkDifference=Number(a.link_clicks||0)-Number(b.link_clicks||0);
-  if(linkDifference!==0)return direction==='asc'?linkDifference:-linkDifference;
-
-  const impressionDifference=Number(a.impressions||0)-Number(b.impressions||0);
-  if(impressionDifference!==0)return direction==='asc'?impressionDifference:-impressionDifference;
-
+/** Highest value is Best; lowest value is Worst. Campaign name breaks ties. */
+function comparePerformanceRows(a,b,direction,metricKey){
+  const difference=performanceSummaryMetricValue(a,metricKey)-performanceSummaryMetricValue(b,metricKey);
+  if(difference!==0)return direction==='asc'?difference:-difference;
   return String(a.name||'').localeCompare(String(b.name||''),undefined,{sensitivity:'base'});
 }
 
-function performanceSummaryRowHtml(row,group,rank){
+function performanceSummaryRowHtml(row,group,rank,metrics,selectedMetricKey){
   const badgeLabel=group==='best'?'Best':'Worst';
+  const metricCells=metrics.map(metric=>{
+    const selected=metric.key===selectedMetricKey;
+    return `<td class="num${selected?' performance-summary-selected-metric':''}">${selected?'<strong>':''}${formatPerformanceSummaryMetric(row,metric)}${selected?'</strong>':''}</td>`;
+  }).join('');
+
   return `<tr class="performance-summary-row ${group}">
     <td><span class="performance-summary-badge ${group}">${badgeLabel}</span></td>
     <td class="num performance-summary-rank">${rank}</td>
     <td class="performance-summary-campaign">${esc(row.name||'Unnamed campaign')}</td>
     <td>${esc(row.artist||'')}</td>
-    <td>${esc(row.week||'')}</td>
     <td>${esc(row.platform||'')}</td>
     <td>${esc(row.type||'')}</td>
-    <td class="num"><strong>${fmtMetric('ctr_link',performanceSummaryCtrLink(row))}</strong></td>
-    <td class="num">${fmtMetric('link_clicks',Number(row.link_clicks||0))}</td>
-    <td class="num">${fmtMetric('impressions',Number(row.impressions||0))}</td>
-    <td class="num">${fmtMetric('spend',Number(row.spend||0))}</td>
+    ${metricCells}
   </tr>`;
 }
 
@@ -1858,50 +1951,68 @@ function renderPerformanceSummary(rows){
   if(!table)return;
 
   const settings=getPerformanceSummarySettings();
+  const metricDefinitions=performanceSummaryMetricDefinitions();
+  const orderedMetrics=orderedPerformanceSummaryMetrics(settings.rankMetric);
+  const selectedMetric=orderedMetrics[0];
+
+  const metricSelect=document.getElementById('performanceRankMetric');
+  if(metricSelect){
+    metricSelect.innerHTML=metricDefinitions.map(metric=>
+      `<option value="${esc(metric.key)}" ${metric.key===settings.rankMetric?'selected':''}>${esc(metric.label)}</option>`
+    ).join('');
+    metricSelect.value=settings.rankMetric;
+  }
+
   const bestInput=document.getElementById('performanceBestCount');
   const worstInput=document.getElementById('performanceWorstCount');
   if(bestInput)bestInput.value=String(settings.bestCount);
   if(worstInput)worstInput.value=String(settings.worstCount);
 
-  /* Match the main table exactly: top filters are already represented in rows,
-     then its active ranking and display limit are applied here as well. */
+  /* Top filters are already represented in rows. Applying the main table's
+     ranking and limit here ensures this summary evaluates exactly what that
+     table is currently displaying. */
   const displayedRows=getMainTableDisplayedRows(rows||[]);
   const bestRows=[...displayedRows]
-    .sort((a,b)=>comparePerformanceRows(a,b,'desc'))
+    .sort((a,b)=>comparePerformanceRows(a,b,'desc',settings.rankMetric))
     .slice(0,settings.bestCount);
   const worstRows=[...displayedRows]
-    .sort((a,b)=>comparePerformanceRows(a,b,'asc'))
+    .sort((a,b)=>comparePerformanceRows(a,b,'asc',settings.rankMetric))
     .slice(0,settings.worstCount);
 
   const activeFilters=['weekFilter','artistFilter','platformFilter','typeFilter','campaignFilter']
     .filter(id=>getFilterVal(id)!=='All').length;
   const context=document.getElementById('performanceSummaryContext');
   if(context){
-    const settingsText=getMainTableSettings();
-    const limitText=settingsText.rankLimit==='all'?'all matching rows':`the first ${settingsText.rankLimit} main-table rows`;
-    context.innerHTML=`Ranking <strong>${displayedRows.length}</strong> campaign row${displayedRows.length===1?'':'s'} currently visible in the main table by <strong>CTR (link)</strong>. ${activeFilters?`${activeFilters} top filter${activeFilters===1?' is':'s are'} active; `:'No top filters are active; '}${limitText} are being evaluated.`;
+    const mainSettings=getMainTableSettings();
+    const limitText=mainSettings.rankLimit==='all'?'all matching rows':`the first ${mainSettings.rankLimit} main-table rows`;
+    context.innerHTML=`Ranking <strong>${displayedRows.length}</strong> campaign row${displayedRows.length===1?'':'s'} currently visible in the main table by <strong>${esc(selectedMetric.label)}</strong>. ${activeFilters?`${activeFilters} top filter${activeFilters===1?' is':'s are'} active; `:'No top filters are active; '}${limitText} are being evaluated.`;
   }
+
+  const metricHeaders=orderedMetrics.map(metric=>
+    `<th class="num${metric.key===settings.rankMetric?' performance-summary-selected-metric':''}">${esc(metric.label)}</th>`
+  ).join('');
 
   const header=`<thead><tr>
     <th>Performance</th>
     <th class="num">Rank</th>
     <th>Campaign</th>
     <th>Artist</th>
-    <th>Week</th>
     <th>Platform</th>
     <th>Type</th>
-    <th class="num">CTR (link)</th>
-    <th class="num">Link Clicks</th>
-    <th class="num">Impressions</th>
-    <th class="num">Spend</th>
+    ${metricHeaders}
   </tr></thead>`;
 
   const body=displayedRows.length
     ? [
-        ...bestRows.map((row,index)=>performanceSummaryRowHtml(row,'best',index+1)),
-        ...worstRows.map((row,index)=>performanceSummaryRowHtml(row,'worst',index+1))
+        ...bestRows.map((row,index)=>performanceSummaryRowHtml(row,'best',index+1,orderedMetrics,settings.rankMetric)),
+        ...worstRows.map((row,index)=>performanceSummaryRowHtml(row,'worst',index+1,orderedMetrics,settings.rankMetric))
       ].join('')
-    : `<tr class="performance-summary-empty"><td colspan="11">No campaigns match the current Campaign Results Table filters.</td></tr>`;
+    : `<tr class="performance-summary-empty"><td colspan="${6+orderedMetrics.length}">No campaigns match the current Campaign Results Table filters.</td></tr>`;
+
+  const footnote=document.getElementById('performanceSummaryFootnote');
+  if(footnote){
+    footnote.textContent=`Best is the highest ${selectedMetric.label}; Worst is the lowest ${selectedMetric.label}. The two lists are calculated independently, so a campaign may appear in both when the visible data set is smaller than the combined requested counts.`;
+  }
 
   table.innerHTML=header+`<tbody>${body}</tbody>`;
 }
