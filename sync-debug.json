@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-11T08:34:07.949Z",
+  "generatedAt": "2026-07-12T04:19:24.746Z",
   "datePreset": "last_30d",
   "meta": {
     "enabled": true,
@@ -8,26 +8,28 @@
     "graphVersion": "v24.0",
     "levels": {
       "campaign": {
-        "status": "ok",
-        "fieldMode": "full",
-        "rows": 20
+        "status": "error",
+        "fieldMode": "core",
+        "message": "{\n  \"message\": \"Error validating access token: Session has expired on Saturday, 11-Jul-26 03:00:00 PDT. The current time is Saturday, 11-Jul-26 21:19:25 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AeTTF6jNJQGYdk0Vg6QaY5_\"\n}"
       },
       "ad": {
-        "status": "ok",
-        "fieldMode": "full",
-        "rows": 83
+        "status": "error",
+        "fieldMode": "core",
+        "message": "{\n  \"message\": \"Error validating access token: Session has expired on Saturday, 11-Jul-26 03:00:00 PDT. The current time is Saturday, 11-Jul-26 21:19:25 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AkK4KqQN4QoAKElt1_lrd_D\"\n}"
       },
       "adset": {
-        "status": "ok",
-        "fieldMode": "full",
-        "rows": 47
+        "status": "error",
+        "fieldMode": "core",
+        "message": "{\n  \"message\": \"Error validating access token: Session has expired on Saturday, 11-Jul-26 03:00:00 PDT. The current time is Saturday, 11-Jul-26 21:19:25 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AhIJXSKBjhhmnz6F1yK-Pl6\"\n}"
       }
     }
   },
   "summary": {
-    "campaigns": 20,
-    "adsets": 47,
-    "ads": 83,
-    "totalRows": 150
+    "campaigns": 0,
+    "adsets": 0,
+    "ads": 0,
+    "totalRows": 0,
+    "skippedDashboardDataUpdate": true,
+    "reason": "Meta API returned an error. Existing dashboard-data.json was left unchanged."
   }
 }
