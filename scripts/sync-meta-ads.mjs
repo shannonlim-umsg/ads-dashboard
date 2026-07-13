@@ -7,6 +7,7 @@ import fs from "node:fs";
    - Refresh only recent weeks while preserving every older archived week.
    - Retain legacy rolling snapshots for reference without replacing them.
    - Never write zero/empty API results over previously stored data.
+   - Remove zero-only campaign/ad set/ad rows that contain no delivery.
    ========================================================================== */
 
 const token = process.env.META_ACCESS_TOKEN;
@@ -344,6 +345,69 @@ function baseMetrics(row) {
   };
 }
 
+/* Additive result fields used to decide whether an API row contains actual
+   delivery. A row containing only zeros is not a new result and must not
+   supersede a historical non-zero campaign. */
+const DELIVERY_FIELDS = [
+  "spend", "impressions", "reach", "clicks_all", "link_clicks",
+  "purchases", "conversions", "revenue", "views"
+];
+
+function hasMeasurableResults(row) {
+  return DELIVERY_FIELDS.some(key => Number(row?.[key] || 0) > 0);
+}
+
+function filterPeriodToDeliveredRows(campaigns, adsets, ads) {
+  const deliveredCampaignNames = new Set();
+
+  campaigns.filter(hasMeasurableResults).forEach(row => {
+    deliveredCampaignNames.add(normalizedName(row.name));
+  });
+  adsets.filter(hasMeasurableResults).forEach(row => {
+    deliveredCampaignNames.add(normalizedName(row.campaign));
+  });
+  ads.filter(hasMeasurableResults).forEach(row => {
+    deliveredCampaignNames.add(normalizedName(row.campaign));
+  });
+
+  const filteredCampaigns = campaigns.filter(row =>
+    deliveredCampaignNames.has(normalizedName(row.name)) && hasMeasurableResults(row)
+  );
+  const filteredAdsets = adsets.filter(row =>
+    deliveredCampaignNames.has(normalizedName(row.campaign)) && hasMeasurableResults(row)
+  );
+  const filteredAds = ads.filter(row =>
+    deliveredCampaignNames.has(normalizedName(row.campaign)) && hasMeasurableResults(row)
+  );
+
+  return {
+    campaigns: filteredCampaigns,
+    adsets: filteredAdsets,
+    ads: filteredAds,
+    removed:
+      campaigns.length - filteredCampaigns.length +
+      adsets.length - filteredAdsets.length +
+      ads.length - filteredAds.length
+  };
+}
+
+function cleanZeroOnlyRowsFromWeek(week) {
+  const campaigns = Array.isArray(week?.campaigns) ? week.campaigns : [];
+  const adsets = Array.isArray(week?.adsets) ? week.adsets : [];
+  const ads = Array.isArray(week?.ads) ? week.ads : [];
+  const filtered = filterPeriodToDeliveredRows(campaigns, adsets, ads);
+
+  return {
+    week: {
+      ...week,
+      campaigns: filtered.campaigns,
+      adsets: filtered.adsets,
+      ads: filtered.ads
+    },
+    removed: filtered.removed
+  };
+}
+
 function mapCampaign(row) {
   return {
     id: row.campaign_id || row.campaign_name || "",
@@ -498,13 +562,17 @@ const periodKeys = new Set([
   ...adPeriods.keys()
 ]);
 
+let removedZeroRowsFromIncoming = 0;
+
 const incomingWeeks = [...periodKeys]
   .sort()
   .map(key => {
     const [dateFrom, dateTo] = key.split("|");
-    const campaigns = dedupeMappedRows((campaignPeriods.get(key) || []).map(mapCampaign), "campaign");
-    const adsets = dedupeMappedRows((adsetPeriods.get(key) || []).map(mapAdset), "adset");
-    const ads = dedupeMappedRows((adPeriods.get(key) || []).map(mapAd), "ad");
+    const mappedCampaigns = dedupeMappedRows((campaignPeriods.get(key) || []).map(mapCampaign), "campaign");
+    const mappedAdsets = dedupeMappedRows((adsetPeriods.get(key) || []).map(mapAdset), "adset");
+    const mappedAds = dedupeMappedRows((adPeriods.get(key) || []).map(mapAd), "ad");
+    const delivered = filterPeriodToDeliveredRows(mappedCampaigns, mappedAdsets, mappedAds);
+    removedZeroRowsFromIncoming += delivered.removed;
 
     return {
       id: `meta_week_${dateFrom}`,
@@ -513,23 +581,27 @@ const incomingWeeks = [...periodKeys]
       dateFrom,
       dateTo,
       snapshotType: "weekly",
-      campaigns,
-      adsets,
-      ads,
+      campaigns: delivered.campaigns,
+      adsets: delivered.adsets,
+      ads: delivered.ads,
       source: "Meta Marketing API",
       syncedAt: new Date().toISOString()
     };
   })
   .filter(week => week.campaigns.length + week.adsets.length + week.ads.length > 0);
 
+let removedZeroRowsFromExisting = 0;
 const normalizedExistingWeeks = existingWeeks.map(week => {
-  if (
+  const normalized = (
     !week.snapshotType &&
     (String(week.id || "").startsWith("meta_last_30d_") || String(week.label || "").includes("last 30d"))
-  ) {
-    return { ...week, snapshotType: "legacy_rolling", archivedLegacy: true };
-  }
-  return week;
+  )
+    ? { ...week, snapshotType: "legacy_rolling", archivedLegacy: true }
+    : week;
+
+  const cleaned = cleanZeroOnlyRowsFromWeek(normalized);
+  removedZeroRowsFromExisting += cleaned.removed;
+  return cleaned.week;
 });
 
 const mergedById = new Map(normalizedExistingWeeks.map(week => [week.id || week.label, week]));
@@ -551,9 +623,15 @@ for (const week of incomingWeeks) {
   }
 }
 
-const mergedWeeks = [...mergedById.values()].sort((a, b) =>
-  String(a.dateFrom || a.id || "").localeCompare(String(b.dateFrom || b.id || ""))
-);
+const mergedWeeks = [...mergedById.values()]
+  .filter(week =>
+    (week.campaigns?.length || 0) +
+    (week.adsets?.length || 0) +
+    (week.ads?.length || 0) > 0
+  )
+  .sort((a, b) =>
+    String(a.dateFrom || a.id || "").localeCompare(String(b.dateFrom || b.id || ""))
+  );
 
 const totalRows = incomingWeeks.reduce(
   (total, week) => total + week.campaigns.length + week.adsets.length + week.ads.length,
@@ -566,6 +644,8 @@ debug.summary = {
   adsets: adsetRaw.length,
   ads: adRaw.length,
   totalRows,
+  zeroOnlyRowsRemovedFromIncoming: removedZeroRowsFromIncoming,
+  zeroOnlyRowsRemovedFromExisting: removedZeroRowsFromExisting,
   preservedExistingWeeks: normalizedExistingWeeks.length,
   addedWeeks,
   updatedWeeks,
@@ -605,5 +685,7 @@ if (hadFetchError || totalRows === 0) {
   console.log(`Meta campaign rows: ${campaignRaw.length}`);
   console.log(`Meta ad set rows: ${adsetRaw.length}`);
   console.log(`Meta ad rows: ${adRaw.length}`);
+  console.log(`Zero-only incoming rows removed: ${removedZeroRowsFromIncoming}`);
+  console.log(`Zero-only stored rows removed: ${removedZeroRowsFromExisting}`);
   console.log(`Total archive periods retained: ${mergedWeeks.length}`);
 }

@@ -1643,7 +1643,8 @@ function refreshFilters(){
    Purpose:
    - Keep the permanent weekly archive for history and trend charts.
    - Show one current row per campaign name when the Week filter is "All".
-   - Use the newest archived result for that campaign name.
+   - Prefer the newest archived result that contains measurable delivery.
+   - A newer zero-only snapshot never replaces an older non-zero result.
    - Keep specific Week selections unchanged so historical periods remain usable.
    -------------------------------------------------------------------------- */
 function normalizedCampaignName(value){
@@ -1658,6 +1659,32 @@ function campaignPeriodTime(row){
   const candidate=week?.dateTo || week?.dateFrom || String(row?.period||'').split(' to ').pop() || '';
   const parsed=Date.parse(candidate);
   return Number.isFinite(parsed) ? parsed : Number(row?.weekIndex||0);
+}
+
+/* A campaign has usable delivery when at least one additive result is above
+   zero. Rate-only values are intentionally excluded because CTR/CPC/CPM are
+   derived from the additive fields below. */
+const CAMPAIGN_DELIVERY_FIELDS=[
+  'spend','impressions','reach','clicks_all','link_clicks','purchases',
+  'conversions','revenue','views'
+];
+
+function campaignHasMeasurableResults(row){
+  return CAMPAIGN_DELIVERY_FIELDS.some(key=>Number(row?.[key]||0)>0);
+}
+
+function shouldReplaceCampaignCandidate(existing,candidate){
+  const existingHasResults=campaignHasMeasurableResults(existing.row);
+  const candidateHasResults=campaignHasMeasurableResults(candidate.row);
+
+  // A non-zero result always wins over a zero-only snapshot, regardless of
+  // which reporting period is newer.
+  if(existingHasResults!==candidateHasResults)return candidateHasResults;
+
+  // When both candidates have results (or both are zero), use the newer one.
+  return candidate.periodTime>existing.periodTime ||
+    (candidate.periodTime===existing.periodTime &&
+      Number(candidate.row?.weekIndex||0)>=Number(existing.row?.weekIndex||0));
 }
 
 function dedupeCampaignRowsByName(rows){
@@ -1678,15 +1705,9 @@ function dedupeCampaignRowsByName(rows){
 
     const existing=byName.get(key);
     const candidate={row,index,periodTime:campaignPeriodTime(row)};
-    if(!existing){
+    if(!existing || shouldReplaceCampaignCandidate(existing,candidate)){
       byName.set(key,candidate);
-      return;
     }
-
-    const isNewer=candidate.periodTime>existing.periodTime ||
-      (candidate.periodTime===existing.periodTime && Number(row?.weekIndex||0)>=Number(existing.row?.weekIndex||0));
-
-    if(isNewer)byName.set(key,candidate);
   });
 
   return [...byName.values(),...unnamed]
