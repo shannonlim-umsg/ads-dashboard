@@ -1,14 +1,18 @@
-name: Sync Meta Ads Weekly Archive
+name: Sync Meta Ads Resilient Weekly Archive
 
 on:
   workflow_dispatch:
     inputs:
       backfill_weeks:
-        description: "Optional one-time historical backfill window (for example 104 or 260 weeks)"
+        description: "Optional historical lookback in weeks, for example 52 or 104"
         required: false
         type: string
       refresh_weeks:
-        description: "Optional recent-week refresh window for this run (default 6)"
+        description: "Recent weeks to refresh on each run (default 6)"
+        required: false
+        type: string
+      max_retries:
+        description: "Retries per Meta request (default 5)"
         required: false
         type: string
   schedule:
@@ -20,6 +24,7 @@ permissions:
 jobs:
   sync-meta-ads:
     runs-on: ubuntu-latest
+    timeout-minutes: 120
 
     steps:
       - name: Check out repository
@@ -30,9 +35,7 @@ jobs:
         with:
           node-version: "20"
 
-      # The sync step is allowed to finish with an error so sync-debug.json can
-      # still be committed. A later step marks the workflow as failed.
-      - name: Pull Meta Ads data into permanent weekly archive
+      - name: Pull Meta Ads data one week at a time
         id: meta_sync
         continue-on-error: true
         env:
@@ -42,18 +45,21 @@ jobs:
           META_SYNC_WEEKS: ${{ github.event.inputs.refresh_weeks || secrets.META_SYNC_WEEKS }}
           META_INITIAL_BACKFILL_WEEKS: ${{ secrets.META_INITIAL_BACKFILL_WEEKS }}
           META_FORCE_BACKFILL_WEEKS: ${{ github.event.inputs.backfill_weeks }}
-          META_CHUNK_WEEKS: ${{ secrets.META_CHUNK_WEEKS }}
+          META_MAX_RETRIES: ${{ github.event.inputs.max_retries || secrets.META_MAX_RETRIES }}
+          META_RETRY_BASE_MS: ${{ secrets.META_RETRY_BASE_MS }}
+          META_REQUEST_DELAY_MS: ${{ secrets.META_REQUEST_DELAY_MS }}
+          META_REQUEST_TIMEOUT_MS: ${{ secrets.META_REQUEST_TIMEOUT_MS }}
         run: node scripts/sync-meta-ads.mjs
 
       - name: Commit archive and debug output
         if: always()
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Update permanent Meta Ads weekly archive"
+          commit_message: "Update resilient Meta Ads weekly archive"
           file_pattern: dashboard-data.json sync-debug.json
 
-      - name: Mark workflow failed when Meta sync failed
+      - name: Mark workflow incomplete when some weeks failed
         if: steps.meta_sync.outcome == 'failure'
         run: |
-          echo "Meta sync failed. Review sync-debug.json for the API response."
+          echo "One or more Meta periods remain incomplete. Successful weeks were committed. Rerun the workflow to resume failed weeks."
           exit 1
