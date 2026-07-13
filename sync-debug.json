@@ -1,21 +1,37 @@
 {
-  "generatedAt": "2026-07-13T06:16:37.566Z",
+  "generatedAt": "2026-07-13T06:46:02.170Z",
   "mode": "weekly_archive",
   "graphVersion": "v24.0",
   "accountIdPresent": true,
   "tokenPresent": true,
   "archive": {
     "existingWeeklyArchive": false,
-    "forcedBackfillWeeks": 12,
-    "requestedWeeks": 12,
+    "forcedBackfillWeeks": null,
+    "requestedWeeks": 52,
     "normalRefreshWeeks": 6,
     "initialBackfillWeeks": 52,
     "chunkWeeks": 12,
-    "since": "2026-04-27",
+    "since": "2025-07-21",
     "until": "2026-07-13",
     "chunks": [
       {
-        "since": "2026-04-27",
+        "since": "2025-07-21",
+        "until": "2025-10-12"
+      },
+      {
+        "since": "2025-10-13",
+        "until": "2026-01-04"
+      },
+      {
+        "since": "2026-01-05",
+        "until": "2026-03-29"
+      },
+      {
+        "since": "2026-03-30",
+        "until": "2026-06-21"
+      },
+      {
+        "since": "2026-06-22",
         "until": "2026-07-13"
       }
     ]
@@ -27,22 +43,10 @@
         "rows": 0,
         "chunks": [
           {
-            "since": "2026-04-27",
-            "until": "2026-07-13",
+            "since": "2025-07-21",
+            "until": "2025-10-12",
             "status": "error",
-            "message": "{\n  \"message\": \"Error validating access token: Session has expired on Saturday, 11-Jul-26 03:00:00 PDT. The current time is Sunday, 12-Jul-26 23:16:38 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"ApNZsff81fY7PD47dLpUtMe\"\n}"
-          }
-        ]
-      },
-      "campaign": {
-        "status": "error",
-        "rows": 0,
-        "chunks": [
-          {
-            "since": "2026-04-27",
-            "until": "2026-07-13",
-            "status": "error",
-            "message": "{\n  \"message\": \"Error validating access token: Session has expired on Saturday, 11-Jul-26 03:00:00 PDT. The current time is Sunday, 12-Jul-26 23:16:38 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AeIGDBtAWtQPInn0mfMySI4\"\n}"
+            "message": "{\n  \"message\": \"Error validating access token: Session has expired on Saturday, 11-Jul-26 03:00:00 PDT. The current time is Sunday, 12-Jul-26 23:46:02 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"Aj2cMZjDU41PhVXfZZ5pXPK\"\n}"
           }
         ]
       },
@@ -51,10 +55,22 @@
         "rows": 0,
         "chunks": [
           {
-            "since": "2026-04-27",
-            "until": "2026-07-13",
+            "since": "2025-07-21",
+            "until": "2025-10-12",
             "status": "error",
-            "message": "{\n  \"message\": \"Error validating access token: Session has expired on Saturday, 11-Jul-26 03:00:00 PDT. The current time is Sunday, 12-Jul-26 23:16:38 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AdYACAQMG4Ocq9aXvVZNjEd\"\n}"
+            "message": "{\n  \"message\": \"Error validating access token: Session has expired on Saturday, 11-Jul-26 03:00:00 PDT. The current time is Sunday, 12-Jul-26 23:46:02 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"APes0YO1I1v4lEslqwAVoeu\"\n}"
+          }
+        ]
+      },
+      "campaign": {
+        "status": "error",
+        "rows": 0,
+        "chunks": [
+          {
+            "since": "2025-07-21",
+            "until": "2025-10-12",
+            "status": "error",
+            "message": "{\n  \"message\": \"Error validating access token: Session has expired on Saturday, 11-Jul-26 03:00:00 PDT. The current time is Sunday, 12-Jul-26 23:46:02 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"A3Ama5Fy9-U3HV5eNVIadOU\"\n}"
           }
         ]
       }
@@ -66,6 +82,8 @@
     "adsets": 0,
     "ads": 0,
     "totalRows": 0,
+    "zeroOnlyRowsRemovedFromIncoming": 0,
+    "zeroOnlyRowsRemovedFromExisting": 35,
     "preservedExistingWeeks": 2,
     "addedWeeks": 0,
     "updatedWeeks": 0,
