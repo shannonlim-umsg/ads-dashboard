@@ -1,90 +1,28 @@
-# UMG Meta Ads Dashboard — GitHub Pages
+# Campaign-name upsert and duplicate prevention patch
 
-This package is Meta-only. TikTok API code and TikTok secrets have been removed.
+## What changes
 
-## Files
+- The permanent weekly archive remains available for trends and the Week filter.
+- When **Week = All weeks**, the main Campaign Results Table shows only one row per normalized campaign name.
+- The newest archived result is used for the visible row.
+- Selecting a specific Week still shows that week's original data.
+- Dashboard-backed custom Campaign Results Tables use the same deduplication.
+- Within each weekly archive period, matching campaign names are upserted rather than stored twice.
+- An existing weekly period is rewritten only when Campaign, Ad Set, or Ad data actually changed.
+- Durable Artist/name/platform/type/status/custom-column edits are migrated by Meta ID and by normalized name fallback.
+- User-added/manual tables are not deduplicated.
 
-Upload these files to your GitHub repo root:
+## Replace these repository files
 
 ```text
 index.html
-dashboard-data.json
-sync-debug.json
 scripts/sync-meta-ads.mjs
 .github/workflows/sync-meta.yml
-README.md
 ```
 
-## GitHub Secrets
+Keep the current `dashboard-data.json`, `sync-debug.json`, Firebase configuration, and Firebase rules.
+Do not upload an empty dashboard data file.
 
-Go to:
+## Why history is still retained
 
-```text
-Settings > Secrets and variables > Actions
-```
-
-Add:
-
-```text
-META_ACCESS_TOKEN
-META_AD_ACCOUNT_ID
-```
-
-Optional:
-
-```text
-META_GRAPH_VERSION
-META_DATE_PRESET
-```
-
-Default values:
-
-```text
-META_GRAPH_VERSION = v24.0
-META_DATE_PRESET = last_30d
-```
-
-## Run sync
-
-Go to:
-
-```text
-Actions > Sync Meta Ads Data > Run workflow
-```
-
-The workflow writes:
-
-```text
-dashboard-data.json
-sync-debug.json
-```
-
-## Open dashboard
-
-Enable GitHub Pages:
-
-```text
-Settings > Pages > Deploy from branch > main > /root
-```
-
-Open the Pages URL and click:
-
-```text
-Sync GitHub Data
-```
-
-The dashboard also auto-loads `dashboard-data.json` through:
-
-```js
-loadRemoteData(true)
-```
-
-## Important localStorage fix
-
-This package uses:
-
-```text
-umg_meta_ads_dashboard_v1
-```
-
-as the localStorage key. It merges synced `dashboard-data.json` weeks into localStorage, so data is retained and does not disappear on refresh.
+The archive keeps weekly periods so historical charts and explicit Week selections continue to work. Duplicate campaign names are consolidated only in the current/all-weeks table view. This avoids visible duplicate result rows without deleting historical reporting periods.

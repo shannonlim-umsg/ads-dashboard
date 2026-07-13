@@ -71,7 +71,7 @@ const identityFields = {
 const existing = readExistingJson("dashboard-data.json", {
   generatedAt: null,
   source: "Meta Marketing API",
-  archiveVersion: 2,
+  archiveVersion: 3,
   weeks: []
 });
 
@@ -394,6 +394,79 @@ function readExistingJson(path, fallback) {
   }
 }
 
+
+/* --------------------------------------------------------------------------
+   NAME-BASED UPSERT HELPERS
+   The weekly archive remains intact for history. Within each weekly period,
+   matching campaign names are stored once. Existing periods are rewritten only
+   when an API value actually changed.
+   -------------------------------------------------------------------------- */
+function normalizedName(value) {
+  return String(value || "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .toLowerCase();
+}
+
+function archiveRowKey(level, row) {
+  if (level === "campaign") {
+    return normalizedName(row.name) || `id:${row.metaCampaignId || row.id || "unknown"}`;
+  }
+  if (level === "adset") {
+    const campaign = normalizedName(row.campaign);
+    const name = normalizedName(row.name);
+    return campaign && name
+      ? `${campaign}|${name}`
+      : `id:${row.metaAdsetId || row.id || "unknown"}`;
+  }
+  const campaign = normalizedName(row.campaign);
+  const adset = normalizedName(row.adset);
+  const name = normalizedName(row.name);
+  return campaign && name
+    ? `${campaign}|${adset}|${name}`
+    : `id:${row.metaAdId || row.id || "unknown"}`;
+}
+
+function dedupeMappedRows(rows, level) {
+  const byKey = new Map();
+  for (const row of rows || []) {
+    byKey.set(archiveRowKey(level, row), row);
+  }
+  return [...byKey.values()];
+}
+
+function comparableRow(row) {
+  const ignored = new Set(["syncedAt", "_updatedAt", "_updatedBy"]);
+  return Object.keys(row || {})
+    .filter(key => !key.startsWith("_") && !ignored.has(key))
+    .sort()
+    .reduce((result, key) => {
+      result[key] = row[key];
+      return result;
+    }, {});
+}
+
+function comparableRows(rows, level) {
+  return (rows || [])
+    .map(row => ({ key: archiveRowKey(level, row), value: comparableRow(row) }))
+    .sort((a, b) => a.key.localeCompare(b.key));
+}
+
+function comparableWeek(week) {
+  return {
+    id: week.id,
+    dateFrom: week.dateFrom,
+    dateTo: week.dateTo,
+    campaigns: comparableRows(week.campaigns, "campaign"),
+    adsets: comparableRows(week.adsets, "adset"),
+    ads: comparableRows(week.ads, "ad")
+  };
+}
+
+function weekHasDifferences(existingWeek, incomingWeek) {
+  return JSON.stringify(comparableWeek(existingWeek)) !== JSON.stringify(comparableWeek(incomingWeek));
+}
+
 function periodKey(row) {
   if (!row.date_start) return null;
   return `${row.date_start}|${row.date_stop || row.date_start}`;
@@ -429,9 +502,9 @@ const incomingWeeks = [...periodKeys]
   .sort()
   .map(key => {
     const [dateFrom, dateTo] = key.split("|");
-    const campaigns = (campaignPeriods.get(key) || []).map(mapCampaign);
-    const adsets = (adsetPeriods.get(key) || []).map(mapAdset);
-    const ads = (adPeriods.get(key) || []).map(mapAd);
+    const campaigns = dedupeMappedRows((campaignPeriods.get(key) || []).map(mapCampaign), "campaign");
+    const adsets = dedupeMappedRows((adsetPeriods.get(key) || []).map(mapAdset), "adset");
+    const ads = dedupeMappedRows((adPeriods.get(key) || []).map(mapAd), "ad");
 
     return {
       id: `meta_week_${dateFrom}`,
@@ -460,7 +533,23 @@ const normalizedExistingWeeks = existingWeeks.map(week => {
 });
 
 const mergedById = new Map(normalizedExistingWeeks.map(week => [week.id || week.label, week]));
-for (const week of incomingWeeks) mergedById.set(week.id, week);
+let addedWeeks = 0;
+let updatedWeeks = 0;
+let unchangedWeeks = 0;
+
+for (const week of incomingWeeks) {
+  const existingWeek = mergedById.get(week.id);
+  if (!existingWeek) {
+    mergedById.set(week.id, week);
+    addedWeeks += 1;
+  } else if (weekHasDifferences(existingWeek, week)) {
+    mergedById.set(week.id, week);
+    updatedWeeks += 1;
+  } else {
+    // Keep the existing object and timestamp when Meta returned identical data.
+    unchangedWeeks += 1;
+  }
+}
 
 const mergedWeeks = [...mergedById.values()].sort((a, b) =>
   String(a.dateFrom || a.id || "").localeCompare(String(b.dateFrom || b.id || ""))
@@ -478,6 +567,9 @@ debug.summary = {
   ads: adRaw.length,
   totalRows,
   preservedExistingWeeks: normalizedExistingWeeks.length,
+  addedWeeks,
+  updatedWeeks,
+  unchangedWeeks,
   finalArchiveWeeks: mergedWeeks.length
 };
 
@@ -495,8 +587,9 @@ if (hadFetchError || totalRows === 0) {
     ...existing,
     generatedAt: new Date().toISOString(),
     source: "Meta Marketing API",
-    archiveVersion: 2,
+    archiveVersion: 3,
     archiveGranularity: "weekly",
+    dedupePolicy: "campaign_name_latest",
     syncWeeks,
     initialBackfillWeeks,
     weeks: mergedWeeks
@@ -505,7 +598,10 @@ if (hadFetchError || totalRows === 0) {
   fs.writeFileSync("dashboard-data.json", JSON.stringify(output, null, 2));
   fs.writeFileSync("sync-debug.json", JSON.stringify(debug, null, 2));
 
-  console.log(`Weekly archive periods updated: ${incomingWeeks.length}`);
+  console.log(`Weekly archive periods fetched: ${incomingWeeks.length}`);
+  console.log(`Archive periods added: ${addedWeeks}`);
+  console.log(`Archive periods updated: ${updatedWeeks}`);
+  console.log(`Archive periods unchanged: ${unchangedWeeks}`);
   console.log(`Meta campaign rows: ${campaignRaw.length}`);
   console.log(`Meta ad set rows: ${adsetRaw.length}`);
   console.log(`Meta ad rows: ${adRaw.length}`);

@@ -942,7 +942,7 @@ tr.campaign-row-main,tr.adset-row-main{cursor:pointer}tr.campaign-row-main td:fi
 const STORAGE_KEY='umg_meta_ads_dashboard_v1';
 const REMOTE_JSON='./dashboard-data.json';
 const SYNC_DEBUG_JSON='./sync-debug.json';
-let state={weeks:[],cards:null,metrics:null,columns:null,customSections:[],sectionOrder:null,sectionTitles:{},entityOverrides:{},recordOverrides:{},dataSync:{archiveVersion:2,lastRemoteGeneratedAt:null},performanceSummarySettings:{rankMetric:'ctr_link',bestCount:1,worstCount:1},mainTableSettings:{rankMetric:'spend',rankOrder:'desc',rankLimit:'all',editMode:false},meta:{title:'UMG Meta Ads Dashboard',subtitle:'Meta campaign, ad set, and ad results · Live shared edits across browsers',footer:'Dashboard data is loaded from GitHub-synced dashboard-data.json and all page edits are shared live through Firebase Realtime Database.'}};
+let state={weeks:[],cards:null,metrics:null,columns:null,customSections:[],sectionOrder:null,sectionTitles:{},entityOverrides:{},recordOverrides:{},dataSync:{archiveVersion:3,lastRemoteGeneratedAt:null,dedupePolicy:'campaign_name_latest'},performanceSummarySettings:{rankMetric:'ctr_link',bestCount:1,worstCount:1},mainTableSettings:{rankMetric:'spend',rankOrder:'desc',rankLimit:'all',editMode:false,dedupeCampaignNames:true},meta:{title:'UMG Meta Ads Dashboard',subtitle:'Meta campaign, ad set, and ad results · Live shared edits across browsers',footer:'Dashboard data is loaded from GitHub-synced dashboard-data.json and all page edits are shared live through Firebase Realtime Database.'}};
 let charts={}, editingExisting=false, editingIndex=-1, selectedSectionType='stat';
 let liveDb=null, liveRef=null, liveReady=false, liveApplying=false, liveSaveTimer=null, liveInitialLoadComplete=false;
 const CLIENT_ID=localStorage.getItem(STORAGE_KEY+'_client_id')||('client_'+Math.random().toString(36).slice(2));
@@ -1003,7 +1003,7 @@ function normalizeState(){
   if(!state.sectionTitles)state.sectionTitles={};
   if(!state.entityOverrides)state.entityOverrides={};
   if(!state.recordOverrides)state.recordOverrides={};
-  if(!state.dataSync)state.dataSync={archiveVersion:2,lastRemoteGeneratedAt:null};
+  if(!state.dataSync)state.dataSync={archiveVersion:3,lastRemoteGeneratedAt:null,dedupePolicy:'campaign_name_latest'};
   if(!state.performanceSummarySettings)state.performanceSummarySettings={rankMetric:'ctr_link',bestCount:1,worstCount:1};
   const performanceMetricKeys=performanceSummaryMetricDefinitions().map(metric=>metric.key);
   const performanceMetricFallback=performanceMetricKeys.includes('ctr_link') ? 'ctr_link' : (performanceMetricKeys[0]||'spend');
@@ -1024,8 +1024,9 @@ function normalizeState(){
     if(insertBefore>=0)state.sectionOrder.splice(insertBefore,0,'performanceSummary');
     else state.sectionOrder.push('performanceSummary');
   }
-  if(!state.mainTableSettings)state.mainTableSettings={rankMetric:'spend',rankOrder:'desc',rankLimit:'all',editMode:false};
+  if(!state.mainTableSettings)state.mainTableSettings={rankMetric:'spend',rankOrder:'desc',rankLimit:'all',editMode:false,dedupeCampaignNames:true};
   if(typeof state.mainTableSettings.editMode!=='boolean')state.mainTableSettings.editMode=false;
+  if(typeof state.mainTableSettings.dedupeCampaignNames!=='boolean')state.mainTableSettings.dedupeCampaignNames=true;
   state.weeks=(state.weeks||[]).filter(hasRows);
 }
 function exportSharedState(){
@@ -1039,9 +1040,9 @@ function exportSharedState(){
     sectionTitles:state.sectionTitles||{},
     entityOverrides:state.entityOverrides||{},
     recordOverrides:state.recordOverrides||{},
-    dataSync:state.dataSync||{archiveVersion:2,lastRemoteGeneratedAt:null},
+    dataSync:state.dataSync||{archiveVersion:3,lastRemoteGeneratedAt:null,dedupePolicy:'campaign_name_latest'},
     performanceSummarySettings:state.performanceSummarySettings||{rankMetric:'ctr_link',bestCount:1,worstCount:1},
-    mainTableSettings:state.mainTableSettings||{rankMetric:'spend',rankOrder:'desc',rankLimit:'all',editMode:false},
+    mainTableSettings:state.mainTableSettings||{rankMetric:'spend',rankOrder:'desc',rankLimit:'all',editMode:false,dedupeCampaignNames:true},
     meta:state.meta||{},
     updatedAt:new Date().toISOString(),
     updatedBy:CLIENT_ID
@@ -1312,12 +1313,25 @@ function migrateExistingEditsBeforeMerge(incomingWeeks){
     adset:new Map(),
     ad:new Map()
   };
+  const incomingEntitiesByName={
+    campaign:new Map(),
+    adset:new Map(),
+    ad:new Map()
+  };
+
+  function namedEntityKey(level,row){
+    if(level==='campaign')return normalizedCampaignName(row?.name);
+    if(level==='adset')return `${normalizedCampaignName(row?.campaign)}|${normalizedCampaignName(row?.name)}`;
+    return `${normalizedCampaignName(row?.campaign)}|${normalizedCampaignName(row?.adset)}|${normalizedCampaignName(row?.name)}`;
+  }
 
   (incomingWeeks||[]).forEach(week=>{
     ['campaign','adset','ad'].forEach(level=>{
       rowListForLevel(week,level).forEach(row=>{
         const key=entityOverrideKey(level,row);
+        const nameKey=namedEntityKey(level,row);
         if(!incomingEntities[level].has(key))incomingEntities[level].set(key,row);
+        if(nameKey&&!incomingEntitiesByName[level].has(nameKey))incomingEntitiesByName[level].set(nameKey,row);
       });
     });
   });
@@ -1326,14 +1340,25 @@ function migrateExistingEditsBeforeMerge(incomingWeeks){
     ['campaign','adset','ad'].forEach(level=>{
       rowListForLevel(existingWeek,level).forEach(existingRow=>{
         const entityKey=entityOverrideKey(level,existingRow);
-        const incomingRow=incomingEntities[level].get(entityKey);
+        const nameKey=namedEntityKey(level,existingRow);
+        const incomingRow=incomingEntities[level].get(entityKey) || incomingEntitiesByName[level].get(nameKey);
         if(!incomingRow)return;
+        const targetEntityKey=entityOverrideKey(level,incomingRow);
+
+        // Carry any previously stored entity override to the newly matched API
+        // row, even when Meta issued a different object ID for the same name.
+        if(state.entityOverrides?.[entityKey] && entityKey!==targetEntityKey){
+          state.entityOverrides[targetEntityKey]={
+            ...(state.entityOverrides[targetEntityKey]||{}),
+            ...state.entityOverrides[entityKey]
+          };
+        }
 
         entityFields.forEach(key=>{
           if(!Object.prototype.hasOwnProperty.call(existingRow,key))return;
           if(String(existingRow[key]??'')!==String(incomingRow[key]??'')){
-            state.entityOverrides[entityKey]={
-              ...(state.entityOverrides[entityKey]||{}),
+            state.entityOverrides[targetEntityKey]={
+              ...(state.entityOverrides[targetEntityKey]||{}),
               [key]:existingRow[key]
             };
           }
@@ -1345,8 +1370,8 @@ function migrateExistingEditsBeforeMerge(incomingWeeks){
           if(key.startsWith('_')||knownKeys.has(key)||entityFields.includes(key))return;
           if(!Object.prototype.hasOwnProperty.call(existingRow,key))return;
           if(String(existingRow[key]??'')!==String(incomingRow[key]??'')){
-            state.entityOverrides[entityKey]={
-              ...(state.entityOverrides[entityKey]||{}),
+            state.entityOverrides[targetEntityKey]={
+              ...(state.entityOverrides[targetEntityKey]||{}),
               [key]:existingRow[key]
             };
           }
@@ -1388,10 +1413,64 @@ function migrateExistingEditsBeforeMerge(incomingWeeks){
     });
   });
 }
+function apiRowMergeKey(level,row){
+  if(level==='campaign'){
+    const nameKey=normalizedCampaignName(row?.name);
+    return nameKey ? `campaign-name:${nameKey}` : entityOverrideKey(level,row);
+  }
+  if(level==='adset'){
+    const campaignKey=normalizedCampaignName(row?.campaign);
+    const nameKey=normalizedCampaignName(row?.name);
+    return campaignKey&&nameKey ? `adset-name:${campaignKey}|${nameKey}` : entityOverrideKey(level,row);
+  }
+  const campaignKey=normalizedCampaignName(row?.campaign);
+  const adsetKey=normalizedCampaignName(row?.adset);
+  const nameKey=normalizedCampaignName(row?.name);
+  return campaignKey&&nameKey ? `ad-name:${campaignKey}|${adsetKey}|${nameKey}` : entityOverrideKey(level,row);
+}
+
+function comparableApiRow(row){
+  const ignored=new Set(['syncedAt','_updatedAt','_updatedBy']);
+  return Object.keys(row||{})
+    .filter(key=>!key.startsWith('_')&&!ignored.has(key))
+    .sort()
+    .reduce((result,key)=>{
+      result[key]=row[key];
+      return result;
+    },{});
+}
+
+function apiRowsDiffer(existingRow,incomingRow){
+  return JSON.stringify(comparableApiRow(existingRow))!==JSON.stringify(comparableApiRow(incomingRow));
+}
+
 function mergeApiRows(existingRows,incomingRows,level){
-  const apiKeys=new Set((incomingRows||[]).map(row=>entityOverrideKey(level,row)));
-  const userRows=(existingRows||[]).filter(row=>row.userAdded===true || (!row.metaCampaignId && level==='campaign') || (!row.metaAdsetId && level==='adset') || (!row.metaAdId && level==='ad'));
-  return [...(incomingRows||[]),...userRows.filter(row=>!apiKeys.has(entityOverrideKey(level,row)))];
+  const existingByKey=new Map((existingRows||[]).map(row=>[apiRowMergeKey(level,row),row]));
+  const incomingByKey=new Map();
+
+  // A matching campaign/ad set/ad name is an upsert, not a new row.
+  // The final API occurrence wins if Meta returns the same logical entity more
+  // than once in one reporting period.
+  (incomingRows||[]).forEach(row=>incomingByKey.set(apiRowMergeKey(level,row),row));
+
+  const mergedIncoming=[...incomingByKey.entries()].map(([key,incomingRow])=>{
+    const existingRow=existingByKey.get(key);
+    if(existingRow&&!apiRowsDiffer(existingRow,incomingRow))return existingRow;
+    return incomingRow;
+  });
+
+  const apiKeys=new Set(incomingByKey.keys());
+  const userRows=(existingRows||[]).filter(row=>
+    row.userAdded===true ||
+    (!row.metaCampaignId&&level==='campaign') ||
+    (!row.metaAdsetId&&level==='adset') ||
+    (!row.metaAdId&&level==='ad')
+  );
+
+  return [
+    ...mergedIncoming,
+    ...userRows.filter(row=>!apiKeys.has(apiRowMergeKey(level,row)))
+  ];
 }
 async function persistRemoteDataOnly(){
   persistLocalState();
@@ -1471,7 +1550,8 @@ async function loadRemoteData(auto=true){
     setRemoteWeeks(usableWeeks);
     state.dataSync={
       ...(state.dataSync||{}),
-      archiveVersion:data.archiveVersion||2,
+      archiveVersion:data.archiveVersion||3,
+      dedupePolicy:data.dedupePolicy||'campaign_name_latest',
       lastRemoteGeneratedAt:data.generatedAt||new Date().toISOString(),
       lastRefreshAt:new Date().toISOString()
     };
@@ -1558,14 +1638,70 @@ function refreshFilters(){
   fill('metricFilter',enabledMetrics().map(metric=>({value:metric.key,label:metric.label})),'Spend');
   if(getFilterVal('metricFilter')==='All')document.getElementById('metricFilter').value='spend';
 }
+/* --------------------------------------------------------------------------
+   CAMPAIGN NAME UPSERT / DISPLAY DEDUPLICATION
+   Purpose:
+   - Keep the permanent weekly archive for history and trend charts.
+   - Show one current row per campaign name when the Week filter is "All".
+   - Use the newest archived result for that campaign name.
+   - Keep specific Week selections unchanged so historical periods remain usable.
+   -------------------------------------------------------------------------- */
+function normalizedCampaignName(value){
+  return String(value||'')
+    .trim()
+    .replace(/\s+/g,' ')
+    .toLowerCase();
+}
+
+function campaignPeriodTime(row){
+  const week=state.weeks?.[Number(row?.weekIndex)];
+  const candidate=week?.dateTo || week?.dateFrom || String(row?.period||'').split(' to ').pop() || '';
+  const parsed=Date.parse(candidate);
+  return Number.isFinite(parsed) ? parsed : Number(row?.weekIndex||0);
+}
+
+function dedupeCampaignRowsByName(rows){
+  const settings=getMainTableSettings();
+  if(settings.dedupeCampaignNames===false || getFilterVal('weekFilter')!=='All'){
+    return [...(rows||[])];
+  }
+
+  const byName=new Map();
+  const unnamed=[];
+
+  (rows||[]).forEach((row,index)=>{
+    const key=normalizedCampaignName(row?.name);
+    if(!key){
+      unnamed.push({row,index});
+      return;
+    }
+
+    const existing=byName.get(key);
+    const candidate={row,index,periodTime:campaignPeriodTime(row)};
+    if(!existing){
+      byName.set(key,candidate);
+      return;
+    }
+
+    const isNewer=candidate.periodTime>existing.periodTime ||
+      (candidate.periodTime===existing.periodTime && Number(row?.weekIndex||0)>=Number(existing.row?.weekIndex||0));
+
+    if(isNewer)byName.set(key,candidate);
+  });
+
+  return [...byName.values(),...unnamed]
+    .sort((a,b)=>a.index-b.index)
+    .map(item=>item.row);
+}
+
 function getMainTableSettings(){
-  const defaults={rankMetric:'spend',rankOrder:'desc',rankLimit:'all',editMode:false};
+  const defaults={rankMetric:'spend',rankOrder:'desc',rankLimit:'all',editMode:false,dedupeCampaignNames:true};
   return {...defaults,...(state.mainTableSettings||{})};
 }
 
 function getMainTableDisplayedRows(rows){
   const settings=getMainTableSettings();
-  let displayed=[...(rows||[])];
+  let displayed=dedupeCampaignRowsByName(rows||[]);
 
   if(settings.rankMetric){
     displayed.sort((a,b)=>{
@@ -2066,7 +2202,7 @@ function renderTable(rows){
       (row._adsets||[]).reduce((nested,adset)=>nested+(adset._ads||[]).length,0);
   },0);
 
-  document.getElementById('rowCount').textContent=`${rankedRows.length} campaigns · ${totalNestedRows} rows`;
+  document.getElementById('rowCount').textContent=`${rankedRows.length} unique campaigns · ${totalNestedRows} rows`;
 
   const cols=visibleCols();
   const thead='<thead><tr>'+cols.map(col=>`<th class="${isNumCol(col.key)?'num':''}"><div class="th-inner">${esc(col.label)}<button class="col-hide" title="Hide column" onclick="hideColByKey('${col.key}')">×</button></div></th>`).join('')+'</tr></thead>';
@@ -2584,7 +2720,7 @@ function buildNestedResultsTableHTML(sectionId,rows,sec){
 
   let sourceRows=isManual
     ? applySectionScopedFilters(applyTopRowFiltersToManualRows(manualRowsForSection(sec),sec),sec)
-    : rows;
+    : dedupeCampaignRowsByName(rows);
   let rankedRows=[...sourceRows];
 
   if(rankMetric){
