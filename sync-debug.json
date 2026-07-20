@@ -1,21 +1,25 @@
 {
-  "generatedAt": "2026-07-19T14:28:59.593Z",
+  "generatedAt": "2026-07-20T04:32:12.423Z",
   "mode": "resilient_weekly_archive",
   "graphVersion": "v24.0",
   "accountIdPresent": true,
   "tokenPresent": true,
   "archive": {
     "initialBackfillCompleteBeforeRun": false,
-    "forcedBackfillWeeks": 52,
+    "forcedBackfillWeeks": null,
     "requestedWeeks": 52,
     "normalRefreshWeeks": 6,
     "initialBackfillWeeks": 52,
-    "since": "2025-07-21",
-    "until": "2026-07-19",
+    "since": "2025-07-28",
+    "until": "2026-07-20",
     "targetWeeks": 52,
-    "weeksSelectedForThisRun": 52,
-    "weeksSkippedAsPreviouslyCompleted": 0,
+    "weeksSelectedForThisRun": 6,
+    "weeksSkippedAsPreviouslyCompleted": 46,
     "ranges": [
+      {
+        "since": "2026-07-20",
+        "until": "2026-07-20"
+      },
       {
         "since": "2026-07-13",
         "until": "2026-07-19"
@@ -35,194 +39,6 @@
       {
         "since": "2026-06-15",
         "until": "2026-06-21"
-      },
-      {
-        "since": "2026-06-08",
-        "until": "2026-06-14"
-      },
-      {
-        "since": "2026-06-01",
-        "until": "2026-06-07"
-      },
-      {
-        "since": "2026-05-25",
-        "until": "2026-05-31"
-      },
-      {
-        "since": "2026-05-18",
-        "until": "2026-05-24"
-      },
-      {
-        "since": "2026-05-11",
-        "until": "2026-05-17"
-      },
-      {
-        "since": "2026-05-04",
-        "until": "2026-05-10"
-      },
-      {
-        "since": "2026-04-27",
-        "until": "2026-05-03"
-      },
-      {
-        "since": "2026-04-20",
-        "until": "2026-04-26"
-      },
-      {
-        "since": "2026-04-13",
-        "until": "2026-04-19"
-      },
-      {
-        "since": "2026-04-06",
-        "until": "2026-04-12"
-      },
-      {
-        "since": "2026-03-30",
-        "until": "2026-04-05"
-      },
-      {
-        "since": "2026-03-23",
-        "until": "2026-03-29"
-      },
-      {
-        "since": "2026-03-16",
-        "until": "2026-03-22"
-      },
-      {
-        "since": "2026-03-09",
-        "until": "2026-03-15"
-      },
-      {
-        "since": "2026-03-02",
-        "until": "2026-03-08"
-      },
-      {
-        "since": "2026-02-23",
-        "until": "2026-03-01"
-      },
-      {
-        "since": "2026-02-16",
-        "until": "2026-02-22"
-      },
-      {
-        "since": "2026-02-09",
-        "until": "2026-02-15"
-      },
-      {
-        "since": "2026-02-02",
-        "until": "2026-02-08"
-      },
-      {
-        "since": "2026-01-26",
-        "until": "2026-02-01"
-      },
-      {
-        "since": "2026-01-19",
-        "until": "2026-01-25"
-      },
-      {
-        "since": "2026-01-12",
-        "until": "2026-01-18"
-      },
-      {
-        "since": "2026-01-05",
-        "until": "2026-01-11"
-      },
-      {
-        "since": "2025-12-29",
-        "until": "2026-01-04"
-      },
-      {
-        "since": "2025-12-22",
-        "until": "2025-12-28"
-      },
-      {
-        "since": "2025-12-15",
-        "until": "2025-12-21"
-      },
-      {
-        "since": "2025-12-08",
-        "until": "2025-12-14"
-      },
-      {
-        "since": "2025-12-01",
-        "until": "2025-12-07"
-      },
-      {
-        "since": "2025-11-24",
-        "until": "2025-11-30"
-      },
-      {
-        "since": "2025-11-17",
-        "until": "2025-11-23"
-      },
-      {
-        "since": "2025-11-10",
-        "until": "2025-11-16"
-      },
-      {
-        "since": "2025-11-03",
-        "until": "2025-11-09"
-      },
-      {
-        "since": "2025-10-27",
-        "until": "2025-11-02"
-      },
-      {
-        "since": "2025-10-20",
-        "until": "2025-10-26"
-      },
-      {
-        "since": "2025-10-13",
-        "until": "2025-10-19"
-      },
-      {
-        "since": "2025-10-06",
-        "until": "2025-10-12"
-      },
-      {
-        "since": "2025-09-29",
-        "until": "2025-10-05"
-      },
-      {
-        "since": "2025-09-22",
-        "until": "2025-09-28"
-      },
-      {
-        "since": "2025-09-15",
-        "until": "2025-09-21"
-      },
-      {
-        "since": "2025-09-08",
-        "until": "2025-09-14"
-      },
-      {
-        "since": "2025-09-01",
-        "until": "2025-09-07"
-      },
-      {
-        "since": "2025-08-25",
-        "until": "2025-08-31"
-      },
-      {
-        "since": "2025-08-18",
-        "until": "2025-08-24"
-      },
-      {
-        "since": "2025-08-11",
-        "until": "2025-08-17"
-      },
-      {
-        "since": "2025-08-04",
-        "until": "2025-08-10"
-      },
-      {
-        "since": "2025-07-28",
-        "until": "2025-08-03"
-      },
-      {
-        "since": "2025-07-21",
-        "until": "2025-07-27"
       }
     ]
   },
@@ -240,1656 +56,790 @@
   "retries": [],
   "weeks": [
     {
+      "since": "2026-07-20",
+      "until": "2026-07-20",
+      "status": "error",
+      "removedZeroOnlyRows": 0,
+      "rows": 0
+    },
+    {
       "since": "2026-07-13",
       "until": "2026-07-19",
-      "status": "ok",
-      "removedZeroOnlyRows": 22,
-      "rows": 35
+      "status": "error",
+      "removedZeroOnlyRows": 0,
+      "rows": 0
     },
     {
       "since": "2026-07-06",
       "until": "2026-07-12",
-      "status": "ok",
-      "removedZeroOnlyRows": 12,
-      "rows": 92
+      "status": "error",
+      "removedZeroOnlyRows": 0,
+      "rows": 0
     },
     {
       "since": "2026-06-29",
       "until": "2026-07-05",
-      "status": "ok",
+      "status": "error",
       "removedZeroOnlyRows": 0,
-      "rows": 84
+      "rows": 0
     },
     {
       "since": "2026-06-22",
       "until": "2026-06-28",
-      "status": "ok_empty",
+      "status": "error",
       "removedZeroOnlyRows": 0,
       "rows": 0
     },
     {
       "since": "2026-06-15",
       "until": "2026-06-21",
-      "status": "ok",
-      "removedZeroOnlyRows": 0,
-      "rows": 9
-    },
-    {
-      "since": "2026-06-08",
-      "until": "2026-06-14",
-      "status": "ok",
-      "removedZeroOnlyRows": 3,
-      "rows": 61
-    },
-    {
-      "since": "2026-06-01",
-      "until": "2026-06-07",
-      "status": "ok",
-      "removedZeroOnlyRows": 14,
-      "rows": 65
-    },
-    {
-      "since": "2026-05-25",
-      "until": "2026-05-31",
-      "status": "ok",
-      "removedZeroOnlyRows": 7,
-      "rows": 70
-    },
-    {
-      "since": "2026-05-18",
-      "until": "2026-05-24",
-      "status": "ok",
-      "removedZeroOnlyRows": 11,
-      "rows": 90
-    },
-    {
-      "since": "2026-05-11",
-      "until": "2026-05-17",
-      "status": "ok",
-      "removedZeroOnlyRows": 12,
-      "rows": 48
-    },
-    {
-      "since": "2026-05-04",
-      "until": "2026-05-10",
-      "status": "ok",
-      "removedZeroOnlyRows": 16,
-      "rows": 63
-    },
-    {
-      "since": "2026-04-27",
-      "until": "2026-05-03",
-      "status": "ok",
-      "removedZeroOnlyRows": 21,
-      "rows": 62
-    },
-    {
-      "since": "2026-04-20",
-      "until": "2026-04-26",
-      "status": "ok",
-      "removedZeroOnlyRows": 31,
-      "rows": 57
-    },
-    {
-      "since": "2026-04-13",
-      "until": "2026-04-19",
-      "status": "ok",
-      "removedZeroOnlyRows": 7,
-      "rows": 78
-    },
-    {
-      "since": "2026-04-06",
-      "until": "2026-04-12",
-      "status": "ok",
-      "removedZeroOnlyRows": 0,
-      "rows": 55
-    },
-    {
-      "since": "2026-03-30",
-      "until": "2026-04-05",
-      "status": "ok_empty",
+      "status": "error",
       "removedZeroOnlyRows": 0,
       "rows": 0
-    },
-    {
-      "since": "2026-03-23",
-      "until": "2026-03-29",
-      "status": "ok_empty",
-      "removedZeroOnlyRows": 0,
-      "rows": 0
-    },
-    {
-      "since": "2026-03-16",
-      "until": "2026-03-22",
-      "status": "ok_empty",
-      "removedZeroOnlyRows": 0,
-      "rows": 0
-    },
-    {
-      "since": "2026-03-09",
-      "until": "2026-03-15",
-      "status": "ok_empty",
-      "removedZeroOnlyRows": 0,
-      "rows": 0
-    },
-    {
-      "since": "2026-03-02",
-      "until": "2026-03-08",
-      "status": "ok_empty",
-      "removedZeroOnlyRows": 0,
-      "rows": 0
-    },
-    {
-      "since": "2026-02-23",
-      "until": "2026-03-01",
-      "status": "ok_empty",
-      "removedZeroOnlyRows": 0,
-      "rows": 0
-    },
-    {
-      "since": "2026-02-16",
-      "until": "2026-02-22",
-      "status": "ok",
-      "removedZeroOnlyRows": 16,
-      "rows": 54
-    },
-    {
-      "since": "2026-02-09",
-      "until": "2026-02-15",
-      "status": "ok",
-      "removedZeroOnlyRows": 11,
-      "rows": 117
-    },
-    {
-      "since": "2026-02-02",
-      "until": "2026-02-08",
-      "status": "ok",
-      "removedZeroOnlyRows": 0,
-      "rows": 77
-    },
-    {
-      "since": "2026-01-26",
-      "until": "2026-02-01",
-      "status": "ok",
-      "removedZeroOnlyRows": 0,
-      "rows": 48
-    },
-    {
-      "since": "2026-01-19",
-      "until": "2026-01-25",
-      "status": "ok",
-      "removedZeroOnlyRows": 4,
-      "rows": 27
-    },
-    {
-      "since": "2026-01-12",
-      "until": "2026-01-18",
-      "status": "ok",
-      "removedZeroOnlyRows": 0,
-      "rows": 26
-    },
-    {
-      "since": "2026-01-05",
-      "until": "2026-01-11",
-      "status": "ok",
-      "removedZeroOnlyRows": 3,
-      "rows": 7
-    },
-    {
-      "since": "2025-12-29",
-      "until": "2026-01-04",
-      "status": "ok",
-      "removedZeroOnlyRows": 21,
-      "rows": 19
-    },
-    {
-      "since": "2025-12-22",
-      "until": "2025-12-28",
-      "status": "ok",
-      "removedZeroOnlyRows": 21,
-      "rows": 47
-    },
-    {
-      "since": "2025-12-15",
-      "until": "2025-12-21",
-      "status": "ok",
-      "removedZeroOnlyRows": 23,
-      "rows": 77
-    },
-    {
-      "since": "2025-12-08",
-      "until": "2025-12-14",
-      "status": "ok",
-      "removedZeroOnlyRows": 14,
-      "rows": 70
-    },
-    {
-      "since": "2025-12-01",
-      "until": "2025-12-07",
-      "status": "ok",
-      "removedZeroOnlyRows": 28,
-      "rows": 73
-    },
-    {
-      "since": "2025-11-24",
-      "until": "2025-11-30",
-      "status": "ok",
-      "removedZeroOnlyRows": 28,
-      "rows": 126
-    },
-    {
-      "since": "2025-11-17",
-      "until": "2025-11-23",
-      "status": "ok",
-      "removedZeroOnlyRows": 40,
-      "rows": 134
-    },
-    {
-      "since": "2025-11-10",
-      "until": "2025-11-16",
-      "status": "ok",
-      "removedZeroOnlyRows": 15,
-      "rows": 90
-    },
-    {
-      "since": "2025-11-03",
-      "until": "2025-11-09",
-      "status": "ok",
-      "removedZeroOnlyRows": 17,
-      "rows": 76
-    },
-    {
-      "since": "2025-10-27",
-      "until": "2025-11-02",
-      "status": "ok",
-      "removedZeroOnlyRows": 3,
-      "rows": 57
-    },
-    {
-      "since": "2025-10-20",
-      "until": "2025-10-26",
-      "status": "ok",
-      "removedZeroOnlyRows": 5,
-      "rows": 54
-    },
-    {
-      "since": "2025-10-13",
-      "until": "2025-10-19",
-      "status": "ok",
-      "removedZeroOnlyRows": 10,
-      "rows": 34
-    },
-    {
-      "since": "2025-10-06",
-      "until": "2025-10-12",
-      "status": "ok",
-      "removedZeroOnlyRows": 16,
-      "rows": 54
-    },
-    {
-      "since": "2025-09-29",
-      "until": "2025-10-05",
-      "status": "ok",
-      "removedZeroOnlyRows": 9,
-      "rows": 94
-    },
-    {
-      "since": "2025-09-22",
-      "until": "2025-09-28",
-      "status": "ok",
-      "removedZeroOnlyRows": 36,
-      "rows": 118
-    },
-    {
-      "since": "2025-09-15",
-      "until": "2025-09-21",
-      "status": "ok",
-      "removedZeroOnlyRows": 24,
-      "rows": 89
-    },
-    {
-      "since": "2025-09-08",
-      "until": "2025-09-14",
-      "status": "ok",
-      "removedZeroOnlyRows": 13,
-      "rows": 108
-    },
-    {
-      "since": "2025-09-01",
-      "until": "2025-09-07",
-      "status": "ok",
-      "removedZeroOnlyRows": 11,
-      "rows": 92
-    },
-    {
-      "since": "2025-08-25",
-      "until": "2025-08-31",
-      "status": "ok",
-      "removedZeroOnlyRows": 27,
-      "rows": 93
-    },
-    {
-      "since": "2025-08-18",
-      "until": "2025-08-24",
-      "status": "ok",
-      "removedZeroOnlyRows": 10,
-      "rows": 143
-    },
-    {
-      "since": "2025-08-11",
-      "until": "2025-08-17",
-      "status": "ok",
-      "removedZeroOnlyRows": 0,
-      "rows": 132
-    },
-    {
-      "since": "2025-08-04",
-      "until": "2025-08-10",
-      "status": "ok",
-      "removedZeroOnlyRows": 0,
-      "rows": 155
-    },
-    {
-      "since": "2025-07-28",
-      "until": "2025-08-03",
-      "status": "ok",
-      "removedZeroOnlyRows": 0,
-      "rows": 90
-    },
-    {
-      "since": "2025-07-21",
-      "until": "2025-07-27",
-      "status": "ok",
-      "removedZeroOnlyRows": 5,
-      "rows": 36
     }
   ],
   "meta": {
     "levels": {
       "campaign": {
-        "status": "ok",
-        "rows": 604,
+        "status": "error",
+        "rows": 0,
         "weeks": [
+          {
+            "since": "2026-07-20",
+            "until": "2026-07-20",
+            "status": "error",
+            "fieldMode": null,
+            "rows": 0,
+            "attempts": [
+              {
+                "fieldMode": "full",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:12 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AodKVMo4bpzTgZaSIllaq69\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:12 PDT."
+                }
+              },
+              {
+                "fieldMode": "core",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:12 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AFbl8NHpeHFxz5l5huvLJLK\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:12 PDT."
+                }
+              },
+              {
+                "fieldMode": "minimal",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:13 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"Ab2qpeqw-IpgvkBrU6Oh7si\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:13 PDT."
+                }
+              }
+            ]
+          },
           {
             "since": "2026-07-13",
             "until": "2026-07-19",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 11,
-            "attempts": []
+            "status": "error",
+            "fieldMode": null,
+            "rows": 0,
+            "attempts": [
+              {
+                "fieldMode": "full",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:14 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"A6R2Uge6MURuZCRwRzuwV6s\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:14 PDT."
+                }
+              },
+              {
+                "fieldMode": "core",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:14 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"As43Nz9Rms_VgyDw2YP-Vwl\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:14 PDT."
+                }
+              },
+              {
+                "fieldMode": "minimal",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:14 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AQESW_kpRXUwYwT37RjXBPd\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:14 PDT."
+                }
+              }
+            ]
           },
           {
             "since": "2026-07-06",
             "until": "2026-07-12",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 14,
-            "attempts": []
+            "status": "error",
+            "fieldMode": null,
+            "rows": 0,
+            "attempts": [
+              {
+                "fieldMode": "full",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:15 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AtNBCl24qiqBTGmH19qdx9w\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:15 PDT."
+                }
+              },
+              {
+                "fieldMode": "core",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:15 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"Au6G91xA1Uiyl6d7bWAoOOT\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:15 PDT."
+                }
+              },
+              {
+                "fieldMode": "minimal",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:15 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AnByVs_TMDVa2HiOfe7DTjr\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:15 PDT."
+                }
+              }
+            ]
           },
           {
             "since": "2026-06-29",
             "until": "2026-07-05",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 11,
-            "attempts": []
+            "status": "error",
+            "fieldMode": null,
+            "rows": 0,
+            "attempts": [
+              {
+                "fieldMode": "full",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:16 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AgcbSaIdENp1zWEXyW6qdbb\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:16 PDT."
+                }
+              },
+              {
+                "fieldMode": "core",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:16 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"A0qZxm_VaW7_1PJkXTJqGxu\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:16 PDT."
+                }
+              },
+              {
+                "fieldMode": "minimal",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:16 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"Av8lbpFc_i4WoCEi3U8iBgQ\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:16 PDT."
+                }
+              }
+            ]
           },
           {
             "since": "2026-06-22",
             "until": "2026-06-28",
-            "status": "ok",
-            "fieldMode": "full",
+            "status": "error",
+            "fieldMode": null,
             "rows": 0,
-            "attempts": []
+            "attempts": [
+              {
+                "fieldMode": "full",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:17 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"ANVli45aTG74yLY0BLG5Shz\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:17 PDT."
+                }
+              },
+              {
+                "fieldMode": "core",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:17 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"Aj195St-TE5jPgH4N6pYJup\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:17 PDT."
+                }
+              },
+              {
+                "fieldMode": "minimal",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:17 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AxV7qy6k7x4CeZ9mTNYXB1k\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:17 PDT."
+                }
+              }
+            ]
           },
           {
             "since": "2026-06-15",
             "until": "2026-06-21",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 1,
-            "attempts": []
-          },
-          {
-            "since": "2026-06-08",
-            "until": "2026-06-14",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 7,
-            "attempts": []
-          },
-          {
-            "since": "2026-06-01",
-            "until": "2026-06-07",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 10,
-            "attempts": []
-          },
-          {
-            "since": "2026-05-25",
-            "until": "2026-05-31",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 8,
-            "attempts": []
-          },
-          {
-            "since": "2026-05-18",
-            "until": "2026-05-24",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 11,
-            "attempts": []
-          },
-          {
-            "since": "2026-05-11",
-            "until": "2026-05-17",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 9,
-            "attempts": []
-          },
-          {
-            "since": "2026-05-04",
-            "until": "2026-05-10",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 11,
-            "attempts": []
-          },
-          {
-            "since": "2026-04-27",
-            "until": "2026-05-03",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 10,
-            "attempts": []
-          },
-          {
-            "since": "2026-04-20",
-            "until": "2026-04-26",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 13,
-            "attempts": []
-          },
-          {
-            "since": "2026-04-13",
-            "until": "2026-04-19",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 14,
-            "attempts": []
-          },
-          {
-            "since": "2026-04-06",
-            "until": "2026-04-12",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 8,
-            "attempts": []
-          },
-          {
-            "since": "2026-03-30",
-            "until": "2026-04-05",
-            "status": "ok",
-            "fieldMode": "full",
+            "status": "error",
+            "fieldMode": null,
             "rows": 0,
-            "attempts": []
-          },
-          {
-            "since": "2026-03-23",
-            "until": "2026-03-29",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 0,
-            "attempts": []
-          },
-          {
-            "since": "2026-03-16",
-            "until": "2026-03-22",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 0,
-            "attempts": []
-          },
-          {
-            "since": "2026-03-09",
-            "until": "2026-03-15",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 0,
-            "attempts": []
-          },
-          {
-            "since": "2026-03-02",
-            "until": "2026-03-08",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 0,
-            "attempts": []
-          },
-          {
-            "since": "2026-02-23",
-            "until": "2026-03-01",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 0,
-            "attempts": []
-          },
-          {
-            "since": "2026-02-16",
-            "until": "2026-02-22",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 11,
-            "attempts": []
-          },
-          {
-            "since": "2026-02-09",
-            "until": "2026-02-15",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 17,
-            "attempts": []
-          },
-          {
-            "since": "2026-02-02",
-            "until": "2026-02-08",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 8,
-            "attempts": []
-          },
-          {
-            "since": "2026-01-26",
-            "until": "2026-02-01",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 4,
-            "attempts": []
-          },
-          {
-            "since": "2026-01-19",
-            "until": "2026-01-25",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 3,
-            "attempts": []
-          },
-          {
-            "since": "2026-01-12",
-            "until": "2026-01-18",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 2,
-            "attempts": []
-          },
-          {
-            "since": "2026-01-05",
-            "until": "2026-01-11",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 2,
-            "attempts": []
-          },
-          {
-            "since": "2025-12-29",
-            "until": "2026-01-04",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 8,
-            "attempts": []
-          },
-          {
-            "since": "2025-12-22",
-            "until": "2025-12-28",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 13,
-            "attempts": []
-          },
-          {
-            "since": "2025-12-15",
-            "until": "2025-12-21",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 18,
-            "attempts": []
-          },
-          {
-            "since": "2025-12-08",
-            "until": "2025-12-14",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 13,
-            "attempts": []
-          },
-          {
-            "since": "2025-12-01",
-            "until": "2025-12-07",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 18,
-            "attempts": []
-          },
-          {
-            "since": "2025-11-24",
-            "until": "2025-11-30",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 25,
-            "attempts": []
-          },
-          {
-            "since": "2025-11-17",
-            "until": "2025-11-23",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 24,
-            "attempts": []
-          },
-          {
-            "since": "2025-11-10",
-            "until": "2025-11-16",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 15,
-            "attempts": []
-          },
-          {
-            "since": "2025-11-03",
-            "until": "2025-11-09",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 13,
-            "attempts": []
-          },
-          {
-            "since": "2025-10-27",
-            "until": "2025-11-02",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 11,
-            "attempts": []
-          },
-          {
-            "since": "2025-10-20",
-            "until": "2025-10-26",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 10,
-            "attempts": []
-          },
-          {
-            "since": "2025-10-13",
-            "until": "2025-10-19",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 8,
-            "attempts": []
-          },
-          {
-            "since": "2025-10-06",
-            "until": "2025-10-12",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 13,
-            "attempts": []
-          },
-          {
-            "since": "2025-09-29",
-            "until": "2025-10-05",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 18,
-            "attempts": []
-          },
-          {
-            "since": "2025-09-22",
-            "until": "2025-09-28",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 26,
-            "attempts": []
-          },
-          {
-            "since": "2025-09-15",
-            "until": "2025-09-21",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 21,
-            "attempts": []
-          },
-          {
-            "since": "2025-09-08",
-            "until": "2025-09-14",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 23,
-            "attempts": []
-          },
-          {
-            "since": "2025-09-01",
-            "until": "2025-09-07",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 21,
-            "attempts": []
-          },
-          {
-            "since": "2025-08-25",
-            "until": "2025-08-31",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 23,
-            "attempts": []
-          },
-          {
-            "since": "2025-08-18",
-            "until": "2025-08-24",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 25,
-            "attempts": []
-          },
-          {
-            "since": "2025-08-11",
-            "until": "2025-08-17",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 22,
-            "attempts": []
-          },
-          {
-            "since": "2025-08-04",
-            "until": "2025-08-10",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 27,
-            "attempts": []
-          },
-          {
-            "since": "2025-07-28",
-            "until": "2025-08-03",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 16,
-            "attempts": []
-          },
-          {
-            "since": "2025-07-21",
-            "until": "2025-07-27",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 8,
-            "attempts": []
+            "attempts": [
+              {
+                "fieldMode": "full",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:18 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AEcqOwvR0Hh569iPctTFkyk\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:18 PDT."
+                }
+              },
+              {
+                "fieldMode": "core",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:18 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"Af_BN-cS2eqP21hOoipP23V\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:18 PDT."
+                }
+              },
+              {
+                "fieldMode": "minimal",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:18 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AyWiCIeXIZ6aiAZ28hcq0Vv\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:18 PDT."
+                }
+              }
+            ]
           }
         ],
-        "failedWeeks": 0
+        "failedWeeks": 6
       },
       "adset": {
-        "status": "ok",
-        "rows": 1300,
+        "status": "error",
+        "rows": 0,
         "weeks": [
+          {
+            "since": "2026-07-20",
+            "until": "2026-07-20",
+            "status": "error",
+            "fieldMode": null,
+            "rows": 0,
+            "attempts": [
+              {
+                "fieldMode": "full",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:13 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AnvSdPtt-CdcOPdyNrhaVCJ\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:13 PDT."
+                }
+              },
+              {
+                "fieldMode": "core",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:13 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AUGOeFatmjQazBOkiQ41m5H\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:13 PDT."
+                }
+              },
+              {
+                "fieldMode": "minimal",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:13 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AMIsKt2D2y4PB-9M2-ACTYb\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:13 PDT."
+                }
+              }
+            ]
+          },
           {
             "since": "2026-07-13",
             "until": "2026-07-19",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 18,
-            "attempts": []
+            "status": "error",
+            "fieldMode": null,
+            "rows": 0,
+            "attempts": [
+              {
+                "fieldMode": "full",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:14 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"ANvPp_NjKi9YrwGsVCMuzM4\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:14 PDT."
+                }
+              },
+              {
+                "fieldMode": "core",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:14 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AjbCdjZ5YO623j1jV7GK0D1\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:14 PDT."
+                }
+              },
+              {
+                "fieldMode": "minimal",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:14 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AhAe6YhNoKZHOg2yXlhE18G\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:14 PDT."
+                }
+              }
+            ]
           },
           {
             "since": "2026-07-06",
             "until": "2026-07-12",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 32,
-            "attempts": []
+            "status": "error",
+            "fieldMode": null,
+            "rows": 0,
+            "attempts": [
+              {
+                "fieldMode": "full",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:15 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AY6uyt6q7DzasZ1sQO74l1S\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:15 PDT."
+                }
+              },
+              {
+                "fieldMode": "core",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:15 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AzzyR9wiq04seSwQjgfKxCY\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:15 PDT."
+                }
+              },
+              {
+                "fieldMode": "minimal",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:15 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"A5h206kzJmcB7e5adorKUzL\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:15 PDT."
+                }
+              }
+            ]
           },
           {
             "since": "2026-06-29",
             "until": "2026-07-05",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 26,
-            "attempts": []
+            "status": "error",
+            "fieldMode": null,
+            "rows": 0,
+            "attempts": [
+              {
+                "fieldMode": "full",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:16 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"A63sTuRfen_zbgvn9_rlitB\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:16 PDT."
+                }
+              },
+              {
+                "fieldMode": "core",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:16 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AFdDykxiRyWe7Fvn_9jnIOI\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:16 PDT."
+                }
+              },
+              {
+                "fieldMode": "minimal",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:16 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AQplV0mYulIIwbRxw1GfYkf\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:16 PDT."
+                }
+              }
+            ]
           },
           {
             "since": "2026-06-22",
             "until": "2026-06-28",
-            "status": "ok",
-            "fieldMode": "full",
+            "status": "error",
+            "fieldMode": null,
             "rows": 0,
-            "attempts": []
+            "attempts": [
+              {
+                "fieldMode": "full",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:17 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AL02cq77zXAvdwXhzC5FyVm\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:17 PDT."
+                }
+              },
+              {
+                "fieldMode": "core",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:17 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AvHnMkRJ7qsBgXj6H90jvH9\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:17 PDT."
+                }
+              },
+              {
+                "fieldMode": "minimal",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:17 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AOi-oVxZpwzXO9pvCp83Yh8\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:17 PDT."
+                }
+              }
+            ]
           },
           {
             "since": "2026-06-15",
             "until": "2026-06-21",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 3,
-            "attempts": []
-          },
-          {
-            "since": "2026-06-08",
-            "until": "2026-06-14",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 19,
-            "attempts": []
-          },
-          {
-            "since": "2026-06-01",
-            "until": "2026-06-07",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 21,
-            "attempts": []
-          },
-          {
-            "since": "2026-05-25",
-            "until": "2026-05-31",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 21,
-            "attempts": []
-          },
-          {
-            "since": "2026-05-18",
-            "until": "2026-05-24",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 28,
-            "attempts": []
-          },
-          {
-            "since": "2026-05-11",
-            "until": "2026-05-17",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 23,
-            "attempts": []
-          },
-          {
-            "since": "2026-05-04",
-            "until": "2026-05-10",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 29,
-            "attempts": []
-          },
-          {
-            "since": "2026-04-27",
-            "until": "2026-05-03",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 26,
-            "attempts": []
-          },
-          {
-            "since": "2026-04-20",
-            "until": "2026-04-26",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 29,
-            "attempts": []
-          },
-          {
-            "since": "2026-04-13",
-            "until": "2026-04-19",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 29,
-            "attempts": []
-          },
-          {
-            "since": "2026-04-06",
-            "until": "2026-04-12",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 17,
-            "attempts": []
-          },
-          {
-            "since": "2026-03-30",
-            "until": "2026-04-05",
-            "status": "ok",
-            "fieldMode": "full",
+            "status": "error",
+            "fieldMode": null,
             "rows": 0,
-            "attempts": []
-          },
-          {
-            "since": "2026-03-23",
-            "until": "2026-03-29",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 0,
-            "attempts": []
-          },
-          {
-            "since": "2026-03-16",
-            "until": "2026-03-22",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 0,
-            "attempts": []
-          },
-          {
-            "since": "2026-03-09",
-            "until": "2026-03-15",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 0,
-            "attempts": []
-          },
-          {
-            "since": "2026-03-02",
-            "until": "2026-03-08",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 0,
-            "attempts": []
-          },
-          {
-            "since": "2026-02-23",
-            "until": "2026-03-01",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 0,
-            "attempts": []
-          },
-          {
-            "since": "2026-02-16",
-            "until": "2026-02-22",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 21,
-            "attempts": []
-          },
-          {
-            "since": "2026-02-09",
-            "until": "2026-02-15",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 41,
-            "attempts": []
-          },
-          {
-            "since": "2026-02-02",
-            "until": "2026-02-08",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 23,
-            "attempts": []
-          },
-          {
-            "since": "2026-01-26",
-            "until": "2026-02-01",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 12,
-            "attempts": []
-          },
-          {
-            "since": "2026-01-19",
-            "until": "2026-01-25",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 10,
-            "attempts": []
-          },
-          {
-            "since": "2026-01-12",
-            "until": "2026-01-18",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 8,
-            "attempts": []
-          },
-          {
-            "since": "2026-01-05",
-            "until": "2026-01-11",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 4,
-            "attempts": []
-          },
-          {
-            "since": "2025-12-29",
-            "until": "2026-01-04",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 16,
-            "attempts": []
-          },
-          {
-            "since": "2025-12-22",
-            "until": "2025-12-28",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 25,
-            "attempts": []
-          },
-          {
-            "since": "2025-12-15",
-            "until": "2025-12-21",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 35,
-            "attempts": []
-          },
-          {
-            "since": "2025-12-08",
-            "until": "2025-12-14",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 29,
-            "attempts": []
-          },
-          {
-            "since": "2025-12-01",
-            "until": "2025-12-07",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 38,
-            "attempts": []
-          },
-          {
-            "since": "2025-11-24",
-            "until": "2025-11-30",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 56,
-            "attempts": []
-          },
-          {
-            "since": "2025-11-17",
-            "until": "2025-11-23",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 59,
-            "attempts": []
-          },
-          {
-            "since": "2025-11-10",
-            "until": "2025-11-16",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 40,
-            "attempts": []
-          },
-          {
-            "since": "2025-11-03",
-            "until": "2025-11-09",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 36,
-            "attempts": []
-          },
-          {
-            "since": "2025-10-27",
-            "until": "2025-11-02",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 23,
-            "attempts": []
-          },
-          {
-            "since": "2025-10-20",
-            "until": "2025-10-26",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 21,
-            "attempts": []
-          },
-          {
-            "since": "2025-10-13",
-            "until": "2025-10-19",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 17,
-            "attempts": []
-          },
-          {
-            "since": "2025-10-06",
-            "until": "2025-10-12",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 25,
-            "attempts": []
-          },
-          {
-            "since": "2025-09-29",
-            "until": "2025-10-05",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 36,
-            "attempts": []
-          },
-          {
-            "since": "2025-09-22",
-            "until": "2025-09-28",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 51,
-            "attempts": []
-          },
-          {
-            "since": "2025-09-15",
-            "until": "2025-09-21",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 38,
-            "attempts": []
-          },
-          {
-            "since": "2025-09-08",
-            "until": "2025-09-14",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 42,
-            "attempts": []
-          },
-          {
-            "since": "2025-09-01",
-            "until": "2025-09-07",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 38,
-            "attempts": []
-          },
-          {
-            "since": "2025-08-25",
-            "until": "2025-08-31",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 44,
-            "attempts": []
-          },
-          {
-            "since": "2025-08-18",
-            "until": "2025-08-24",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 49,
-            "attempts": []
-          },
-          {
-            "since": "2025-08-11",
-            "until": "2025-08-17",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 41,
-            "attempts": []
-          },
-          {
-            "since": "2025-08-04",
-            "until": "2025-08-10",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 54,
-            "attempts": []
-          },
-          {
-            "since": "2025-07-28",
-            "until": "2025-08-03",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 33,
-            "attempts": []
-          },
-          {
-            "since": "2025-07-21",
-            "until": "2025-07-27",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 14,
-            "attempts": []
+            "attempts": [
+              {
+                "fieldMode": "full",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:18 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AMo6TB0vzYfsB29IKLY5RVV\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:18 PDT."
+                }
+              },
+              {
+                "fieldMode": "core",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:18 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AmvX7S-bukeMevwRZHcaWLV\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:18 PDT."
+                }
+              },
+              {
+                "fieldMode": "minimal",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:18 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AUyc2mjUB9x2YnmNtbz0BO8\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:18 PDT."
+                }
+              }
+            ]
           }
         ],
-        "failedWeeks": 0
+        "failedWeeks": 6
       },
       "ad": {
-        "status": "ok",
-        "rows": 2133,
+        "status": "error",
+        "rows": 0,
         "weeks": [
+          {
+            "since": "2026-07-20",
+            "until": "2026-07-20",
+            "status": "error",
+            "fieldMode": null,
+            "rows": 0,
+            "attempts": [
+              {
+                "fieldMode": "full",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:13 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AVEpfBeaU0Eylu2PHwJs6xk\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:13 PDT."
+                }
+              },
+              {
+                "fieldMode": "core",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:13 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AIAF4NPHmFsMERvVJaPp-Pc\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:13 PDT."
+                }
+              },
+              {
+                "fieldMode": "minimal",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:13 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AbLozrfnR5n13WnBFb2kr7p\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:13 PDT."
+                }
+              }
+            ]
+          },
           {
             "since": "2026-07-13",
             "until": "2026-07-19",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 28,
-            "attempts": []
+            "status": "error",
+            "fieldMode": null,
+            "rows": 0,
+            "attempts": [
+              {
+                "fieldMode": "full",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:14 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AlSCqjpIrM3waK5mdrVkgqh\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:14 PDT."
+                }
+              },
+              {
+                "fieldMode": "core",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:14 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AsJupG-yJIP4mkfYnLviimW\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:14 PDT."
+                }
+              },
+              {
+                "fieldMode": "minimal",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:14 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AQQgvWI3lsT3IaTgNBiRQgx\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:14 PDT."
+                }
+              }
+            ]
           },
           {
             "since": "2026-07-06",
             "until": "2026-07-12",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 60,
-            "attempts": []
+            "status": "error",
+            "fieldMode": null,
+            "rows": 0,
+            "attempts": [
+              {
+                "fieldMode": "full",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:15 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AHvuFJrFMDMXIn7pzof4oyn\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:15 PDT."
+                }
+              },
+              {
+                "fieldMode": "core",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:15 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"Atiu6Nm5ClUQpT_vECqPtTJ\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:15 PDT."
+                }
+              },
+              {
+                "fieldMode": "minimal",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:16 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"ARjR-vlmH_80D18EVTQ6Ls6\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:16 PDT."
+                }
+              }
+            ]
           },
           {
             "since": "2026-06-29",
             "until": "2026-07-05",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 49,
-            "attempts": []
+            "status": "error",
+            "fieldMode": null,
+            "rows": 0,
+            "attempts": [
+              {
+                "fieldMode": "full",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:17 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AhczSrKl3lUj-kZixTQ7FkI\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:17 PDT."
+                }
+              },
+              {
+                "fieldMode": "core",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:17 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"A3B7qCO15oeCzZnwH-64d7-\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:17 PDT."
+                }
+              },
+              {
+                "fieldMode": "minimal",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:17 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AuDESsmiTDXsL6yjkoz_QJD\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:17 PDT."
+                }
+              }
+            ]
           },
           {
             "since": "2026-06-22",
             "until": "2026-06-28",
-            "status": "ok",
-            "fieldMode": "full",
+            "status": "error",
+            "fieldMode": null,
             "rows": 0,
-            "attempts": []
+            "attempts": [
+              {
+                "fieldMode": "full",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:18 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"A0y6gEK9LdKgH1uur3ba5wP\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:18 PDT."
+                }
+              },
+              {
+                "fieldMode": "core",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:18 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AuhUjjPDW7GMazC3B-aGvFw\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:18 PDT."
+                }
+              },
+              {
+                "fieldMode": "minimal",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:18 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AOekkVzXPc0ZcGRDjAJ43gn\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:18 PDT."
+                }
+              }
+            ]
           },
           {
             "since": "2026-06-15",
             "until": "2026-06-21",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 5,
-            "attempts": []
-          },
-          {
-            "since": "2026-06-08",
-            "until": "2026-06-14",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 38,
-            "attempts": []
-          },
-          {
-            "since": "2026-06-01",
-            "until": "2026-06-07",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 48,
-            "attempts": []
-          },
-          {
-            "since": "2026-05-25",
-            "until": "2026-05-31",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 48,
-            "attempts": []
-          },
-          {
-            "since": "2026-05-18",
-            "until": "2026-05-24",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 62,
-            "attempts": []
-          },
-          {
-            "since": "2026-05-11",
-            "until": "2026-05-17",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 33,
-            "attempts": []
-          },
-          {
-            "since": "2026-05-04",
-            "until": "2026-05-10",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 73,
-            "attempts": []
-          },
-          {
-            "since": "2026-04-27",
-            "until": "2026-05-03",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 96,
-            "attempts": []
-          },
-          {
-            "since": "2026-04-20",
-            "until": "2026-04-26",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 51,
-            "attempts": []
-          },
-          {
-            "since": "2026-04-13",
-            "until": "2026-04-19",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 50,
-            "attempts": []
-          },
-          {
-            "since": "2026-04-06",
-            "until": "2026-04-12",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 33,
-            "attempts": []
-          },
-          {
-            "since": "2026-03-30",
-            "until": "2026-04-05",
-            "status": "ok",
-            "fieldMode": "full",
+            "status": "error",
+            "fieldMode": null,
             "rows": 0,
-            "attempts": []
-          },
-          {
-            "since": "2026-03-23",
-            "until": "2026-03-29",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 0,
-            "attempts": []
-          },
-          {
-            "since": "2026-03-16",
-            "until": "2026-03-22",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 0,
-            "attempts": []
-          },
-          {
-            "since": "2026-03-09",
-            "until": "2026-03-15",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 0,
-            "attempts": []
-          },
-          {
-            "since": "2026-03-02",
-            "until": "2026-03-08",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 0,
-            "attempts": []
-          },
-          {
-            "since": "2026-02-23",
-            "until": "2026-03-01",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 0,
-            "attempts": []
-          },
-          {
-            "since": "2026-02-16",
-            "until": "2026-02-22",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 40,
-            "attempts": []
-          },
-          {
-            "since": "2026-02-09",
-            "until": "2026-02-15",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 90,
-            "attempts": []
-          },
-          {
-            "since": "2026-02-02",
-            "until": "2026-02-08",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 77,
-            "attempts": []
-          },
-          {
-            "since": "2026-01-26",
-            "until": "2026-02-01",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 35,
-            "attempts": []
-          },
-          {
-            "since": "2026-01-19",
-            "until": "2026-01-25",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 18,
-            "attempts": []
-          },
-          {
-            "since": "2026-01-12",
-            "until": "2026-01-18",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 16,
-            "attempts": []
-          },
-          {
-            "since": "2026-01-05",
-            "until": "2026-01-11",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 4,
-            "attempts": []
-          },
-          {
-            "since": "2025-12-29",
-            "until": "2026-01-04",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 16,
-            "attempts": []
-          },
-          {
-            "since": "2025-12-22",
-            "until": "2025-12-28",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 30,
-            "attempts": []
-          },
-          {
-            "since": "2025-12-15",
-            "until": "2025-12-21",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 47,
-            "attempts": []
-          },
-          {
-            "since": "2025-12-08",
-            "until": "2025-12-14",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 46,
-            "attempts": []
-          },
-          {
-            "since": "2025-12-01",
-            "until": "2025-12-07",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 51,
-            "attempts": []
-          },
-          {
-            "since": "2025-11-24",
-            "until": "2025-11-30",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 79,
-            "attempts": []
-          },
-          {
-            "since": "2025-11-17",
-            "until": "2025-11-23",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 91,
-            "attempts": []
-          },
-          {
-            "since": "2025-11-10",
-            "until": "2025-11-16",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 50,
-            "attempts": []
-          },
-          {
-            "since": "2025-11-03",
-            "until": "2025-11-09",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 44,
-            "attempts": []
-          },
-          {
-            "since": "2025-10-27",
-            "until": "2025-11-02",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 29,
-            "attempts": []
-          },
-          {
-            "since": "2025-10-20",
-            "until": "2025-10-26",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 28,
-            "attempts": []
-          },
-          {
-            "since": "2025-10-13",
-            "until": "2025-10-19",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 19,
-            "attempts": []
-          },
-          {
-            "since": "2025-10-06",
-            "until": "2025-10-12",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 34,
-            "attempts": []
-          },
-          {
-            "since": "2025-09-29",
-            "until": "2025-10-05",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 49,
-            "attempts": []
-          },
-          {
-            "since": "2025-09-22",
-            "until": "2025-09-28",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 77,
-            "attempts": []
-          },
-          {
-            "since": "2025-09-15",
-            "until": "2025-09-21",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 54,
-            "attempts": []
-          },
-          {
-            "since": "2025-09-08",
-            "until": "2025-09-14",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 56,
-            "attempts": []
-          },
-          {
-            "since": "2025-09-01",
-            "until": "2025-09-07",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 44,
-            "attempts": []
-          },
-          {
-            "since": "2025-08-25",
-            "until": "2025-08-31",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 53,
-            "attempts": []
-          },
-          {
-            "since": "2025-08-18",
-            "until": "2025-08-24",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 79,
-            "attempts": []
-          },
-          {
-            "since": "2025-08-11",
-            "until": "2025-08-17",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 69,
-            "attempts": []
-          },
-          {
-            "since": "2025-08-04",
-            "until": "2025-08-10",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 74,
-            "attempts": []
-          },
-          {
-            "since": "2025-07-28",
-            "until": "2025-08-03",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 41,
-            "attempts": []
-          },
-          {
-            "since": "2025-07-21",
-            "until": "2025-07-27",
-            "status": "ok",
-            "fieldMode": "full",
-            "rows": 19,
-            "attempts": []
+            "attempts": [
+              {
+                "fieldMode": "full",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:19 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"Ae9V3YaPLGNftZI_PasN40k\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:19 PDT."
+                }
+              },
+              {
+                "fieldMode": "core",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:19 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"A_rGjZhXcG5IbCam9BUs6zf\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:19 PDT."
+                }
+              },
+              {
+                "fieldMode": "minimal",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:19 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"ALhOjA3oCkFWw7IU2tOLko6\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 19-Jul-26 09:00:00 PDT. The current time is Sunday, 19-Jul-26 21:32:19 PDT."
+                }
+              }
+            ]
           }
         ],
-        "failedWeeks": 0
+        "failedWeeks": 6
       }
     }
   },
   "summary": {
-    "weeksAttempted": 52,
-    "successfulWeeks": 52,
-    "emptyWeeks": 7,
-    "failedWeeks": 0,
+    "weeksAttempted": 6,
+    "successfulWeeks": 0,
+    "emptyWeeks": 0,
+    "failedWeeks": 6,
     "addedWeeks": 0,
-    "updatedWeeks": 1,
-    "unchangedWeeks": 44,
+    "updatedWeeks": 0,
+    "unchangedWeeks": 0,
     "finalArchiveWeeks": 47,
-    "zeroOnlyRowsRemovedFromIncoming": 566,
+    "zeroOnlyRowsRemovedFromIncoming": 0,
     "zeroOnlyRowsRemovedFromExisting": 0,
-    "initialBackfillCompleteAfterRun": true,
+    "initialBackfillCompleteAfterRun": false,
     "completedWeekStarts": 52,
-    "partialDashboardDataUpdate": false
+    "partialDashboardDataUpdate": false,
+    "skippedDashboardDataUpdate": true,
+    "reason": "No complete weekly period was fetched. Existing dashboard-data.json was left unchanged."
   }
 }
