@@ -1,20 +1,20 @@
 {
-  "generatedAt": "2026-07-27T02:21:38.456Z",
+  "generatedAt": "2026-07-27T02:24:47.581Z",
   "mode": "resilient_weekly_archive",
   "graphVersion": "v24.0",
   "accountIdPresent": true,
   "tokenPresent": true,
   "archive": {
-    "initialBackfillCompleteBeforeRun": false,
+    "initialBackfillCompleteBeforeRun": true,
     "forcedBackfillWeeks": null,
-    "requestedWeeks": 52,
-    "normalRefreshWeeks": 4,
+    "requestedWeeks": 6,
+    "normalRefreshWeeks": 6,
     "initialBackfillWeeks": 52,
-    "since": "2025-08-04",
+    "since": "2026-06-22",
     "until": "2026-07-27",
-    "targetWeeks": 52,
-    "weeksSelectedForThisRun": 4,
-    "weeksSkippedAsPreviouslyCompleted": 48,
+    "targetWeeks": 6,
+    "weeksSelectedForThisRun": 6,
+    "weeksSkippedAsPreviouslyCompleted": 0,
     "ranges": [
       {
         "since": "2026-07-27",
@@ -31,6 +31,14 @@
       {
         "since": "2026-07-06",
         "until": "2026-07-12"
+      },
+      {
+        "since": "2026-06-29",
+        "until": "2026-07-05"
+      },
+      {
+        "since": "2026-06-22",
+        "until": "2026-06-28"
       }
     ]
   },
@@ -45,7 +53,23 @@
       "minimal"
     ]
   },
-  "retries": [],
+  "retries": [
+    {
+      "level": "ad",
+      "since": "2026-07-27",
+      "until": "2026-07-27",
+      "fieldMode": "full",
+      "page": 1,
+      "attempt": 1,
+      "delayMs": 1393,
+      "error": {
+        "code": 1,
+        "subcode": 99,
+        "isTransient": false,
+        "message": "An unknown error occurred"
+      }
+    }
+  ],
   "weeks": [
     {
       "since": "2026-07-27",
@@ -74,13 +98,27 @@
       "status": "ok",
       "removedZeroOnlyRows": 12,
       "rows": 92
+    },
+    {
+      "since": "2026-06-29",
+      "until": "2026-07-05",
+      "status": "ok",
+      "removedZeroOnlyRows": 0,
+      "rows": 84
+    },
+    {
+      "since": "2026-06-22",
+      "until": "2026-06-28",
+      "status": "ok_empty",
+      "removedZeroOnlyRows": 0,
+      "rows": 0
     }
   ],
   "meta": {
     "levels": {
       "campaign": {
         "status": "ok",
-        "rows": 32,
+        "rows": 43,
         "weeks": [
           {
             "since": "2026-07-27",
@@ -113,13 +151,29 @@
             "fieldMode": "full",
             "rows": 14,
             "attempts": []
+          },
+          {
+            "since": "2026-06-29",
+            "until": "2026-07-05",
+            "status": "ok",
+            "fieldMode": "full",
+            "rows": 11,
+            "attempts": []
+          },
+          {
+            "since": "2026-06-22",
+            "until": "2026-06-28",
+            "status": "ok",
+            "fieldMode": "full",
+            "rows": 0,
+            "attempts": []
           }
         ],
         "failedWeeks": 0
       },
       "adset": {
         "status": "ok",
-        "rows": 62,
+        "rows": 88,
         "weeks": [
           {
             "since": "2026-07-27",
@@ -152,13 +206,29 @@
             "fieldMode": "full",
             "rows": 32,
             "attempts": []
+          },
+          {
+            "since": "2026-06-29",
+            "until": "2026-07-05",
+            "status": "ok",
+            "fieldMode": "full",
+            "rows": 26,
+            "attempts": []
+          },
+          {
+            "since": "2026-06-22",
+            "until": "2026-06-28",
+            "status": "ok",
+            "fieldMode": "full",
+            "rows": 0,
+            "attempts": []
           }
         ],
         "failedWeeks": 0
       },
       "ad": {
         "status": "ok",
-        "rows": 103,
+        "rows": 152,
         "weeks": [
           {
             "since": "2026-07-27",
@@ -191,6 +261,22 @@
             "fieldMode": "full",
             "rows": 60,
             "attempts": []
+          },
+          {
+            "since": "2026-06-29",
+            "until": "2026-07-05",
+            "status": "ok",
+            "fieldMode": "full",
+            "rows": 49,
+            "attempts": []
+          },
+          {
+            "since": "2026-06-22",
+            "until": "2026-06-28",
+            "status": "ok",
+            "fieldMode": "full",
+            "rows": 0,
+            "attempts": []
           }
         ],
         "failedWeeks": 0
@@ -198,13 +284,13 @@
     }
   },
   "summary": {
-    "weeksAttempted": 4,
-    "successfulWeeks": 4,
-    "emptyWeeks": 0,
+    "weeksAttempted": 6,
+    "successfulWeeks": 6,
+    "emptyWeeks": 1,
     "failedWeeks": 0,
-    "addedWeeks": 2,
+    "addedWeeks": 0,
     "updatedWeeks": 1,
-    "unchangedWeeks": 1,
+    "unchangedWeeks": 4,
     "finalArchiveWeeks": 49,
     "zeroOnlyRowsRemovedFromIncoming": 51,
     "zeroOnlyRowsRemovedFromExisting": 0,
