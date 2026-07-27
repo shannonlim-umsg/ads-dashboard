@@ -40,7 +40,7 @@ textarea{min-height:88px;resize:vertical}
 .card-tools{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}.drag-handle{color:var(--muted);font-weight:900;letter-spacing:.08em;cursor:grab;user-select:none}.card-actions{display:flex;gap:6px}.icon-btn{box-shadow:none;border:1px solid var(--line);padding:5px 8px;border-radius:9px;background:#fff;font-size:12px}
 .customize-bar{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:14px;flex-wrap:wrap}.customize-note{color:var(--muted);font-size:13px}
 .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}.wide{grid-column:1/-1}.section-title{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:12px}h2{font-size:18px;margin:0;letter-spacing:-.02em}.hint{color:var(--muted);font-size:13px}.chartbox{height:310px}.shortchart{height:260px}
-.table-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin:0 0 12px;padding:12px;background:#f8fafc;border:1px solid var(--line);border-radius:14px}.table-toolbar>div{min-width:160px}.tablewrap{max-height:560px;overflow:auto;border:1px solid var(--line);border-radius:14px;background:#fff}table{width:100%;border-collapse:collapse;font-size:13px}th{text-align:left;color:#475467;background:#f8fafc;position:sticky;top:0;z-index:2;white-space:nowrap}th,td{padding:11px 10px;border-bottom:1px solid var(--line)}td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}.pill{display:inline-block;padding:4px 9px;border-radius:999px;background:#eef4ff;color:#3538cd;font-weight:800;font-size:12px}.pill.paused{background:#fffaeb;color:#b54708}.th-inner{display:flex;align-items:center;gap:5px}.col-hide{cursor:pointer;color:var(--muted);font-size:10px;opacity:0;transition:.15s;margin-left:2px;border:none;background:none;padding:0;line-height:1;box-shadow:none}th:hover .col-hide{opacity:.7}
+.table-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin:0 0 12px;padding:12px;background:#f8fafc;border:1px solid var(--line);border-radius:14px}.table-toolbar>div{min-width:160px}.tablewrap{max-height:560px;overflow:auto;border:1px solid var(--line);border-radius:14px;background:#fff}table{width:100%;border-collapse:collapse;font-size:13px}th{text-align:left;color:#475467;background:#f8fafc;position:sticky;top:0;z-index:2;white-space:nowrap}th,td{padding:11px 10px;border-bottom:1px solid var(--line)}td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}.pill{display:inline-block;padding:4px 9px;border-radius:999px;background:#eef4ff;color:#3538cd;font-weight:800;font-size:12px}.pill.paused{background:#fffaeb;color:#b54708}.pill.completed{background:#f2f4f7;color:#475467}.th-inner{display:flex;align-items:center;gap:5px}.col-hide{cursor:pointer;color:var(--muted);font-size:10px;opacity:0;transition:.15s;margin-left:2px;border:none;background:none;padding:0;line-height:1;box-shadow:none}th:hover .col-hide{opacity:.7}
 tr.campaign-row-main,tr.adset-row-main{cursor:pointer}tr.campaign-row-main td:first-child::before,tr.adset-row-main td:first-child::before{content:'▶';font-size:9px;color:var(--muted);margin-right:7px;display:inline-block;transition:transform .15s}tr.campaign-row-main.expanded td:first-child::before,tr.adset-row-main.expanded td:first-child::before{transform:rotate(90deg)}tr.adset-row-main td{background:#f8fafc;font-size:12px;color:var(--muted)}tr.adset-row-main td:first-child{padding-left:32px}tr.ad-row td{background:#fff;font-size:12px;color:var(--muted)}tr.ad-row td:first-child{padding-left:58px}.level-pill{display:inline-block;font-size:10px;padding:2px 7px;border-radius:999px;font-weight:800;margin-right:6px;background:#eef4ff;color:#3538cd}.level-pill.adset{background:#ecfdf3;color:#067647}.level-pill.ad{background:#fff7ed;color:#c2410c}
 .footer{color:var(--muted);font-size:12px;margin-top:18px;line-height:1.45}.empty{text-align:center;padding:42px;background:#fff;border:1px dashed var(--line);border-radius:var(--radius);color:var(--muted);box-shadow:var(--shadow)}
 .modal-backdrop{display:none;position:fixed;inset:0;background:rgba(16,24,40,.55);z-index:50;align-items:center;justify-content:center;padding:20px}.modal-backdrop.open{display:flex}.modal{background:#fff;border-radius:18px;border:1px solid var(--line);width:min(1080px,96vw);max-height:92vh;overflow:auto;padding:22px;box-shadow:0 24px 80px rgba(0,0,0,.2)}.modal.small{width:min(540px,96vw)}.modal.medium{width:min(760px,96vw)}.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}.modal-title{font-size:20px;font-weight:900}.x{border:0;background:transparent;box-shadow:none;font-size:24px;padding:0 8px;cursor:pointer}
@@ -1098,7 +1098,7 @@ const DEFAULT_METRICS=[
 const DEFAULT_COLUMN_OPTIONS={
   platform:['Meta','TikTok','Google','YouTube','Snapchat','Pinterest','Other'],
   type:['Traffic','Reach','Views','KOL Boost','Conversions','Brand Awareness','Sales','Engagement','Other'],
-  status:['active','paused']
+  status:['active','paused','completed']
 };
 
 const DEFAULT_COLS=[
@@ -3878,6 +3878,671 @@ renderCustomSections = function renderCustomSectionsWithCrm(rows) {
 
     grid.appendChild(element);
   });
+};
+
+
+/* ========================================================================== 
+   CAMPAIGN-CENTRIC META RESULTS MODEL
+   Purpose:
+   - Keep the permanent weekly archive for historical Week selections.
+   - When Week = All, combine every non-overlapping weekly result that shares
+     the same campaign name into one campaign-lifetime row.
+   - Aggregate Campaign, Ad Set, and Ad results without duplicating periods.
+   - Recalculate rate/cost metrics from aggregate totals.
+   - Mark a campaign Completed when it has no measurable delivery in the most
+     recent successfully synced completed week.
+   - Keep all existing Firebase overrides, table editing, cards, sections,
+     filters, CRM tables, and performance-summary behavior.
+   ========================================================================== */
+
+const CAMPAIGN_ROLLUP_DERIVED_FIELDS=new Set([
+  'ctr_all','cpc_all','cpm','ctr_link','cpc_link','purchase_roas','roas','ctr','cpc','cpa'
+]);
+const CAMPAIGN_ROLLUP_CORE_ADDITIVE_FIELDS=[
+  'spend','impressions','reach','clicks_all','link_clicks','purchases','views','conversions','revenue'
+];
+
+/** Resolve the state Week object associated with a rendered raw row. */
+function campaignCentricWeekForRow(row){
+  return state.weeks?.[Number(row?.weekIndex)]||null;
+}
+
+/** Identify the permanent, non-overlapping weekly Meta archive periods. */
+function campaignCentricIsWeeklyMetaWeek(week){
+  return !!week && isMetaWeek(week) &&
+    (week.snapshotType==='weekly'||String(week.id||'').startsWith('meta_week_'));
+}
+
+function campaignCentricIsLegacyWeek(week){
+  return !!week && (week.archivedLegacy===true||week.snapshotType==='legacy_rolling'||String(week.id||'').startsWith('meta_last_30d_'));
+}
+
+function campaignCentricWeekTime(week){
+  const parsed=Date.parse(week?.dateTo||week?.dateFrom||'');
+  return Number.isFinite(parsed)?parsed:0;
+}
+
+/**
+ * Use weekly archive rows when available. Legacy rolling 30-day snapshots are
+ * excluded from lifetime totals because overlapping windows would double-count
+ * results. Manual Weeks remain eligible for campaign-focused totals.
+ */
+function campaignCentricEligibleRawRows(){
+  const rows=allRows();
+  const hasWeeklyMeta=(state.weeks||[]).some(campaignCentricIsWeeklyMetaWeek);
+
+  if(hasWeeklyMeta){
+    return rows.filter(row=>!campaignCentricIsLegacyWeek(campaignCentricWeekForRow(row)));
+  }
+
+  const legacyIndexes=(state.weeks||[])
+    .map((week,index)=>({week,index}))
+    .filter(item=>campaignCentricIsLegacyWeek(item.week))
+    .sort((a,b)=>campaignCentricWeekTime(b.week)-campaignCentricWeekTime(a.week));
+
+  if(!legacyIndexes.length)return rows;
+
+  // Without a weekly archive, use only the newest overlapping rolling snapshot
+  // plus every manually entered Week.
+  const newestLegacyIndex=legacyIndexes[0].index;
+  return rows.filter(row=>{
+    const week=campaignCentricWeekForRow(row);
+    return !campaignCentricIsLegacyWeek(week)||Number(row.weekIndex)===newestLegacyIndex;
+  });
+}
+
+/** Latest completed/empty week reported by the resilient sync. */
+function campaignCentricLatestCompletedWeekStart(){
+  const syncState=state.dataSync?.syncState||{};
+  const candidates=[
+    ...(Array.isArray(syncState.completedWeeks)?syncState.completedWeeks:[]),
+    ...(Array.isArray(syncState.emptyWeeks)?syncState.emptyWeeks:[])
+  ].filter(Boolean).sort();
+  if(candidates.length)return candidates[candidates.length-1];
+  if(state.dataSync?.latestCompletedWeekStart)return state.dataSync.latestCompletedWeekStart;
+
+  const weekly=(state.weeks||[])
+    .filter(campaignCentricIsWeeklyMetaWeek)
+    .sort((a,b)=>campaignCentricWeekTime(a)-campaignCentricWeekTime(b));
+  return weekly.at(-1)?.dateFrom||'';
+}
+
+function campaignCentricPeriodTime(row){
+  return campaignCentricWeekTime(campaignCentricWeekForRow(row))||Number(row?.weekIndex||0);
+}
+
+function campaignCentricSortedRows(rows){
+  return [...(rows||[])].sort((a,b)=>campaignCentricPeriodTime(a)-campaignCentricPeriodTime(b));
+}
+
+function campaignCentricDateBounds(rows){
+  const weeks=rows.map(campaignCentricWeekForRow).filter(Boolean);
+  const starts=weeks.map(week=>week.dateFrom).filter(Boolean).sort();
+  const ends=weeks.map(week=>week.dateTo||week.dateFrom).filter(Boolean).sort();
+  return {
+    start:starts[0]||'',
+    end:ends.at(-1)||starts.at(-1)||''
+  };
+}
+
+function campaignCentricUniqueValues(rows,key){
+  return uniq((rows||[]).map(row=>String(row?.[key]??'').trim()).filter(Boolean));
+}
+
+function campaignCentricLatestValue(rows,key,fallback=''){
+  const sorted=campaignCentricSortedRows(rows);
+  for(let index=sorted.length-1;index>=0;index-=1){
+    const value=sorted[index]?.[key];
+    if(value!==undefined&&value!==null&&String(value).trim()!=='')return value;
+  }
+  return fallback;
+}
+
+/** Aggregate additive metrics and recalculate every rate/cost metric. */
+function campaignCentricAggregateMetrics(rows){
+  const result={};
+  const definitions=[...(state.metrics||DEFAULT_METRICS)];
+  const customNumericColumns=(state.columns||[])
+    .filter(column=>columnStoresNumber(column)&&!definitions.some(metric=>metric.key===column.key));
+
+  [...definitions,...customNumericColumns].forEach(definition=>{
+    const key=definition.key;
+    if(!key||CAMPAIGN_ROLLUP_DERIVED_FIELDS.has(key))return;
+
+    if(['percent','ratio'].includes(definition.type)){
+      result[key]=Number(campaignCentricLatestValue(rows,key,0)||0);
+    }else if(columnStoresNumber(definition)||['number','currency'].includes(definition.type)){
+      result[key]=sum(rows,key);
+    }
+  });
+
+  CAMPAIGN_ROLLUP_CORE_ADDITIVE_FIELDS.forEach(key=>{result[key]=sum(rows,key)});
+
+  const spend=Number(result.spend||0);
+  const impressions=Number(result.impressions||0);
+  const clicks=Number(result.clicks_all||0);
+  const linkClicks=Number(result.link_clicks||0);
+  const conversions=Number(result.conversions||0);
+  const revenue=Number(result.revenue||0);
+
+  result.ctr_all=impressions?clicks/impressions:0;
+  result.cpc_all=clicks?spend/clicks:0;
+  result.cpm=impressions?spend/impressions*1000:0;
+  result.ctr_link=impressions?linkClicks/impressions:0;
+  result.cpc_link=linkClicks?spend/linkClicks:0;
+  result.purchase_roas=spend?revenue/spend:0;
+  result.roas=spend?revenue/spend:0;
+  result.ctr=result.ctr_all;
+  result.cpc=result.cpc_all;
+  result.cpa=conversions?spend/conversions:0;
+
+  return result;
+}
+
+function campaignCentricRollupEntityKey(level,stableKey){
+  return `${level}-name:${stableKey}`;
+}
+
+function campaignCentricRollupRecordKey(level,stableKey){
+  return `campaign-rollup|${level}|${stableKey}`;
+}
+
+function campaignCentricExplicitStatus(rows,rollupEntityKey){
+  const rollupStatus=state.entityOverrides?.[rollupEntityKey]?.status;
+  if(rollupStatus)return rollupStatus;
+
+  const sorted=campaignCentricSortedRows(rows).reverse();
+  for(const row of sorted){
+    const status=state.entityOverrides?.[row?._entityKey]?.status;
+    if(status)return status;
+  }
+  return '';
+}
+
+/**
+ * Active means the logical entity delivered in the latest completed Meta week.
+ * Otherwise historical Meta entities are automatically marked completed.
+ */
+function campaignCentricLifecycleStatus(rows,rollupEntityKey){
+  const explicit=campaignCentricExplicitStatus(rows,rollupEntityKey);
+  if(explicit)return explicit;
+
+  const latestCompletedStart=campaignCentricLatestCompletedWeekStart();
+  const metaRows=rows.filter(row=>isMetaWeek(campaignCentricWeekForRow(row)));
+
+  if(metaRows.length&&latestCompletedStart){
+    const active=metaRows.some(row=>{
+      const week=campaignCentricWeekForRow(row);
+      return week?.dateFrom===latestCompletedStart&&campaignHasMeasurableResults(row);
+    });
+    return active?'active':'completed';
+  }
+
+  return String(campaignCentricLatestValue(rows,'status','active')||'active');
+}
+
+function campaignCentricPreferredArtist(rows){
+  const sorted=campaignCentricSortedRows(rows).reverse();
+  const edited=sorted.find(row=>row.artist&&row.artist!=='Imported Artist');
+  return edited?.artist||campaignCentricLatestValue(rows,'artist','Imported Artist');
+}
+
+/** Build one rollup row while retaining IDs and custom fields from the latest row. */
+function campaignCentricBuildEntityRollup(rows,level,stableKey,context={}){
+  const sorted=campaignCentricSortedRows(rows);
+  const latestWithResults=[...sorted].reverse().find(campaignHasMeasurableResults);
+  const representative=latestWithResults||sorted.at(-1)||{};
+  const base={...representative};
+  delete base._adsets;
+  delete base._directAds;
+  delete base._ads;
+
+  const dates=campaignCentricDateBounds(rows);
+  const entityKey=campaignCentricRollupEntityKey(level,stableKey);
+  const recordKey=campaignCentricRollupRecordKey(level,stableKey);
+  const platforms=campaignCentricUniqueValues(rows,'platform');
+  const types=campaignCentricUniqueValues(rows,'type');
+  const artists=campaignCentricUniqueValues(rows,'artist');
+  const sourceWeeks=uniq(rows.map(row=>row.week).filter(Boolean));
+  const metrics=campaignCentricAggregateMetrics(rows);
+
+  let rollup={
+    ...base,
+    ...metrics,
+    name:campaignCentricLatestValue(rows,'name',base.name||'Unnamed'),
+    artist:level==='campaign'?campaignCentricPreferredArtist(rows):(base.artist||''),
+    platform:platforms.length===1?platforms[0]:(platforms.length>1?'Multiple':base.platform||''),
+    type:level==='campaign'
+      ? (types.length===1?types[0]:(types.length>1?'Multiple':base.type||''))
+      : base.type,
+    status:campaignCentricLifecycleStatus(rows,entityKey),
+    week:'Campaign lifetime',
+    period:dates.start&&dates.end?`${dates.start} to ${dates.end}`:(dates.start||dates.end||''),
+    weekIndex:Number(representative.weekIndex??0),
+    _campaignRollup:true,
+    _sourceWeekCount:sourceWeeks.length,
+    _sourceWeeks:sourceWeeks,
+    _firstActivityDate:dates.start,
+    _lastActivityDate:dates.end,
+    _artists:artists,
+    _platforms:platforms,
+    _types:types,
+    _entityKey:entityKey,
+    _recordKey:recordKey,
+    _weekId:'campaign_rollup',
+    _snapshotType:'campaign_rollup',
+    _archivedLegacy:false,
+    _rollupStableKey:stableKey,
+    _reachAggregation:'sum_of_weekly_reach'
+  };
+
+  if(context.campaign)rollup.campaign=context.campaign;
+  if(context.adset)rollup.adset=context.adset;
+
+  rollup={
+    ...rollup,
+    ...(state.entityOverrides?.[entityKey]||{}),
+    ...(state.recordOverrides?.[recordKey]||{})
+  };
+
+  return rollup;
+}
+
+function campaignCentricGroupRows(rows,keyBuilder){
+  const groups=new Map();
+  (rows||[]).forEach((row,index)=>{
+    const key=keyBuilder(row)||`unnamed:${index}`;
+    if(!groups.has(key))groups.set(key,[]);
+    groups.get(key).push(row);
+  });
+  return groups;
+}
+
+function campaignCentricAggregateAds(rows,campaignStableKey,adsetStableKey,campaignName,adsetName){
+  const groups=campaignCentricGroupRows(rows,row=>normalizedCampaignName(row.name));
+  return [...groups.entries()].map(([adKey,group])=>{
+    const stableKey=`${campaignStableKey}|${adsetStableKey||'direct'}|${adKey}`;
+    return campaignCentricBuildEntityRollup(group,'ad',stableKey,{campaign:campaignName,adset:adsetName||''});
+  });
+}
+
+function campaignCentricAggregateAdsets(campaignRows,campaignStableKey,campaignName){
+  const rows=[];
+  campaignRows.forEach(campaignRow=>{
+    (campaignRow._adsets||[]).forEach(adset=>rows.push({
+      ...adset,
+      week:campaignRow.week,
+      period:campaignRow.period,
+      weekIndex:campaignRow.weekIndex
+    }));
+  });
+
+  const groups=campaignCentricGroupRows(rows,row=>normalizedCampaignName(row.name));
+  return [...groups.entries()].map(([adsetKey,group])=>{
+    const stableKey=`${campaignStableKey}|${adsetKey}`;
+    const rollup=campaignCentricBuildEntityRollup(group,'adset',stableKey,{campaign:campaignName});
+    const ads=[];
+    group.forEach(adsetRow=>{
+      (adsetRow._ads||[]).forEach(ad=>ads.push({
+        ...ad,
+        week:adsetRow.week,
+        period:adsetRow.period,
+        weekIndex:adsetRow.weekIndex
+      }));
+    });
+    rollup.campaign=campaignName;
+    rollup._ads=campaignCentricAggregateAds(ads,campaignStableKey,adsetKey,campaignName,rollup.name);
+    return rollup;
+  });
+}
+
+function campaignCentricAggregateDirectAds(campaignRows,campaignStableKey,campaignName){
+  const rows=[];
+  campaignRows.forEach(campaignRow=>{
+    (campaignRow._directAds||[]).forEach(ad=>rows.push({
+      ...ad,
+      week:campaignRow.week,
+      period:campaignRow.period,
+      weekIndex:campaignRow.weekIndex
+    }));
+  });
+  return campaignCentricAggregateAds(rows,campaignStableKey,'direct',campaignName,'');
+}
+
+/** One campaign row per normalized campaign name, with lifetime totals. */
+function campaignCentricAggregateCampaignRows(rows){
+  const groups=campaignCentricGroupRows(rows,row=>normalizedCampaignName(row.name));
+  return [...groups.entries()].map(([campaignKey,group])=>{
+    const rollup=campaignCentricBuildEntityRollup(group,'campaign',campaignKey);
+    rollup._adsets=campaignCentricAggregateAdsets(group,campaignKey,rollup.name);
+    rollup._directAds=campaignCentricAggregateDirectAds(group,campaignKey,rollup.name);
+    return rollup;
+  });
+}
+
+function campaignCentricAllCampaignRows(){
+  return campaignCentricAggregateCampaignRows(campaignCentricEligibleRawRows());
+}
+
+function campaignCentricRowMatches(row,key,value){
+  if(value==='All')return true;
+  const membershipKey={artist:'_artists',platform:'_platforms',type:'_types'}[key];
+  if(membershipKey&&Array.isArray(row?.[membershipKey]))return row?.[key]===value||row[membershipKey].includes(value);
+  return row?.[key]===value;
+}
+
+function campaignCentricApplyTopFilters(rows){
+  const artist=getFilterVal('artistFilter');
+  const platform=getFilterVal('platformFilter');
+  const type=getFilterVal('typeFilter');
+  const campaign=getFilterVal('campaignFilter');
+  return (rows||[]).filter(row=>
+    campaignCentricRowMatches(row,'artist',artist)&&
+    campaignCentricRowMatches(row,'platform',platform)&&
+    campaignCentricRowMatches(row,'type',type)&&
+    (campaign==='All'||row.name===campaign)
+  );
+}
+
+/** Apply current rollup identity/status to a historical Week row. */
+function campaignCentricApplyRollupStateToHistoricalRows(rows){
+  const rollups=campaignCentricAllCampaignRows();
+  const byKey=new Map(rollups.map(row=>[row._rollupStableKey,row]));
+
+  return (rows||[]).map(row=>{
+    const key=normalizedCampaignName(row.name);
+    const rollup=byKey.get(key);
+    if(!rollup)return row;
+
+    const campaign={
+      ...row,
+      name:rollup.name,
+      artist:rollup.artist,
+      platform:rollup.platform==='Multiple'?row.platform:rollup.platform,
+      type:rollup.type==='Multiple'?row.type:rollup.type,
+      status:rollup.status,
+      _artists:rollup._artists,
+      _platforms:rollup._platforms,
+      _types:rollup._types
+    };
+
+    const adsetByName=new Map((rollup._adsets||[]).map(adset=>[normalizedCampaignName(adset.name),adset]));
+    campaign._adsets=(row._adsets||[]).map(adset=>{
+      const current=adsetByName.get(normalizedCampaignName(adset.name));
+      if(!current)return adset;
+      const adByName=new Map((current._ads||[]).map(ad=>[normalizedCampaignName(ad.name),ad]));
+      return {
+        ...adset,
+        campaign:campaign.name,
+        status:current.status,
+        _ads:(adset._ads||[]).map(ad=>({
+          ...ad,
+          campaign:campaign.name,
+          adset:current.name,
+          status:adByName.get(normalizedCampaignName(ad.name))?.status||ad.status
+        }))
+      };
+    });
+
+    const directByName=new Map((rollup._directAds||[]).map(ad=>[normalizedCampaignName(ad.name),ad]));
+    campaign._directAds=(row._directAds||[]).map(ad=>({
+      ...ad,
+      campaign:campaign.name,
+      status:directByName.get(normalizedCampaignName(ad.name))?.status||ad.status
+    }));
+
+    return campaign;
+  });
+}
+
+/**
+ * Week = All now means campaign-lifetime totals. Selecting a historical Week
+ * still returns that exact weekly snapshot, but with the current lifecycle
+ * status and durable identity overrides.
+ */
+selectedRows=function campaignCentricSelectedRows(){
+  const week=getFilterVal('weekFilter');
+  let rows;
+
+  if(week==='All'){
+    rows=campaignCentricAllCampaignRows();
+  }else{
+    rows=allRows().filter(row=>String(row.weekIndex)===week);
+    rows=campaignCentricApplyRollupStateToHistoricalRows(rows);
+  }
+
+  return campaignCentricApplyTopFilters(rows);
+};
+
+/** Prior comparison for All Weeks is lifetime totals before the latest period. */
+prevRows=function campaignCentricPreviousRows(){
+  const selectedWeek=getFilterVal('weekFilter');
+
+  if(selectedWeek==='All'){
+    const latestStart=campaignCentricLatestCompletedWeekStart();
+    const previousRaw=campaignCentricEligibleRawRows().filter(row=>{
+      const week=campaignCentricWeekForRow(row);
+      return !latestStart||!week?.dateFrom||week.dateFrom<latestStart;
+    });
+    return campaignCentricApplyTopFilters(campaignCentricAggregateCampaignRows(previousRaw));
+  }
+
+  const currentIndex=Number(selectedWeek);
+  const currentWeek=state.weeks?.[currentIndex];
+  const previous=(state.weeks||[])
+    .map((week,index)=>({week,index}))
+    .filter(item=>item.index!==currentIndex&&campaignCentricWeekTime(item.week)<campaignCentricWeekTime(currentWeek))
+    .sort((a,b)=>campaignCentricWeekTime(b.week)-campaignCentricWeekTime(a.week))[0];
+
+  if(!previous)return[];
+  const rows=allRows().filter(row=>Number(row.weekIndex)===previous.index);
+  return campaignCentricApplyTopFilters(campaignCentricApplyRollupStateToHistoricalRows(rows));
+};
+
+/** Rows used only for the weekly trend chart; these remain period-specific. */
+function campaignCentricSelectedWeeklyRows(){
+  const selectedWeek=getFilterVal('weekFilter');
+  let rows=campaignCentricEligibleRawRows();
+  if(selectedWeek!=='All')rows=rows.filter(row=>String(row.weekIndex)===selectedWeek);
+  rows=campaignCentricApplyRollupStateToHistoricalRows(rows);
+  return campaignCentricApplyTopFilters(rows);
+}
+
+/** The campaign-focused row set is already unique; only sorting/limits remain. */
+getMainTableDisplayedRows=function campaignCentricDisplayedRows(rows){
+  const settings=getMainTableSettings();
+  let displayed=[...(rows||[])];
+
+  if(settings.rankMetric){
+    displayed.sort((a,b)=>{
+      const av=getMetricRaw(a,settings.rankMetric);
+      const bv=getMetricRaw(b,settings.rankMetric);
+      return settings.rankOrder==='asc'?av-bv:bv-av;
+    });
+  }
+
+  if(settings.rankLimit!=='all')displayed=displayed.slice(0,Number(settings.rankLimit));
+  return displayed;
+};
+
+/** Custom sections use campaign totals unless they explicitly display a Week. */
+rowsForCustomSection=function campaignCentricRowsForCustomSection(sec){
+  const baseRows=sectionUsesDashboardFilter(sec)?selectedRows():campaignCentricAllCampaignRows();
+  return applySectionScopedFilters(baseRows,sec);
+};
+
+/** Style Completed status distinctly while preserving all other cell formats. */
+const _campaignCentricOriginalGetCellValue=getCellValue;
+getCellValue=function campaignCentricGetCellValue(row,key){
+  if(key==='status'){
+    const status=String(row?.status||'active');
+    const className=status==='paused'?'paused':status==='completed'?'completed':'';
+    return `<span class="pill ${className}">${esc(status)}</span>`;
+  }
+  return _campaignCentricOriginalGetCellValue(row,key);
+};
+
+/** Ensure older Firebase column settings receive the new Completed option. */
+const _campaignCentricOriginalNormalizeState=normalizeState;
+normalizeState=function campaignCentricNormalizeState(){
+  _campaignCentricOriginalNormalizeState();
+  DEFAULT_COLUMN_OPTIONS.status=normalizeOptionList([...(DEFAULT_COLUMN_OPTIONS.status||[]),'completed']);
+  state.columns=normalizeColumnList(state.columns||DEFAULT_COLS).map(column=>{
+    if(column.key!=='status')return column;
+    return {...column,editorMode:'dropdown',options:normalizeOptionList([...(column.options||[]),'active','paused','completed'])};
+  });
+  state.dataSync={
+    ...(state.dataSync||{}),
+    campaignDisplayMode:'campaign_name_lifetime_rollup',
+    statusPolicy:'active_in_latest_completed_week_else_completed'
+  };
+};
+
+/** Load syncState so an API-verified empty week can complete inactive campaigns. */
+loadRemoteData=async function campaignCentricLoadRemoteData(auto=true){
+  try{
+    captureEditableContent();
+    persistLocalState();
+    if(liveReady&&liveRef&&!liveApplying&&liveInitialLoadComplete)await saveSharedNow();
+
+    const response=await fetch(REMOTE_JSON+'?ts='+Date.now());
+    if(!response.ok)throw new Error('dashboard-data.json not found');
+    const data=await response.json();
+    if(!Array.isArray(data.weeks))throw new Error('No weeks array in dashboard-data.json');
+    const usableWeeks=data.weeks.filter(hasRows);
+    if(!usableWeeks.length)throw new Error('dashboard-data.json has no synced weeks with rows');
+
+    setRemoteWeeks(usableWeeks);
+    state.dataSync={
+      ...(state.dataSync||{}),
+      archiveVersion:data.archiveVersion||4,
+      archiveGranularity:data.archiveGranularity||'weekly',
+      dedupePolicy:data.dedupePolicy||'campaign_name_lifetime_rollup',
+      campaignDisplayMode:data.campaignDisplayMode||'campaign_name_lifetime_rollup',
+      statusPolicy:data.statusPolicy||'active_in_latest_completed_week_else_completed',
+      syncState:data.syncState||state.dataSync?.syncState||{},
+      latestCompletedWeekStart:data.latestCompletedWeekStart||data.syncState?.latestCompletedWeekStart||'',
+      lastRemoteGeneratedAt:data.generatedAt||new Date().toISOString(),
+      lastRefreshAt:new Date().toISOString()
+    };
+    normalizeState();
+    render();
+    await persistRemoteDataOnly();
+    if(!auto)alert('Meta data refreshed. Matching campaign names were combined into campaign-lifetime totals; historical Weeks and page edits were retained.');
+  }catch(error){
+    console.warn(error);
+    const debug=await loadSyncDebug();
+    const message=syncErrorMessage(debug);
+    setSaveStatus(auto?(state.weeks?.length?'Keeping current live data':'No remote data loaded'):'Sync failed');
+    if(!auto)alert(message);
+  }
+};
+
+/** Newest-first historical Week list; All Weeks represents campaign totals. */
+const _campaignCentricOriginalRefreshFilters=refreshFilters;
+refreshFilters=function campaignCentricRefreshFilters(){
+  const previousWeek=getFilterVal('weekFilter');
+  const previousArtist=getFilterVal('artistFilter');
+  const previousPlatform=getFilterVal('platformFilter');
+  const previousType=getFilterVal('typeFilter');
+  const previousCampaign=getFilterVal('campaignFilter');
+
+  _campaignCentricOriginalRefreshFilters();
+
+  const weekSelect=document.getElementById('weekFilter');
+  if(weekSelect){
+    const historical=(state.weeks||[])
+      .map((week,index)=>({week,index}))
+      .sort((a,b)=>campaignCentricWeekTime(b.week)-campaignCentricWeekTime(a.week));
+    weekSelect.innerHTML='<option value="All">Campaign totals · All synced weeks</option>'+historical.map(({week,index})=>{
+      const legacy=campaignCentricIsLegacyWeek(week)?'Legacy · ':'';
+      return `<option value="${index}">${esc(`${legacy}${week.label} · ${week.period||''}`)}</option>`;
+    }).join('');
+    weekSelect.value=[...weekSelect.options].some(option=>option.value===previousWeek)?previousWeek:'All';
+  }
+
+  const rollups=campaignCentricAllCampaignRows();
+  const appendOptions=(id,values,preferred)=>{
+    const select=document.getElementById(id);if(!select)return;
+    const existing=new Set([...select.options].map(option=>option.value));
+    uniq(values.filter(Boolean)).forEach(value=>{
+      if(existing.has(value))return;
+      const option=document.createElement('option');
+      option.value=value;
+      option.textContent=value;
+      select.appendChild(option);
+      existing.add(value);
+    });
+    if(preferred&&existing.has(preferred))select.value=preferred;
+  };
+
+  appendOptions('artistFilter',rollups.flatMap(row=>row._artists||[row.artist]),previousArtist);
+  appendOptions('platformFilter',rollups.flatMap(row=>row._platforms||[row.platform]),previousPlatform);
+  appendOptions('typeFilter',rollups.flatMap(row=>row._types||[row.type]),previousType);
+  appendOptions('campaignFilter',rollups.map(row=>row.name),previousCampaign);
+};
+
+/** Weekly trend remains weekly; all other charts use campaign-lifetime rows. */
+renderCharts=function campaignCentricRenderCharts(rows){
+  ['trend','platform','clickConv','spendRevenue','rank'].forEach(destroy);
+
+  const weeklyRows=campaignCentricSelectedWeeklyRows();
+  const weekGroups=new Map();
+  weeklyRows.forEach(row=>{
+    const key=String(row.weekIndex);
+    if(!weekGroups.has(key))weekGroups.set(key,{label:row.week,index:Number(row.weekIndex),rows:[]});
+    weekGroups.get(key).rows.push(row);
+  });
+  const byWeek=[...weekGroups.values()]
+    .sort((a,b)=>campaignCentricWeekTime(state.weeks?.[a.index])-campaignCentricWeekTime(state.weeks?.[b.index]))
+    .map(group=>({label:group.label,...totalize(group.rows)}));
+
+  const trendCanvas=document.getElementById('trendChart');
+  if(trendCanvas){
+    charts.trend=new Chart(trendCanvas,{type:'line',data:{labels:byWeek.map(item=>item.label),datasets:[
+      {label:'Spend',data:byWeek.map(item=>item.spend),tension:.3},
+      {label:'Revenue',data:byWeek.map(item=>item.revenue),tension:.3},
+      {label:'Clicks (all)',data:byWeek.map(item=>item.clicks_all),tension:.3,yAxisID:'y1'},
+      {label:'Purchases',data:byWeek.map(item=>item.purchases),tension:.3,yAxisID:'y1'}
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{y:{beginAtZero:true},y1:{beginAtZero:true,position:'right',grid:{drawOnChartArea:false}}}}});
+  }
+
+  const platformGroups=Object.entries(groupBy(rows,'platform')).map(([label,groupRows])=>({label,value:sum(groupRows,'spend')}));
+  const platformCanvas=document.getElementById('platformChart');
+  if(platformCanvas){
+    charts.platform=new Chart(platformCanvas,{type:'doughnut',data:{labels:platformGroups.map(item=>item.label),datasets:[{data:platformGroups.map(item=>item.value)}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}});
+  }
+
+  const campaigns=[...(rows||[])].slice(0,12);
+  const clickCanvas=document.getElementById('clickConvChart');
+  if(clickCanvas){
+    charts.clickConv=new Chart(clickCanvas,{type:'bar',data:{labels:campaigns.map(row=>row.name),datasets:[
+      {label:'Clicks (all)',data:campaigns.map(row=>row.clicks_all||0)},
+      {label:'Purchases',data:campaigns.map(row=>row.purchases||0)}
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{y:{beginAtZero:true}}}});
+  }
+
+  const spendCanvas=document.getElementById('spendRevenueChart');
+  if(spendCanvas){
+    charts.spendRevenue=new Chart(spendCanvas,{type:'bar',data:{labels:campaigns.map(row=>row.name),datasets:[
+      {label:'Spend',data:campaigns.map(row=>row.spend||0)},
+      {label:'Revenue',data:campaigns.map(row=>row.revenue||0)}
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{y:{beginAtZero:true}}}});
+  }
+
+  const metric=getFilterVal('metricFilter')||'spend';
+  const ranked=[...(rows||[])]
+    .map(row=>({label:row.name,value:calcMetric(metric,row)}))
+    .sort((a,b)=>b.value-a.value)
+    .slice(0,8);
+  const rankHint=document.getElementById('rankHint');
+  if(rankHint)rankHint.textContent='Top campaigns by '+metricByKey(metric).label;
+  const rankCanvas=document.getElementById('rankChart');
+  if(rankCanvas){
+    charts.rank=new Chart(rankCanvas,{type:'bar',data:{labels:ranked.map(item=>item.label),datasets:[{label:metricByKey(metric).label,data:ranked.map(item=>item.value)}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true}}}});
+  }
+
+  renderCustomSections(rows);
 };
 
 

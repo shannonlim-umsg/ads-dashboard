@@ -22,6 +22,7 @@ const maxRetries = positiveInteger(process.env.META_MAX_RETRIES, 5);
 const retryBaseMs = positiveInteger(process.env.META_RETRY_BASE_MS, 1200);
 const requestDelayMs = nonNegativeInteger(process.env.META_REQUEST_DELAY_MS, 200);
 const requestTimeoutMs = positiveInteger(process.env.META_REQUEST_TIMEOUT_MS, 120000);
+const includeCurrentWeek = String(process.env.META_INCLUDE_CURRENT_WEEK || 'false').toLowerCase() === 'true';
 
 if (!token || !accountId) {
   throw new Error("Missing META_ACCESS_TOKEN or META_AD_ACCOUNT_ID GitHub secret.");
@@ -96,11 +97,14 @@ const initialBackfillComplete = previousSyncState.initialBackfillComplete === tr
 const lookbackWeeks = forcedBackfillWeeks || (initialBackfillComplete ? syncWeeks : initialBackfillWeeks);
 
 const today = startOfUtcDay(new Date());
-const archiveStart = addDays(startOfIsoWeek(today), -(lookbackWeeks - 1) * 7);
-const archiveEnd = today;
+/* Scheduled runs use the most recently completed Monday-Sunday week. This
+   avoids labelling campaigns Completed from an unfinished current week. A
+   manual run can opt into the current partial week. */
+const archiveEnd = includeCurrentWeek ? today : addDays(startOfIsoWeek(today), -1);
+const archiveStart = addDays(startOfIsoWeek(archiveEnd), -(lookbackWeeks - 1) * 7);
 const targetRanges = buildWeeklyRanges(archiveStart, archiveEnd);
 
-const recentStart = addDays(startOfIsoWeek(today), -(syncWeeks - 1) * 7);
+const recentStart = addDays(startOfIsoWeek(archiveEnd), -(syncWeeks - 1) * 7);
 const previouslyCompleted = new Set([
   ...(Array.isArray(previousSyncState.completedWeeks) ? previousSyncState.completedWeeks : []),
   ...(Array.isArray(previousSyncState.emptyWeeks) ? previousSyncState.emptyWeeks : [])
@@ -140,6 +144,7 @@ const debug = {
     retryBaseMs,
     requestDelayMs,
     requestTimeoutMs,
+    includeCurrentWeek,
     fieldModes: ["full", "core", "minimal"]
   },
   retries: [],
@@ -812,7 +817,8 @@ const syncState = {
   failedWeeks: [...failedWeekStarts].sort(),
   lastAttemptAt: new Date().toISOString(),
   lastSuccessfulWeekCount: successfulWeeks,
-  lastFailedWeekCount: failedWeeks
+  lastFailedWeekCount: failedWeeks,
+  latestCompletedWeekStart: [...completedWeeks, ...knownEmptyWeeks].filter(Boolean).sort().at(-1) || ''
 };
 
 const output = {
@@ -821,7 +827,10 @@ const output = {
   source: "Meta Marketing API",
   archiveVersion: 4,
   archiveGranularity: "weekly",
-  dedupePolicy: "campaign_name_latest_nonzero",
+  dedupePolicy: "campaign_name_lifetime_rollup",
+  campaignDisplayMode: "campaign_name_lifetime_rollup",
+  statusPolicy: "active_in_latest_completed_week_else_completed",
+  latestCompletedWeekStart: syncState.latestCompletedWeekStart,
   syncWeeks,
   initialBackfillWeeks,
   syncState,
