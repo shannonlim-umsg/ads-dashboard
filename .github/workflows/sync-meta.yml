@@ -1,4 +1,4 @@
-name: Sync Meta Ads Resilient Weekly Archive
+name: Sync Meta Ads Campaign-Centric Weekly Archive
 
 on:
   workflow_dispatch:
@@ -15,8 +15,13 @@ on:
         description: "Retries per Meta request (default 5)"
         required: false
         type: string
+      include_current_week:
+        description: "Include the unfinished current week (normally false)"
+        required: false
+        type: boolean
+        default: false
   schedule:
-    - cron: "0 1 * * *"
+    - cron: "0 3 * * 1"
 
 permissions:
   contents: write
@@ -49,13 +54,14 @@ jobs:
           META_RETRY_BASE_MS: ${{ secrets.META_RETRY_BASE_MS }}
           META_REQUEST_DELAY_MS: ${{ secrets.META_REQUEST_DELAY_MS }}
           META_REQUEST_TIMEOUT_MS: ${{ secrets.META_REQUEST_TIMEOUT_MS }}
+          META_INCLUDE_CURRENT_WEEK: ${{ github.event.inputs.include_current_week }}
         run: node scripts/sync-meta-ads.mjs
 
       - name: Commit archive and debug output
         if: always()
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Update resilient Meta Ads weekly archive"
+          commit_message: "Update campaign-centric Meta Ads weekly archive"
           file_pattern: dashboard-data.json sync-debug.json
 
       - name: Mark workflow incomplete when some weeks failed
