@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-03T06:26:44.219Z",
+  "generatedAt": "2026-08-10T04:40:13.498Z",
   "mode": "resilient_weekly_archive",
   "graphVersion": "v24.0",
   "accountIdPresent": true,
@@ -10,12 +10,16 @@
     "requestedWeeks": 6,
     "normalRefreshWeeks": 6,
     "initialBackfillWeeks": 52,
-    "since": "2026-06-22",
-    "until": "2026-08-02",
+    "since": "2026-06-29",
+    "until": "2026-08-09",
     "targetWeeks": 6,
     "weeksSelectedForThisRun": 6,
     "weeksSkippedAsPreviouslyCompleted": 0,
     "ranges": [
+      {
+        "since": "2026-08-03",
+        "until": "2026-08-09"
+      },
       {
         "since": "2026-07-27",
         "until": "2026-08-02"
@@ -35,10 +39,6 @@
       {
         "since": "2026-06-29",
         "until": "2026-07-05"
-      },
-      {
-        "since": "2026-06-22",
-        "until": "2026-06-28"
       }
     ]
   },
@@ -56,6 +56,13 @@
   },
   "retries": [],
   "weeks": [
+    {
+      "since": "2026-08-03",
+      "until": "2026-08-09",
+      "status": "error",
+      "removedZeroOnlyRows": 0,
+      "rows": 0
+    },
     {
       "since": "2026-07-27",
       "until": "2026-08-02",
@@ -90,13 +97,6 @@
       "status": "error",
       "removedZeroOnlyRows": 0,
       "rows": 0
-    },
-    {
-      "since": "2026-06-22",
-      "until": "2026-06-28",
-      "status": "error",
-      "removedZeroOnlyRows": 0,
-      "rows": 0
     }
   ],
   "meta": {
@@ -106,6 +106,45 @@
         "rows": 0,
         "weeks": [
           {
+            "since": "2026-08-03",
+            "until": "2026-08-09",
+            "status": "error",
+            "fieldMode": null,
+            "rows": 0,
+            "attempts": [
+              {
+                "fieldMode": "full",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:13 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AJUgWqmhrks3eqlz746Ae8y\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:13 PDT."
+                }
+              },
+              {
+                "fieldMode": "core",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:13 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AVA1a4qct-qbp2OYvpZFdIE\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:13 PDT."
+                }
+              },
+              {
+                "fieldMode": "minimal",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:14 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"ARAv0j2oNmT9M5FOm9nNqbT\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:14 PDT."
+                }
+              }
+            ]
+          },
+          {
             "since": "2026-07-27",
             "until": "2026-08-02",
             "status": "error",
@@ -114,32 +153,32 @@
             "attempts": [
               {
                 "fieldMode": "full",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:44 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AWKaGyUrRTDh58_zXhZrB4F\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:15 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AGFDFQ2z4Bxs647e10mhdO4\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:44 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:15 PDT."
                 }
               },
               {
                 "fieldMode": "core",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:44 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"APXRA4EqFQSWM59AFbpDnGs\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:15 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"At3s5f2J5z4llI6f7JlM_Ub\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:44 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:15 PDT."
                 }
               },
               {
                 "fieldMode": "minimal",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:44 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"A5bb9jEQMl__eoLADXlQlbm\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:15 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"ATQmEP7oxjOSFKh2d7uSFPp\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:44 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:15 PDT."
                 }
               }
             ]
@@ -153,32 +192,32 @@
             "attempts": [
               {
                 "fieldMode": "full",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:46 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AL2cobQzonyrjrhnCoQsnRn\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:16 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"A4BlbeXvgOsvWGEdMDL2rxc\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:46 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:16 PDT."
                 }
               },
               {
                 "fieldMode": "core",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:46 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"A6aI1zc38mTG8Qv2D9tUvBK\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:16 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"Adi0B7xLN4zzkni9xOvtCZ5\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:46 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:16 PDT."
                 }
               },
               {
                 "fieldMode": "minimal",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:46 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AW7b9xyZituNQT3VCOMIk7_\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:16 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"Ar9MPY_wsHF1ZoXjNdMaqa8\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:46 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:16 PDT."
                 }
               }
             ]
@@ -192,32 +231,32 @@
             "attempts": [
               {
                 "fieldMode": "full",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:47 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"A_1S0GQZtc3hgXBCAoZtizH\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:17 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AbU1YREdLFemHvttimTFJKV\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:47 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:17 PDT."
                 }
               },
               {
                 "fieldMode": "core",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:47 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AeOYsPz8f6-0GW10q8VreW_\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:17 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AWPj35J6L4Bil5cyV9FJwDq\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:47 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:17 PDT."
                 }
               },
               {
                 "fieldMode": "minimal",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:47 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"A6PFv2SwyJxLtmKWmHXJrnc\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:17 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AIT3Wad7qfu2s0NDKKwkbHI\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:47 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:17 PDT."
                 }
               }
             ]
@@ -231,32 +270,32 @@
             "attempts": [
               {
                 "fieldMode": "full",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:48 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"A6KfABI01JjZvna9Q3WNlnj\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:18 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AxD-KffsScfjR060m5Xd1ZT\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:48 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:18 PDT."
                 }
               },
               {
                 "fieldMode": "core",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:48 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"Av0ojySJg4FiFsw5Ypt8CMP\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:18 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AWeV35hrtZwU0cT4PeQIpZT\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:48 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:18 PDT."
                 }
               },
               {
                 "fieldMode": "minimal",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:48 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AHS_kGjOme023CqsGwVH36Y\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:18 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"Ahv8bE9edz903FkRaSBRWbn\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:48 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:18 PDT."
                 }
               }
             ]
@@ -270,71 +309,32 @@
             "attempts": [
               {
                 "fieldMode": "full",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:50 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AjMpCrhyE6litJTlBs9iCBz\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:19 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"Aja11By3tnNrHa8iPXAhDk7\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:50 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:19 PDT."
                 }
               },
               {
                 "fieldMode": "core",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:50 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AejfYYNE4-k1PnJpoSBsOY8\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:19 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AC8GsdRdm5hFhF6HxVDXh82\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:50 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:19 PDT."
                 }
               },
               {
                 "fieldMode": "minimal",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:50 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"A_UCB8IkDjJ4W2iGlkb1a96\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:19 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AqD4DgwniIXUNAEeBJWj_qA\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:50 PDT."
-                }
-              }
-            ]
-          },
-          {
-            "since": "2026-06-22",
-            "until": "2026-06-28",
-            "status": "error",
-            "fieldMode": null,
-            "rows": 0,
-            "attempts": [
-              {
-                "fieldMode": "full",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:51 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"An5p55bgeS326_k_uOPCiIH\"\n}",
-                "error": {
-                  "code": 190,
-                  "subcode": 463,
-                  "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:51 PDT."
-                }
-              },
-              {
-                "fieldMode": "core",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:51 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"A_DB6Lwt5K4tMJeMNr5uTse\"\n}",
-                "error": {
-                  "code": 190,
-                  "subcode": 463,
-                  "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:51 PDT."
-                }
-              },
-              {
-                "fieldMode": "minimal",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:51 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AZfzbjYecmltBzMJd9j7Zx-\"\n}",
-                "error": {
-                  "code": 190,
-                  "subcode": 463,
-                  "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:51 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:19 PDT."
                 }
               }
             ]
@@ -347,6 +347,45 @@
         "rows": 0,
         "weeks": [
           {
+            "since": "2026-08-03",
+            "until": "2026-08-09",
+            "status": "error",
+            "fieldMode": null,
+            "rows": 0,
+            "attempts": [
+              {
+                "fieldMode": "full",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:14 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AnwyRs3mQSuStdeBQckvRwS\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:14 PDT."
+                }
+              },
+              {
+                "fieldMode": "core",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:14 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AiO1NUc56NYDNki8qTB7jSu\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:14 PDT."
+                }
+              },
+              {
+                "fieldMode": "minimal",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:14 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AAlcl6IBET1sdY_lLLiUuCB\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:14 PDT."
+                }
+              }
+            ]
+          },
+          {
             "since": "2026-07-27",
             "until": "2026-08-02",
             "status": "error",
@@ -355,32 +394,32 @@
             "attempts": [
               {
                 "fieldMode": "full",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:45 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"ACpwX8epBz3Ohnpz4uTDHf2\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:15 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"A4rjgxRdBLSi_8htdrHr8tl\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:45 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:15 PDT."
                 }
               },
               {
                 "fieldMode": "core",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:45 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AZnvjqYm1pgFl9Hdnt-2pmz\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:15 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AdRjDZntQkjJ8GEaBp-s82R\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:45 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:15 PDT."
                 }
               },
               {
                 "fieldMode": "minimal",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:45 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AdUXTYnKA8suu53apwVMPOs\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:15 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"APu1vtRVHpSEBZj0mG0VRqI\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:45 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:15 PDT."
                 }
               }
             ]
@@ -394,32 +433,32 @@
             "attempts": [
               {
                 "fieldMode": "full",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:46 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AepgKKRm2hJmC8CI4fsyeF0\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:16 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AxevorwxRHeON_tEw34IcaJ\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:46 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:16 PDT."
                 }
               },
               {
                 "fieldMode": "core",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:46 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AIRRpwbwoolkQbo2VAgf6x0\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:16 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"A1hvZCvBV1pDXE-gZgkABiU\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:46 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:16 PDT."
                 }
               },
               {
                 "fieldMode": "minimal",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:46 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"A4EgGNv3fgoHedyKVkvwQZb\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:16 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AR9bCi3kGNMcaipIDyq7wJM\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:46 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:16 PDT."
                 }
               }
             ]
@@ -433,32 +472,32 @@
             "attempts": [
               {
                 "fieldMode": "full",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:47 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AcZYVicApwGwRay31gJdIt5\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:17 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AuTzeHWESMXiZWraTgvRSSk\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:47 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:17 PDT."
                 }
               },
               {
                 "fieldMode": "core",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:47 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AZJd9QOwWTICinMC5SajjrI\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:17 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AMU0B_i1OkxUHzZVp_1QIZO\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:47 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:17 PDT."
                 }
               },
               {
                 "fieldMode": "minimal",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:48 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"A8-uMCi8ISEXPc6uRfU9dDM\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:18 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AnGOcnLJyD_m0UF0a1snJj9\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:48 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:18 PDT."
                 }
               }
             ]
@@ -472,32 +511,32 @@
             "attempts": [
               {
                 "fieldMode": "full",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:49 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AKyxYi5-Pp48VwZkcFgbHpW\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:19 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AtLuFbKzTYZ0K-YrkElWORY\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:49 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:19 PDT."
                 }
               },
               {
                 "fieldMode": "core",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:49 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AlgWFMQ74Wsyj_i4aKrRsEt\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:19 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AI-0kcMwVRSkoUgrS4YBg2q\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:49 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:19 PDT."
                 }
               },
               {
                 "fieldMode": "minimal",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:49 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"ASHInR8Yiw26rWKhjSl_yIp\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:19 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AetXcZ2FbBNWoqPm2Wd8bro\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:49 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:19 PDT."
                 }
               }
             ]
@@ -511,71 +550,32 @@
             "attempts": [
               {
                 "fieldMode": "full",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:50 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"Anr5r3VGKGX9-U52RYduh8x\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:20 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AjfwpvKD6xjgPGMvV62P55S\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:50 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:20 PDT."
                 }
               },
               {
                 "fieldMode": "core",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:50 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"Ac6K3wOhDyHy5pkkUjVrY6N\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:20 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AaAleGZyNvBV_6yoHixsnI7\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:50 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:20 PDT."
                 }
               },
               {
                 "fieldMode": "minimal",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:50 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"ADwczq-Ojg-9eO9zsCyZZ9E\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:20 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AEL6b7xUJ2UcDTO6tDr8T8q\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:50 PDT."
-                }
-              }
-            ]
-          },
-          {
-            "since": "2026-06-22",
-            "until": "2026-06-28",
-            "status": "error",
-            "fieldMode": null,
-            "rows": 0,
-            "attempts": [
-              {
-                "fieldMode": "full",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:51 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AdNadAkSG8ZZ44Tr1Az7xLo\"\n}",
-                "error": {
-                  "code": 190,
-                  "subcode": 463,
-                  "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:51 PDT."
-                }
-              },
-              {
-                "fieldMode": "core",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:52 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"A3ThzKAjTYjl_HklQ6WoY_l\"\n}",
-                "error": {
-                  "code": 190,
-                  "subcode": 463,
-                  "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:52 PDT."
-                }
-              },
-              {
-                "fieldMode": "minimal",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:52 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AyUFiHmhxF1ppqHXOgAARuV\"\n}",
-                "error": {
-                  "code": 190,
-                  "subcode": 463,
-                  "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:52 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:20 PDT."
                 }
               }
             ]
@@ -588,6 +588,45 @@
         "rows": 0,
         "weeks": [
           {
+            "since": "2026-08-03",
+            "until": "2026-08-09",
+            "status": "error",
+            "fieldMode": null,
+            "rows": 0,
+            "attempts": [
+              {
+                "fieldMode": "full",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:14 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"A-edAy7nL8Ebw6FxcC1eU9t\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:14 PDT."
+                }
+              },
+              {
+                "fieldMode": "core",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:14 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"Aq04U2DxcpVNGi3GXZY-RFU\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:14 PDT."
+                }
+              },
+              {
+                "fieldMode": "minimal",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:14 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AoOGAe-bm3rI5oscncjVDcP\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 463,
+                  "isTransient": false,
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:14 PDT."
+                }
+              }
+            ]
+          },
+          {
             "since": "2026-07-27",
             "until": "2026-08-02",
             "status": "error",
@@ -596,32 +635,32 @@
             "attempts": [
               {
                 "fieldMode": "full",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:45 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AD_7gdvJYsYsl9nGNENXzSK\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:16 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AKXnpW4wmT5IC1fRml8Lcbu\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:45 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:16 PDT."
                 }
               },
               {
                 "fieldMode": "core",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:45 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AeG96YQB5ou5K9uRNMqe2up\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:16 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AM0wC458NAkTfOPPV6kn9UE\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:45 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:16 PDT."
                 }
               },
               {
                 "fieldMode": "minimal",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:45 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AWoVIKRmU3OanfyUv_ntYMj\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:16 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AJMU0QAoIAlI5bfR6IHhpUu\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:45 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:16 PDT."
                 }
               }
             ]
@@ -635,32 +674,32 @@
             "attempts": [
               {
                 "fieldMode": "full",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:47 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"Avk2_1TWqaBfS9h9zxC9DBt\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:17 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"ASC1ponFtTkTN4vdaf_hur9\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:47 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:17 PDT."
                 }
               },
               {
                 "fieldMode": "core",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:47 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"Am1laLNyErXn3g3Ox8V1OBi\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:17 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"A3R2IRhtk86_br2bwHy9k-D\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:47 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:17 PDT."
                 }
               },
               {
                 "fieldMode": "minimal",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:47 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AfUQYwSPwZGDla78ROgSWYO\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:17 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AHLcfYXYmDkApyeH8VJdWRw\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:47 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:17 PDT."
                 }
               }
             ]
@@ -674,32 +713,32 @@
             "attempts": [
               {
                 "fieldMode": "full",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:48 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AR6QUGNvp8xO5bWA_DV6Y5o\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:18 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"A2ANNIJJx-NSWK5Zy0kVoz0\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:48 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:18 PDT."
                 }
               },
               {
                 "fieldMode": "core",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:48 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"ASPGP5zwwT4b_nctfNjNbp8\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:18 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"A25T39AXkQwRS1RrcRTpdpP\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:48 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:18 PDT."
                 }
               },
               {
                 "fieldMode": "minimal",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:48 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AmBuYU0YHTSZwSF321BpUwB\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:18 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"A_GTY-4W3PWwrtT6-XlJj_g\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:48 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:18 PDT."
                 }
               }
             ]
@@ -713,32 +752,32 @@
             "attempts": [
               {
                 "fieldMode": "full",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:49 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AqLMDCzajnzk_ZPK5G6llUO\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:19 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"A7MM0qrO97X--px39BiJ-Yi\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:49 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:19 PDT."
                 }
               },
               {
                 "fieldMode": "core",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:49 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AQv4HmyRPKXk8xqRsKhleJX\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:19 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AD2WtxThPMTG6W18ILyUNn7\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:49 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:19 PDT."
                 }
               },
               {
                 "fieldMode": "minimal",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:49 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"ALT3gr7pB_v01kZpnt9OlmM\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:19 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AE2fAdwWSn1PUylxHDt6jhj\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:49 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:19 PDT."
                 }
               }
             ]
@@ -752,71 +791,32 @@
             "attempts": [
               {
                 "fieldMode": "full",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:51 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AN-6PREarGy-c1C0K937VUg\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:20 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"Apg7bEOm0wrwTGAT26S5qrk\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:51 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:20 PDT."
                 }
               },
               {
                 "fieldMode": "core",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:51 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AB8252c6uUghrLztOTZ__8l\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:20 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"A5ay3B2t9jwuWo-_CFtSyHz\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:51 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:20 PDT."
                 }
               },
               {
                 "fieldMode": "minimal",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:51 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"Az3xBEb5y5wwaJF7PeM6scU\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:20 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AvYWzVQcatr-RSJ7SCz-bnd\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 463,
                   "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:51 PDT."
-                }
-              }
-            ]
-          },
-          {
-            "since": "2026-06-22",
-            "until": "2026-06-28",
-            "status": "error",
-            "fieldMode": null,
-            "rows": 0,
-            "attempts": [
-              {
-                "fieldMode": "full",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:52 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AZPNDGN5u6_l8b0ykWX3DT7\"\n}",
-                "error": {
-                  "code": 190,
-                  "subcode": 463,
-                  "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:52 PDT."
-                }
-              },
-              {
-                "fieldMode": "core",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:52 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"AreHAj9BIhbFQ9whQNDN2fC\"\n}",
-                "error": {
-                  "code": 190,
-                  "subcode": 463,
-                  "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:52 PDT."
-                }
-              },
-              {
-                "fieldMode": "minimal",
-                "message": "{\n  \"message\": \"Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:52 PDT.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 463,\n  \"fbtrace_id\": \"A5z3c44O8a_na5j1F9aRivF\"\n}",
-                "error": {
-                  "code": 190,
-                  "subcode": 463,
-                  "isTransient": false,
-                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 02-Aug-26 23:26:52 PDT."
+                  "message": "Error validating access token: Session has expired on Sunday, 26-Jul-26 21:00:00 PDT. The current time is Sunday, 09-Aug-26 21:40:20 PDT."
                 }
               }
             ]
@@ -837,7 +837,7 @@
     "finalArchiveWeeks": 49,
     "zeroOnlyRowsRemovedFromIncoming": 0,
     "zeroOnlyRowsRemovedFromExisting": 0,
-    "initialBackfillCompleteAfterRun": true,
+    "initialBackfillCompleteAfterRun": false,
     "completedWeekStarts": 54,
     "partialDashboardDataUpdate": false,
     "skippedDashboardDataUpdate": true,
