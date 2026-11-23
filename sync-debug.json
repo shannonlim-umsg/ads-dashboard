@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-16T10:46:40.267Z",
+  "generatedAt": "2026-11-23T11:58:06.167Z",
   "mode": "resilient_weekly_archive",
   "graphVersion": "v24.0",
   "accountIdPresent": true,
@@ -10,12 +10,16 @@
     "requestedWeeks": 6,
     "normalRefreshWeeks": 6,
     "initialBackfillWeeks": 52,
-    "since": "2026-10-05",
-    "until": "2026-11-15",
+    "since": "2026-10-12",
+    "until": "2026-11-22",
     "targetWeeks": 6,
     "weeksSelectedForThisRun": 6,
     "weeksSkippedAsPreviouslyCompleted": 0,
     "ranges": [
+      {
+        "since": "2026-11-16",
+        "until": "2026-11-22"
+      },
       {
         "since": "2026-11-09",
         "until": "2026-11-15"
@@ -35,10 +39,6 @@
       {
         "since": "2026-10-12",
         "until": "2026-10-18"
-      },
-      {
-        "since": "2026-10-05",
-        "until": "2026-10-11"
       }
     ]
   },
@@ -56,6 +56,13 @@
   },
   "retries": [],
   "weeks": [
+    {
+      "since": "2026-11-16",
+      "until": "2026-11-22",
+      "status": "error",
+      "removedZeroOnlyRows": 0,
+      "rows": 0
+    },
     {
       "since": "2026-11-09",
       "until": "2026-11-15",
@@ -90,13 +97,6 @@
       "status": "error",
       "removedZeroOnlyRows": 0,
       "rows": 0
-    },
-    {
-      "since": "2026-10-05",
-      "until": "2026-10-11",
-      "status": "error",
-      "removedZeroOnlyRows": 0,
-      "rows": 0
     }
   ],
   "meta": {
@@ -106,15 +106,15 @@
         "rows": 0,
         "weeks": [
           {
-            "since": "2026-11-09",
-            "until": "2026-11-15",
+            "since": "2026-11-16",
+            "until": "2026-11-22",
             "status": "error",
             "fieldMode": null,
             "rows": 0,
             "attempts": [
               {
                 "fieldMode": "full",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AbRpRAkYoxGXbqsdfTgED0a\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AnuwszZbm7nMgEYmegP0W7Y\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -124,7 +124,7 @@
               },
               {
                 "fieldMode": "core",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AyM7FJJWWlPlNa2_p1aBrKo\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AC55R9t6qg9QD6lS_V5dkFa\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -134,7 +134,46 @@
               },
               {
                 "fieldMode": "minimal",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AQlwEwumo_lDevnoNLwGj02\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"A3wVXwfw0dgHwpxhlnCk7dc\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 467,
+                  "isTransient": false,
+                  "message": "Error validating access token: The session is invalid because the user logged out."
+                }
+              }
+            ]
+          },
+          {
+            "since": "2026-11-09",
+            "until": "2026-11-15",
+            "status": "error",
+            "fieldMode": null,
+            "rows": 0,
+            "attempts": [
+              {
+                "fieldMode": "full",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AY-godNGA4RgE99LlO1oKlG\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 467,
+                  "isTransient": false,
+                  "message": "Error validating access token: The session is invalid because the user logged out."
+                }
+              },
+              {
+                "fieldMode": "core",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AZd6LnWY66MLGttJFi899pQ\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 467,
+                  "isTransient": false,
+                  "message": "Error validating access token: The session is invalid because the user logged out."
+                }
+              },
+              {
+                "fieldMode": "minimal",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AHv4nf0FlohzdY0Hi_VKhkr\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -153,7 +192,7 @@
             "attempts": [
               {
                 "fieldMode": "full",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AaF5_bMKCN1qxhj3EDb2SYZ\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"Af9k6ju-FjWnRjrbHwKd5dt\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -163,7 +202,7 @@
               },
               {
                 "fieldMode": "core",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"ASid1QVFPey3-aFYpRhJgXy\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AmCMqXbf_3wl-1RRaKQGzBx\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -173,7 +212,7 @@
               },
               {
                 "fieldMode": "minimal",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AKyPZ053p2hC5nHlgRf1oXo\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"A2lHrxEXNWUILYTgSEhCfOO\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -192,7 +231,7 @@
             "attempts": [
               {
                 "fieldMode": "full",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AYmqDdX8hfxMZMFqtOht7Kc\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AkhY2Vc2lKCUZryLdN_eJ3t\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -202,7 +241,7 @@
               },
               {
                 "fieldMode": "core",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AZRHA4TBSQ3gC5nGp4ID6j-\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AwmfRfYszcVJK6JPyitQYyZ\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -212,7 +251,7 @@
               },
               {
                 "fieldMode": "minimal",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"A4sGmwQm2JnojoKVN2rjGoC\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AITxmsfadTndCgNeJgeBuF_\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -231,7 +270,7 @@
             "attempts": [
               {
                 "fieldMode": "full",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"ABplhxTKcF61obbrHQBGdoR\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AoeNCF_9vkNhTbDH7Pj_p8G\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -241,7 +280,7 @@
               },
               {
                 "fieldMode": "core",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"A_ADXN3EOqHQX-rCd0IQh5y\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AzNai1Gn5uMl4feVb_urTe2\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -251,7 +290,7 @@
               },
               {
                 "fieldMode": "minimal",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"A4FmACt95h9Ys8rP9yvGSxO\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AJ9enDSUjjWacHWpTZ_9iy0\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -270,7 +309,7 @@
             "attempts": [
               {
                 "fieldMode": "full",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"A1wpzTOwUZd9n4cLl_wNOkp\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"A7Rxfrg_C45yEUyQRpFubli\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -280,7 +319,7 @@
               },
               {
                 "fieldMode": "core",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"A-zBiQcHb20YmeZJLUwO3sx\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AChrvxaCyWQPbgmrW0EParh\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -290,46 +329,7 @@
               },
               {
                 "fieldMode": "minimal",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AKnscWAPdEpBk6revI4VESd\"\n}",
-                "error": {
-                  "code": 190,
-                  "subcode": 467,
-                  "isTransient": false,
-                  "message": "Error validating access token: The session is invalid because the user logged out."
-                }
-              }
-            ]
-          },
-          {
-            "since": "2026-10-05",
-            "until": "2026-10-11",
-            "status": "error",
-            "fieldMode": null,
-            "rows": 0,
-            "attempts": [
-              {
-                "fieldMode": "full",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AlY987vRuXzWgmHJMjdK6fP\"\n}",
-                "error": {
-                  "code": 190,
-                  "subcode": 467,
-                  "isTransient": false,
-                  "message": "Error validating access token: The session is invalid because the user logged out."
-                }
-              },
-              {
-                "fieldMode": "core",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"A_QiP5mmssjN6tG7gtlk5f8\"\n}",
-                "error": {
-                  "code": 190,
-                  "subcode": 467,
-                  "isTransient": false,
-                  "message": "Error validating access token: The session is invalid because the user logged out."
-                }
-              },
-              {
-                "fieldMode": "minimal",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"ArWjqSJfvGoZAvfojCFQkNZ\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"ARzSCEQC5aAHICZOwwz9jsW\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -347,15 +347,15 @@
         "rows": 0,
         "weeks": [
           {
-            "since": "2026-11-09",
-            "until": "2026-11-15",
+            "since": "2026-11-16",
+            "until": "2026-11-22",
             "status": "error",
             "fieldMode": null,
             "rows": 0,
             "attempts": [
               {
                 "fieldMode": "full",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"A1AeWBkC3MRICGfoQMQWqtr\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"A56eG_79xsDvu1SJg07PzPy\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -365,7 +365,7 @@
               },
               {
                 "fieldMode": "core",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AY4gY19y1otrMsYWSOy69Fr\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AvG63M7ugRsHD4hSsiRz0Af\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -375,7 +375,46 @@
               },
               {
                 "fieldMode": "minimal",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"Agcn3wqyMaha5fA73-YJJc7\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"ApmZ4DC1CNsVFD4ni0zw38B\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 467,
+                  "isTransient": false,
+                  "message": "Error validating access token: The session is invalid because the user logged out."
+                }
+              }
+            ]
+          },
+          {
+            "since": "2026-11-09",
+            "until": "2026-11-15",
+            "status": "error",
+            "fieldMode": null,
+            "rows": 0,
+            "attempts": [
+              {
+                "fieldMode": "full",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AtS6whvKEyDkUUGegPvAXB_\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 467,
+                  "isTransient": false,
+                  "message": "Error validating access token: The session is invalid because the user logged out."
+                }
+              },
+              {
+                "fieldMode": "core",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"A-9hL2HTk9HvnzBCPbJbaQC\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 467,
+                  "isTransient": false,
+                  "message": "Error validating access token: The session is invalid because the user logged out."
+                }
+              },
+              {
+                "fieldMode": "minimal",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"ACnQHqG0vwworUw2E2KphGa\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -394,7 +433,7 @@
             "attempts": [
               {
                 "fieldMode": "full",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"A0-_MlkqP8MgIgv-5pJiKuf\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AURPTlFkKj98xmxBbIPpDAu\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -404,7 +443,7 @@
               },
               {
                 "fieldMode": "core",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AUw9zhoSzJnOKydhJEDWvL7\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AM3RiqJIjC57g1WC27LDtRr\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -414,7 +453,7 @@
               },
               {
                 "fieldMode": "minimal",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AMvSCVBMuxbpRApan_x00_D\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"ALZeakoKWXPdv91nSboFXiu\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -433,7 +472,7 @@
             "attempts": [
               {
                 "fieldMode": "full",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"ACVGSyrKCMj09w6AqtLs03a\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"A-OKRCm4EvNY2Urwx7fRjsu\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -443,7 +482,7 @@
               },
               {
                 "fieldMode": "core",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AVbdy8Kq2kAUCyayxHnhffM\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AWK0upLL8JiBkWvgZUkmcO4\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -453,7 +492,7 @@
               },
               {
                 "fieldMode": "minimal",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AGuGyukKsUEtVGJB83rIth-\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AUGTdYOcbmdsA-rPsce8P_K\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -472,7 +511,7 @@
             "attempts": [
               {
                 "fieldMode": "full",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"ANGv85kXoOuVqPEJDrAOYa6\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AfkQPRD2ZTjXM-S2O5lQG4U\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -482,7 +521,7 @@
               },
               {
                 "fieldMode": "core",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AsVIzaQzb0L2hbz4EQlql0r\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"ApWyjewHqKD5-gR9fXgMWQT\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -492,7 +531,7 @@
               },
               {
                 "fieldMode": "minimal",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"Alu-ygmcEFlQsM4MyGDjHrv\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AD7w9IimELinCNyzUHzBYZD\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -511,7 +550,7 @@
             "attempts": [
               {
                 "fieldMode": "full",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"Ao-ssrm87xJXHpzS0L4ykw7\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AIXm5jDHpbYPRLzfGZRagFR\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -521,7 +560,7 @@
               },
               {
                 "fieldMode": "core",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"ASaibiwxXF5equISneqHvZt\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"Acg4gTieVULy20rJnbeq3Ch\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -531,46 +570,7 @@
               },
               {
                 "fieldMode": "minimal",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AIaP1Pwvo5VmX3odcLFZPv3\"\n}",
-                "error": {
-                  "code": 190,
-                  "subcode": 467,
-                  "isTransient": false,
-                  "message": "Error validating access token: The session is invalid because the user logged out."
-                }
-              }
-            ]
-          },
-          {
-            "since": "2026-10-05",
-            "until": "2026-10-11",
-            "status": "error",
-            "fieldMode": null,
-            "rows": 0,
-            "attempts": [
-              {
-                "fieldMode": "full",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"ApKIjncWsvmFoYIZSyRqU21\"\n}",
-                "error": {
-                  "code": 190,
-                  "subcode": 467,
-                  "isTransient": false,
-                  "message": "Error validating access token: The session is invalid because the user logged out."
-                }
-              },
-              {
-                "fieldMode": "core",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AX-JdL9UQqll7Dxls5GYUMg\"\n}",
-                "error": {
-                  "code": 190,
-                  "subcode": 467,
-                  "isTransient": false,
-                  "message": "Error validating access token: The session is invalid because the user logged out."
-                }
-              },
-              {
-                "fieldMode": "minimal",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"A9CqSpyvsUDnf758BqivzDh\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AZN2jPQYP4P4PEtnzFmD71e\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -588,15 +588,15 @@
         "rows": 0,
         "weeks": [
           {
-            "since": "2026-11-09",
-            "until": "2026-11-15",
+            "since": "2026-11-16",
+            "until": "2026-11-22",
             "status": "error",
             "fieldMode": null,
             "rows": 0,
             "attempts": [
               {
                 "fieldMode": "full",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AEeSQDGOgxvzfLvYd_s-3X6\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AV0BJQNHgkrwrpuHJy7_mAc\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -606,7 +606,7 @@
               },
               {
                 "fieldMode": "core",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"ArA7iZNcngPHEfApEUVzHqn\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"A05xPfEi-e2O3QlU2OnWwDP\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -616,7 +616,46 @@
               },
               {
                 "fieldMode": "minimal",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"Ahj37k3gz0Vhs-TZXvYs1C0\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AU_IXCNMHH2a1Wsu_7kzIBL\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 467,
+                  "isTransient": false,
+                  "message": "Error validating access token: The session is invalid because the user logged out."
+                }
+              }
+            ]
+          },
+          {
+            "since": "2026-11-09",
+            "until": "2026-11-15",
+            "status": "error",
+            "fieldMode": null,
+            "rows": 0,
+            "attempts": [
+              {
+                "fieldMode": "full",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"Au9a6HHt3g3T2W2kpFn-YPE\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 467,
+                  "isTransient": false,
+                  "message": "Error validating access token: The session is invalid because the user logged out."
+                }
+              },
+              {
+                "fieldMode": "core",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AVwnCTR5srv0OggKg8m_ftk\"\n}",
+                "error": {
+                  "code": 190,
+                  "subcode": 467,
+                  "isTransient": false,
+                  "message": "Error validating access token: The session is invalid because the user logged out."
+                }
+              },
+              {
+                "fieldMode": "minimal",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"A9lTtQxlZiyF4Ug9R0Fn4XG\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -635,7 +674,7 @@
             "attempts": [
               {
                 "fieldMode": "full",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"ABsP-X7wXmYZyIKvmKRQjdR\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"Alnli672s_hvfr8luDTSIwH\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -645,7 +684,7 @@
               },
               {
                 "fieldMode": "core",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"ABnAMHKXAPKtu-CkzVHgNSV\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"A3ng_j9b1wsiELGUSeCFVqO\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -655,7 +694,7 @@
               },
               {
                 "fieldMode": "minimal",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AAYuDVHn30QjOOWYvjn-QeG\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"A55k5UDiXzhvcW4oQcK-4Pj\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -674,7 +713,7 @@
             "attempts": [
               {
                 "fieldMode": "full",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AW4ByXBtER6z76Ntj-Kg0St\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"A6DRIZIE73SHnLhMRm77JPE\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -684,7 +723,7 @@
               },
               {
                 "fieldMode": "core",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AnPy2vy4CqJ9q3YVIIWbdjq\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AdRJMv3Xw8qNh5y3i_2SNuM\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -694,7 +733,7 @@
               },
               {
                 "fieldMode": "minimal",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"ANSGbIQ4BQcYogd2lDM3Epb\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AsAQAl4zyfiKKC3ejP80wBt\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -713,7 +752,7 @@
             "attempts": [
               {
                 "fieldMode": "full",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AxZAh4Sg3UJNIKX5HL1cO_i\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AsvdKtbZ5IcRSDMVib3rD2T\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -723,7 +762,7 @@
               },
               {
                 "fieldMode": "core",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"A1eiI3wnXrmFLFsF8J_TXCm\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AMiYIjkVIsMZMLhyNvjFto8\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -733,7 +772,7 @@
               },
               {
                 "fieldMode": "minimal",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AW8KpuY8SnKYftpp8RLj_WW\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AkDJvirVFjR0MllOw7P0vqg\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -752,7 +791,7 @@
             "attempts": [
               {
                 "fieldMode": "full",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AOsn1_Ue3_8XElV777sjbYH\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AP7e9kRuTAVEGV7nFiAk_AQ\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -762,7 +801,7 @@
               },
               {
                 "fieldMode": "core",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AUKmkcWJsYg-1o0O0UUDXPG\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"ASIDU58aeS6-UKu7SIYQgsz\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
@@ -772,46 +811,7 @@
               },
               {
                 "fieldMode": "minimal",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"ARSVCDor2kKo6TM1wyRMhTg\"\n}",
-                "error": {
-                  "code": 190,
-                  "subcode": 467,
-                  "isTransient": false,
-                  "message": "Error validating access token: The session is invalid because the user logged out."
-                }
-              }
-            ]
-          },
-          {
-            "since": "2026-10-05",
-            "until": "2026-10-11",
-            "status": "error",
-            "fieldMode": null,
-            "rows": 0,
-            "attempts": [
-              {
-                "fieldMode": "full",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AAR9t8UvM0APHCmF63ECxGB\"\n}",
-                "error": {
-                  "code": 190,
-                  "subcode": 467,
-                  "isTransient": false,
-                  "message": "Error validating access token: The session is invalid because the user logged out."
-                }
-              },
-              {
-                "fieldMode": "core",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AwiGNI7QaA-9LKdxGfj98px\"\n}",
-                "error": {
-                  "code": 190,
-                  "subcode": 467,
-                  "isTransient": false,
-                  "message": "Error validating access token: The session is invalid because the user logged out."
-                }
-              },
-              {
-                "fieldMode": "minimal",
-                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"AVMRUC19HX05KgAbHheJvaK\"\n}",
+                "message": "{\n  \"message\": \"Error validating access token: The session is invalid because the user logged out.\",\n  \"type\": \"OAuthException\",\n  \"code\": 190,\n  \"error_subcode\": 467,\n  \"fbtrace_id\": \"Ag5_x9eW2UnADd2ruhmUWQ2\"\n}",
                 "error": {
                   "code": 190,
                   "subcode": 467,
